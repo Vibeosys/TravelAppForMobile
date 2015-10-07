@@ -61,11 +61,8 @@ ShowListAdaptor(Context context){
         View view=layoutInflater.inflate(R.layout.otherphotos,parent,false);
         ImageView photo=null;
         TextView user=null;
-
-
         photo=(ImageView)view.findViewById(R.id.otherphotoview);
         user=(TextView)view.findViewById(R.id.user_text);
-
         user.setText("Mahesh Giri");
         photo.setImageResource(mThumbIds[position]);
         return view;

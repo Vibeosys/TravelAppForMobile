@@ -74,12 +74,12 @@ int [] mThumbIds= new int[]{
 
            // imageView.getLayoutParams().height=30;
             //imageView.getLayoutParams().width=ViewGroup.LayoutParams.WRAP_CONTENT;
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300));
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             //imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             textView.setText("Created on 15-12-2015");
             textView.setPadding(30,30,30,30);
-            imageView.setPadding(8, 8, 8, 8);
+
             imageView.setImageResource(mThumbIds[position]);
         // imageView.requestLayout();
 
