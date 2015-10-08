@@ -1,4 +1,4 @@
-package com.example.mahesh.travelapp;
+package com.vibeosys.travelapp;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.mahesh.travelapp.R;
 
 /**
  * Created by mahesh on 10/6/2015.

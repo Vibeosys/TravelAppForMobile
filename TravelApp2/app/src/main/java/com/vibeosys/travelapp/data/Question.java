@@ -1,4 +1,4 @@
-package com.example.mahesh.travelapp.data;
+package com.vibeosys.travelapp.data;
 
 /**
  * Created by mahesh on 10/7/2015.
@@ -7,7 +7,18 @@ public class Question {
 
     private String[] mAnswers;
     private String mQuestion;
-    private int mType;
+    private String mType[];
+
+
+    public String[] getmType() {
+        return mType;
+    }
+
+    public void setmType(String[] mType) {
+        this.mType = mType;
+    }
+
+
 
     public Question() {
 

@@ -1,17 +1,19 @@
-package com.example.mahesh.travelapp;
+package com.vibeosys.travelapp;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.mahesh.travelapp.data.Question;
+import com.example.mahesh.travelapp.R;
+import com.vibeosys.travelapp.data.Question;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,33 +36,38 @@ public class QuestionsFromOthers extends AppCompatActivity {
 
         //questionslistView.setAdapter(new OthersQuestionsAdaptor(getApplicationContext()));
 
-        List<Question> questionsList = new ArrayList<Question>();
+        final List<Question> questionsList = new ArrayList<Question>();
 
         Question q1 = new Question();
         q1.setmQuestion("Hows your experience?");
-        q1.setmAnswers(new String[] {"fine", "good", "wrost", "nice", "glorius", "bad"});
+        q1.setmAnswers(new String[]{"fine", "good", "wrost", "nice", "glorius", "bad"});
+        q1.setmType(new String[]{"2", "3", "6", "2", "6", "2"});
 
         Question q2 = new Question();
         q2.setmQuestion("Do you like the Place?");
-        q2.setmAnswers(new String[]{"3", "2", "4"});
-
+        q2.setmAnswers(new String[]{"good", "bad", "na"});
+        q2.setmType(new String[]{"3", "4", "2"});
         Question q3 = new Question();
         q3.setmQuestion("Do you like the Place?");
-        q3.setmAnswers(new String[]{"3"});
-
+        q3.setmAnswers(new String[]{"Fine", "Great"});
+        q3.setmType(new String[]{"2", "3"});
         questionsList.add(q1);
         questionsList.add(q2);
         questionsList.add(q3);
         questionslistView.setAdapter(new OthersQuestionsAdaptor(this, questionsList));
+
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
+                Toast.makeText(getApplicationContext(), "Clicked On.." + questionsList.get(groupPosition).getmAnswers()[childPosition], Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
 
+
+
     }
+
 
     private class OthersQuestionsAdaptor implements ExpandableListAdapter {
 
@@ -108,27 +115,32 @@ public class QuestionsFromOthers extends AppCompatActivity {
         @Override
         public String getChild(int groupPosition, int childPosition) {
             return mList.get(groupPosition).getmAnswers()[childPosition];
+           // return null;
         }
 
         @Override
         public long getGroupId(int groupPosition) {
-            return 0;
+            return groupPosition;
         }
 
         @Override
         public long getChildId(int groupPosition, int childPosition) {
-            return 0;
+            return childPosition;
         }
 
         @Override
         public boolean hasStableIds() {
-            return false;
+            return true;
         }
 
         @Override
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
             TextView theView = new TextView(mContext);
+            questionslistView.expandGroup(groupPosition);
+            theView.setTextSize(20);
+            theView.setTypeface(Typeface.DEFAULT_BOLD);
             theView.setText(mList.get(groupPosition).getmQuestion());
+
             return theView;
         }
 
@@ -136,42 +148,22 @@ public class QuestionsFromOthers extends AppCompatActivity {
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
             View aView = getLayoutInflater().inflate(R.layout.answer, null);
-            CheckBox theText = (CheckBox) aView.findViewById(R.id.text);
-            theText.setText(getChild(groupPosition, childPosition));
+            TextView theText = (TextView) aView.findViewById(R.id.text);
+            TextView theCount=(TextView) aView.findViewById(R.id.count);
+            theText.setText(mList.get(groupPosition).getmAnswers()[childPosition]);
+            theCount.setText(mList.get(groupPosition).getmType()[childPosition]);
             return aView;
-            /*ViewHolder viewHolder = new ViewHolder();
-            LinearLayout parentlinearLayout = new LinearLayout(mContext);
-            parentlinearLayout.setOrientation(LinearLayout.VERTICAL);
-            LinearLayout child = null;
-            viewHolder.questions = new TextView(mContext);
-            viewHolder.counts = new TextView(mContext);
-            viewHolder.answers = new TextView(mContext);
-            viewHolder.questions.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            viewHolder.questions.setText(questions_text[childPosition]);
-            for (int i = 0; i < answers_text.length; i++) {
-                child = new LinearLayout(mContext);
-                child.setOrientation(LinearLayout.HORIZONTAL);
-                viewHolder.answers.append(answers_text[i] + "\n ");
-                viewHolder.counts.append(counts_text[i] + "\n ");
-            }
 
-            parentlinearLayout.addView(viewHolder.questions);
-            // linearLayout.addView(linearLayout);
-            child.addView(viewHolder.answers);
-            child.addView(viewHolder.counts);
-            parentlinearLayout.addView(child);
-            return parentlinearLayout;
-            */
         }
 
         @Override
         public boolean isChildSelectable(int groupPosition, int childPosition) {
-            return false;
+            return true;
         }
 
         @Override
         public boolean areAllItemsEnabled() {
-            return false;
+            return true;
         }
 
         @Override
@@ -200,9 +192,5 @@ public class QuestionsFromOthers extends AppCompatActivity {
         }
     }
 
-    static class ViewHolder {
-        TextView answers;
-        TextView questions;
-        TextView counts;
-    }
+
 }

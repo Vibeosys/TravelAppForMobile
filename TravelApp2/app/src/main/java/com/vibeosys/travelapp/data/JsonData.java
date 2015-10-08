@@ -1,4 +1,4 @@
-package com.example.mahesh.travelapp.data;
+package com.vibeosys.travelapp.data;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

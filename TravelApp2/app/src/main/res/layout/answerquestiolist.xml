@@ -3,9 +3,10 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
+    <ExpandableListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView"
+        android:layout_height="match_parent"
+        android:id="@+id/answerquestionlist"
+        android:dividerHeight="3dp"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

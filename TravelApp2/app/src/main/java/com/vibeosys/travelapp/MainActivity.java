@@ -1,4 +1,4 @@
-package com.example.mahesh.travelapp;
+package com.vibeosys.travelapp;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -27,8 +28,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mahesh.travelapp.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
@@ -128,7 +131,7 @@ public class MainActivity extends AppCompatActivity
             );
             //View v = getLayoutInflater().inflate(R.layout.info_window_layout, null);
             //   mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            /*
+
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
                 //  RelativeLayout relativeLayout;
@@ -165,9 +168,9 @@ public class MainActivity extends AppCompatActivity
                 }
 
             });
-            */
 
-            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+           /* mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
                     View theInfo = findViewById(R.id.info_window);
@@ -178,8 +181,8 @@ public class MainActivity extends AppCompatActivity
 
                     return false;
                 }
-            });
-            /*
+            });*/
+
             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
                 public void onInfoWindowClick(Marker mark) {
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 }
-            });*/
+            });
 
 
         } catch (Exception e) {
@@ -222,7 +225,7 @@ public class MainActivity extends AppCompatActivity
         // Set dialog title
         dialog.setTitle(title);
         Window window = dialog.getWindow();
-        window.setLayout(400, 400);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT );
         dialog.show();
         RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.item1);
         relativeLayout.setOnClickListener(new View.OnClickListener() {
@@ -247,7 +250,9 @@ public class MainActivity extends AppCompatActivity
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+Intent theIntent=new Intent(getApplicationContext(),AnswerQuestion.class);
+ startActivity(theIntent);
+                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
         });
         sendphoto_button.setOnClickListener(new View.OnClickListener() {

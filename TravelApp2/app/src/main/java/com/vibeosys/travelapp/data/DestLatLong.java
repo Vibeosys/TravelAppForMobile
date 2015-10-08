@@ -1,4 +1,4 @@
-package com.example.mahesh.travelapp;
+package com.vibeosys.travelapp.data;
 
 /**
  * Created by mahesh on 10/3/2015.
