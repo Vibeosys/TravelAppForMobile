@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,21 +30,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mahesh.travelapp.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
@@ -60,8 +61,9 @@ public class MainActivity extends AppCompatActivity
     private static final int CAMERA_CAPTURE_REQUEST_CODE = 100;
     private static final int MEDIA_IMAGE = 1;
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
-    String[] list_dest = {"Pune", "Hyderabad", "Mumbai", "Nashik"};
-
+    List<Destination> mDestList;
+    List<TempData> mTempData;
+    NewDataBase newDataBase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,16 +71,89 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list_dest);
+
+
+        mDestList=new ArrayList<Destination>();
+        Destination destination=new Destination();
+        destination.setmDestId(101);
+        destination.setmDestName("Pune");
+        destination.setmLat(18.5203);
+        destination.setmLong(73.8567);
+
+        Destination destination1=new Destination();
+        destination1.setmDestId(102);
+        destination1.setmDestName("Mumbai");
+        destination1.setmLat(18.9750);
+        destination1.setmLong(72.8258);
+
+        Destination destination2=new Destination();
+        destination2.setmDestId(103);
+        destination2.setmDestName("Hyderabad");
+        destination2.setmLat(17.3700);
+        destination2.setmLong(78.4800);
+
+        Destination destination3=new Destination();
+        destination3.setmDestId(104);
+        destination3.setmDestName("Chennai");
+        destination3.setmLat(13.0827);
+        destination3.setmLong(80.2707);
+
+        Destination destination4=new Destination();
+        destination4.setmDestId(105);
+        destination4.setmDestName("VijayWada");
+        destination4.setmLat(16.5083);
+        destination4.setmLong(80.6417);
+
+        Destination destination5=new Destination();
+        destination5.setmDestId(106);
+        destination5.setmDestName("Nanded");
+        destination5.setmLat(19.1500);
+        destination5.setmLong(77.3000);
+        mDestList.add(destination);
+        mDestList.add(destination1);
+        mDestList.add(destination2);
+        mDestList.add(destination3);
+        mDestList.add(destination4);
+        mDestList.add(destination5);
+
+        List<String> mDestinationNames=new ArrayList<String>();
+        UserDetails userDetails=new UserDetails();
+        newDataBase=new NewDataBase(getApplicationContext());
+       // newDataBase.AddUser(UserId,UserName);
+        newDataBase.GetUser();
+        mDestinationNames=newDataBase.getDestNames();
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDestinationNames);
         text_dest.setAdapter(arrayAdapter);
+
+        //    newDataBase.addDestinations(mDestList);
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //int id1=(Integer) parent.getSelectedItem();
-                String selection = (String) parent.getItemAtPosition(position);
-                int itemId = (int) parent.getId();
-                Log.d("ItemId", String.valueOf(itemId));
-                // Toast.makeText(getApplicationContext(), ,Toast.LENGTH_SHORT).show();
+                HashMap<String,Double> mGetLatLongfromTemp=new HashMap<String, Double>();
+                HashMap<String,Double> mDrawLineHashMap=new HashMap<String, Double>();
+                String mDestName = (String) parent.getItemAtPosition(position);
+                mTempData=new ArrayList<TempData>();
+                TempData mtempdataq=new TempData();
+                mTempData=newDataBase.GetLatLong(mDestName);
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong())).title(mDestName));
+                newDataBase.SaveMapInTemp(mTempData, mDestName);
+                mDrawLineHashMap.put("Lat", mTempData.get(0).getmLat());
+                mDrawLineHashMap.put("Long", mTempData.get(0).getmLong());
+                mGetLatLongfromTemp=newDataBase.mGetLatLongFromTemp();
+                Toast.makeText(getApplicationContext(),String.valueOf(mDrawLineHashMap.get("Lat")),Toast.LENGTH_SHORT).show();
+           Toast.makeText(getApplicationContext(),String.valueOf(mGetLatLongfromTemp.get("Lat")),Toast.LENGTH_SHORT).show();
+/*
+                if(mGetLatLongfromTemp.get("Lat")!=null) {
+
+                    mMap.addPolyline(new PolylineOptions().geodesic(true)
+                            .add(new LatLng(mDrawLineHashMap.get("Lat"), mDrawLineHashMap.get("Long")))
+                            .add(new LatLng(mGetLatLongfromTemp.get("Lat"), mGetLatLongfromTemp.get("Long"))).width(5).color(Color.RED)
+
+
+                    );
+                }
+*/
             }
         });
 
@@ -86,6 +161,8 @@ public class MainActivity extends AppCompatActivity
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
                 Snackbar.make(view, "Saved Map..", Snackbar.LENGTH_SHORT)
                         .setAction("Action", null).show();
             }
@@ -108,27 +185,18 @@ public class MainActivity extends AppCompatActivity
                         findFragmentById(R.id.map)).getMap();
             }
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            mMap.addCircle(new CircleOptions()
-                    .center(new LatLng(21.0000, 78.0000))
-                    .radius(100)
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.BLUE));
+
            /* CameraUpdate center=
                     CameraUpdateFactory.newLatLng(new LatLng(18.5203,
                             73.8567));
             CameraUpdate zoom=CameraUpdateFactory.zoomTo(20);
-
             mMap.moveCamera(center);
             mMap.animateCamera(zoom);*/
-            mMap.addMarker(new MarkerOptions().position(new LatLng(18.5203, 73.8567)).title("Pune"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(12.9667, 77.5667)).title("Banglore"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(13.0827, 80.2707)).title("Chennai"));
-            mMap.addPolyline(new PolylineOptions().geodesic(true)
-                    .add(new LatLng(18.5203, 73.8567))  // Pune
-                    .add(new LatLng(12.9667, 77.5667))  // Banglore
-                    .add(new LatLng(13.0827, 80.2707))  // Mumbai
+            CameraUpdate center= CameraUpdateFactory.newLatLng(new LatLng(18.5203,73.8567));
+            CameraUpdate zoom=CameraUpdateFactory.zoomTo(10);
+            mMap.animateCamera(zoom);
+            mMap.moveCamera(center);
 
-            );
             //View v = getLayoutInflater().inflate(R.layout.info_window_layout, null);
             //   mMap.getUiSettings().setMyLocationButtonEnabled(true);
 

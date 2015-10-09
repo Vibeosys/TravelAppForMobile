@@ -12,7 +12,6 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mahesh.travelapp.R;
 import com.vibeosys.travelapp.data.Question;
 
 import java.util.ArrayList;

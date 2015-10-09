@@ -27,11 +27,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:hint="Enter Destination" />
+            android:hint="Enter Destination"
+            android:inputType="textAutoComplete"/>
 
         <Button
             android:layout_width="30dp"
             android:layout_height="35dp"
+
             android:background="@drawable/searchicon" />
     </LinearLayout>
 

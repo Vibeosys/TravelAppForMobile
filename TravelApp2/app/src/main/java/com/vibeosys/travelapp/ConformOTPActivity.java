@@ -6,8 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.mahesh.travelapp.R;
-
 /**
  * Created by mahesh on 10/2/2015.
  */

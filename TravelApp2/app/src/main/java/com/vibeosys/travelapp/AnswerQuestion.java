@@ -14,8 +14,6 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mahesh.travelapp.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +39,21 @@ Context mContext;
         QuestionAnswers q3=new QuestionAnswers();
         q3.setQuestion("What do you Expect from this Place?");
         q3.setAnswers(new String[]{"na", "river", "coolwind"});
-       mList.add(q1);
+        mList.add(q1);
         mList.add(q2);
         mList.add(q3);
         anweerslist.setAdapter( new AnswerQuestionAdaptor(this,mList));
+        anweerslist.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+            RadioButton radioButton;
+                radioButton=(RadioButton)v.findViewById(R.id.answerqueestionoptiontext);
+                radioButton.setChecked(true);
+                //if(radioButton.isChecked()==true)radioButton.setChecked(false);
+
+                return false;
+            }
+        });
     }
     public class AnswerQuestionAdaptor implements ExpandableListAdapter {
         Context mContext;
@@ -127,7 +136,7 @@ Context mContext;
             RadioButton theClicked=(RadioButton)theChild.findViewById(R.id.answerqueestionoptiontext);
             TextView theAnsewers=(TextView)theChild.findViewById(R.id.answertext);
             theAnsewers.setText(mLists.get(groupPosition).getAnswers()[childPosition]);
-            theClicked.setOnCheckedChangeListener(new OnChangeClickLitener());
+            //theClicked.setOnCheckedChangeListener(new OnChangeClickLitener());
             return theChild;
         }
 

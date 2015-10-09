@@ -18,8 +18,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.mahesh.travelapp.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
