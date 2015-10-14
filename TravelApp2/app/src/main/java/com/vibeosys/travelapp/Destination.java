@@ -5,10 +5,10 @@ package com.vibeosys.travelapp;
  */
 public class Destination {
 
-    int mDestId;
-    String mDestName;
-    double mLat;
-    double mLong;
+    protected int mDestId;
+    protected String mDestName;
+    protected double mLat;
+    protected double mLong;
     Destination(int cDestId,String cDestName,double cLat,double cLong){
         mDestId=cDestId;
         mDestName=cDestName;

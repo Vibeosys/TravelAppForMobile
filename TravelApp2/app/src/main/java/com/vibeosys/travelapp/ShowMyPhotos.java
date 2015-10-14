@@ -1,4 +1,5 @@
 package com.vibeosys.travelapp;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,11 +15,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by mahesh on 10/3/2015.
  */
-public class ShowMyPhotos extends AppCompatActivity{
-ListView showphoto_view;
+public class ShowMyPhotos extends AppCompatActivity {
+    ListView showphoto_view;
+    List<MyImageDB> mUserImagesList = null;
+    NewDataBase newDataBase;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,10 +34,15 @@ ListView showphoto_view;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
 
-showphoto_view=(ListView)findViewById(R.id.grid_images);
+        showphoto_view = (ListView) findViewById(R.id.grid_images);
+        newDataBase = new NewDataBase(this);
+        mUserImagesList = newDataBase.mUserImagesList();
 
-showphoto_view.setAdapter(new ImageAdapter(this));
+        showphoto_view.setAdapter(new ImageAdapter(this, mUserImagesList));
+
+
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -46,21 +58,34 @@ showphoto_view.setAdapter(new ImageAdapter(this));
 
         return super.onOptionsItemSelected(item);
     }
-    }
-class ImageAdapter extends BaseAdapter{
+}
+
+class ImageAdapter extends BaseAdapter {
     private Context mContext;
-int [] mThumbIds= new int[]{
-        R.drawable.eiffeltower, R.drawable.dubaiimage, R.drawable.bridgeimage, R.drawable.beachimg, R.drawable.europeimg, R.drawable.ukimg
-};
+    private List<MyImageDB> myImageDBs;
+
+    ImageAdapter(Context context, List<MyImageDB> myimages) {
+        mContext = context;
+        myImageDBs = myimages;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+    }
 
     public int getCount() {
-        return mThumbIds.length;
+        if (myImageDBs != null) return myImageDBs.size();
+        else return 0;
     }
+
     public Object getItem(int position) {
-        return mThumbIds[position];
+        return myImageDBs.get(position).getmImageId();
     }
+
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
@@ -68,37 +93,36 @@ int [] mThumbIds= new int[]{
         View row = convertView;
         ViewHolder viewHolder = null;
         Bitmap bmp = null;
-        if(row==null) {
-            LayoutInflater theLayoutInflator = (LayoutInflater)mContext.getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);;
+        if (row == null) {
+            LayoutInflater theLayoutInflator = (LayoutInflater) mContext.getSystemService
+                    (Context.LAYOUT_INFLATER_SERVICE);
+            ;
             row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
             viewHolder = new ViewHolder();
             viewHolder.imageView = (ImageView) row.findViewById(R.id.viewImage);
+            viewHolder.textView = (TextView) row.findViewById(R.id.dateText);
             row.setTag(viewHolder);
 
-        }
-        else viewHolder = (ViewHolder) row.getTag();
+        } else viewHolder = (ViewHolder) row.getTag();
 
-         //   bmp = decodeURI();
+        bmp = decodeURI(myImageDBs.get(position).getmImagePath());
+        //BitmapFactory.decodeFile(mUrls[position].getPath());
 
-            //BitmapFactory.decodeFile(mUrls[position].getPath());
-            viewHolder.imageView.setImageBitmap(bmp);
+        viewHolder.textView.setText(myImageDBs.get(position).getmCreatedDate());
+        viewHolder.imageView.setImageBitmap(bmp);
 
         return row;
 
 
     }
 
-    public ImageAdapter(Context c) {
-        mContext = c;
-    }
-
 
     private static class ViewHolder {
-    ImageView imageView;
-    TextView textView;
+        ImageView imageView;
+        TextView textView;
     }
-    public Bitmap decodeURI(String filePath){
+
+    public Bitmap decodeURI(String filePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
@@ -106,14 +130,14 @@ int [] mThumbIds= new int[]{
         // Only scale if we need to
         // (16384 buffer for img processing)
         Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
-        if(options.outHeight * options.outWidth * 2 >= 16384){
+        if (options.outHeight * options.outWidth * 2 >= 16384) {
             // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
             double sampleSize = scaleByHeight
                     ? options.outHeight / 100
                     : options.outWidth / 100;
             options.inSampleSize =
-                    (int)Math.pow(2d, Math.floor(
-                            Math.log(sampleSize)/Math.log(2d)));
+                    (int) Math.pow(2d, Math.floor(
+                            Math.log(sampleSize) / Math.log(2d)));
         }
 
         // Do the actual decoding

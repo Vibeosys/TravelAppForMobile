@@ -33,8 +33,8 @@ import java.util.Locale;
  * Created by mahesh on 10/12/2015.
  */
 public class GridViewPhotos extends AppCompatActivity {
-GridView mGridViewPhotos;
-List<String> mImages;
+    GridView mGridViewPhotos;
+    List<String> mImages;
     private static final int IMAGE_CAPTURE_CODE = 100;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int MEDIA_IMAGE = 1;
@@ -53,12 +53,12 @@ List<String> mImages;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gridviewphotos);
         mGridViewPhotos=(GridView)findViewById(R.id.showgridphotos);
-        newDataBase=new NewDataBase(this);
-         cc = this.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                 null,
-                 null,
-                 null,
-                 null);
+
+        cc = this.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
 
         if(cc!=null) {
             if (cc.moveToFirst()) {
@@ -71,16 +71,16 @@ List<String> mImages;
                 new Thread() {
                     public void run() {
                         try {
-                    mUrls = new Uri[cc.getCount()];
-                    strUrls = new String[cc.getCount()];
-                    mNames = new String[cc.getCount()];
-                    for (int i = 0; i < cc.getCount(); i++) {
-                        cc.moveToPosition(i);
-                        mUrls[i] = Uri.parse(cc.getString(1));
-                        strUrls[i] = cc.getString(1);
-                        mNames[i] = cc.getString(3);
-                        //Log.e("mNames[i]",mNames[i]+":"+cc.getColumnCount()+ " : " +cc.getString(3));
-                    }
+                            mUrls = new Uri[cc.getCount()];
+                            strUrls = new String[cc.getCount()];
+                            mNames = new String[cc.getCount()];
+                            for (int i = 0; i < cc.getCount(); i++) {
+                                cc.moveToPosition(i);
+                                mUrls[i] = Uri.parse(cc.getString(1));
+                                strUrls[i] = cc.getString(1);
+                                mNames[i] = cc.getString(3);
+                                //Log.e("mNames[i]",mNames[i]+":"+cc.getColumnCount()+ " : " +cc.getString(3));
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -97,12 +97,7 @@ List<String> mImages;
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Bitmap bitmap;
                 if (position == 0) {
-                    Intent takephoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                  //  imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
-
-                    takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                    startActivityForResult(takephoto, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
-                    Toast.makeText(GridViewPhotos.this, "", Toast.LENGTH_SHORT).show();
+                    captureiMAGE();
                 } else {
                     Intent i = new Intent(getApplicationContext(), PreviewImage.class);
                     // passing array index
@@ -137,7 +132,7 @@ List<String> mImages;
         fileDIr = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), IMAGE_DIRECTORY_NAME);
         if (!fileDIr.exists()) {
             if (!fileDIr.mkdir()) {
-                Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed create "
+                Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed create"
                         + IMAGE_DIRECTORY_NAME + " directory");
                 return null;
             }
@@ -156,10 +151,12 @@ List<String> mImages;
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 String date = DateFormat.getDateTimeInstance().format(new Date());
-                String mImagePath=imageUri.getPath();
-                Toast.makeText(getApplicationContext(),
-                        "User image capture"+imageUri.getPath(), Toast.LENGTH_SHORT)
-                        .show();
+                newDataBase=new NewDataBase(getApplicationContext());
+                newDataBase.mSaveMyImages(imageUri.getPath(),date);
+                    Toast.makeText(getApplicationContext(),
+                            "User image capture"+imageUri.getPath(), Toast.LENGTH_SHORT)
+                            .show();
+
             } else if (resultCode == RESULT_CANCELED) {
                 // user cancelled Image capture
                 Toast.makeText(getApplicationContext(),
@@ -173,8 +170,6 @@ List<String> mImages;
             }
         }
     }
-
-
 
     public Bitmap decodeURI(String filePath){
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -214,7 +209,7 @@ List<String> mImages;
     }*/
 
     private class ShowImages extends BaseAdapter {
-      Context theContext;
+        Context theContext;
         public ShowImages(Context context) {
             theContext=context;
         }
@@ -238,34 +233,34 @@ List<String> mImages;
             View row = convertView;
             ViewHolder viewHolder = null;
             Bitmap bmp = null;
-if(row==null) {
-    LayoutInflater theLayoutInflator = getLayoutInflater();
-    row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
-    viewHolder = new ViewHolder();
-    viewHolder.image = (ImageView) row.findViewById(R.id.viewImage);
-    row.setTag(viewHolder);
+            if(row==null) {
+                LayoutInflater theLayoutInflator = getLayoutInflater();
+                row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
+                viewHolder = new ViewHolder();
+                viewHolder.image = (ImageView) row.findViewById(R.id.viewImage);
+                row.setTag(viewHolder);
 
-}
+            }
             else viewHolder = (ViewHolder) row.getTag();
 
 
             if(position==0){
-    viewHolder.image.setImageResource(R.drawable.camera);
-}
+                viewHolder.image.setImageResource(R.drawable.camera);
+            }
             else {
                 final ImageView theImage = viewHolder.image;
                 theImage.post(new Runnable() {
                     @Override
                     public void run() {
-                       Bitmap bmp = decodeURI(mUrls[position].getPath());
+                        Bitmap bmp = decodeURI(mUrls[position].getPath());
                         theImage.setImageBitmap(bmp);
                     }
                 });
 
 
-    //BitmapFactory.decodeFile(mUrls[position].getPath());
-   // viewHolder.image.setImageBitmap(bmp);
-}
+                //BitmapFactory.decodeFile(mUrls[position].getPath());
+                // viewHolder.image.setImageBitmap(bmp);
+            }
             return row;
         }
 

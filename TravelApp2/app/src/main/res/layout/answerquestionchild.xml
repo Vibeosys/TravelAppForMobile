@@ -5,14 +5,14 @@
     >
 <CheckBox
     style="@android:style/Widget.DeviceDefault.CompoundButton.RadioButton"
-    android:layout_width="wrap_content"
+    android:layout_width="57dp"
     android:layout_height="wrap_content"
     android:id="@+id/answerqueestionoptiontext"
-    android:focusable="false"
-    android:layout_weight="1"/>
+    android:focusable="false" />
 <TextView
-    android:layout_width="wrap_content"
+    android:layout_width="57dp"
     android:layout_height="wrap_content"
     android:id="@+id/answertext"
     android:layout_weight="1"/>
+
 </LinearLayout>

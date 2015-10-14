@@ -53,7 +53,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     private static final int MEDIA_IMAGE = 1;
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
     List<Destination> mDestList;
-    List<TempData> mTempData;
+
     List<GetTemp> mTempDataList;
     NewDataBase newDataBase;
     List<GetTemp> mTempDataShowList;
@@ -145,8 +144,8 @@ public class MainActivity extends AppCompatActivity
         else temp=false;*/
 //       Log.d("MainActivity",String.valueOf(mDestinationList.size()));
 
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDestinationNames);
-            text_dest.setAdapter(arrayAdapter);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDestinationNames);
+        text_dest.setAdapter(arrayAdapter);
           /*  mTempDataShowList = new ArrayList<>();
             try {
                 if (newDataBase.CheckTempData()) {
@@ -163,111 +162,112 @@ public class MainActivity extends AppCompatActivity
             }
           */
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //int id1=(Integer) parent.getSelectedItem();
-                    Log.d("Clicked", "Text Button");
-                    text_dest.setText("");
-                    text_dest.clearListSelection();
-                    text_dest.clearFocus();
-                    HashMap<String, Double> mGetLatLongfromTemp = new HashMap<String, Double>();
-                    String mDestName = null;
-                    mTempData = new ArrayList<>();
-                    mDestName = (String) parent.getItemAtPosition(position);
-                    mTempData = newDataBase.GetLatLong(mDestName);//Get Lat Long of DestName
-                    Log.d("MainActivitymTempData ", mTempData.toString());
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong())).title(mDestName));
-                    Log.d("MainActivity", String.valueOf(mTempData.get(0).getmLat()));
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //int id1=(Integer) parent.getSelectedItem();
+                Log.d("Clicked", "Text Button");
+                text_dest.setText("");
+                text_dest.clearListSelection();
+                text_dest.clearFocus();
+                DestinationTempData destinationTempData = null;
+                String mDestName = null;
+                List<TempData> mCurrentDestinationData = new ArrayList<>();
+                mDestName = (String) parent.getItemAtPosition(position);
+                mCurrentDestinationData = newDataBase.GetLatLong(mDestName);//Get Lat Long of DestName
+                Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
+                Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
 
 
-                    newDataBase.SaveMapInTemp(mTempData, mDestName);
+                newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
 
-                    mGetLatLongfromTemp = newDataBase.mGetLatLongFromTemp();//Get Last Known Lat Long from Temp
-                    Log.d("LATTTTTTTT", String.valueOf(mGetLatLongfromTemp.get("Lat")));
-                    CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong()));
-                    mMap.moveCamera(center);
-                    CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
-                    mMap.animateCamera(zoom);
-                    //Log.d("TempData",String.valueOf(mTempData.size()));
-                    if (mGetLatLongfromTemp.size() > 0) {
-                        mMap.addPolyline(new PolylineOptions().geodesic(true)
-                                        .add(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong()))
-                                        .add(new LatLng(mGetLatLongfromTemp.get("Lat"), mGetLatLongfromTemp.get("Long"))).width(5).color(Color.BLACK)
-                        );
-                    }
 
+                destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
+
+                CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
+                mMap.moveCamera(center);
+                CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
+                mMap.animateCamera(zoom);
+                //Log.d("TempData",String.valueOf(mTempData.size()));
+                if (destinationTempData != null) {
+
+                    mMap.addPolyline(new PolylineOptions().geodesic(true)
+                                    .add(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()))
+                                    .add(new LatLng(destinationTempData.getmLat(), destinationTempData.getmLong())).width(5).color(Color.BLACK)
+                    );
                 }
-            });
 
-            Button button = (Button) findViewById(R.id.fab);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(newDataBase.CheckTempData()) {
-                        final Dialog dialog;
-                        dialog = new Dialog(MainActivity.this);
-                        dialog.setContentView(R.layout.save_map_conform);
-                        dialog.setTitle("Save Map");
-                        Window window = dialog.getWindow();
-                        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                        dialog.show();
-                        Button mSaveMapButton = (Button) dialog.findViewById(R.id.SaveMapButton);
-                        Button mCancelMapButton = (Button) dialog.findViewById(R.id.CancelMapButton);
-                        final EditText mMapTitle = (EditText) dialog.findViewById(R.id.mapNameText);
-                        mSaveMapButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (mMapTitle.getText().toString().length() > 0 && mMapTitle.getText().toString() != null) {
-                                    String mMapName = mMapTitle.getText().toString();
-                                    mTempDataList = new ArrayList<>();
-                                    mTempDataList = newDataBase.GetFromTemp();
-                                    JSONArray jsonArray = new JSONArray();
-                                    ;
-                                    JSONObject jsonObject;
-                                    Log.d("mTempDataSize", String.valueOf(mTempDataList.size()));
-                                    for (int i = 0; i < mTempDataList.size(); i++) {
-                                        try {
-                                            jsonObject = new JSONObject();
-                                            jsonObject.put("Id", mTempDataList.get(i).getId());
-                                            jsonObject.put("DestName", mTempDataList.get(i).getDestName());
-                                            jsonObject.put("DestId", mTempDataList.get(i).getDestId());
-                                            jsonObject.put("Lat", mTempDataList.get(i).getLat());
-                                            jsonObject.put("Long", mTempDataList.get(i).getLong());
-                                            jsonArray.put(jsonObject);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    Log.d("MainActivity: JSONDATA", jsonArray.toString());
-                                    String date = DateFormat.getDateTimeInstance().format(new Date());
-                                    if (newDataBase.SaveinMapTable(mMapName, jsonArray.toString(), date)) {
-                                        newDataBase.DeleteTempMaps();
-                                        Log.d("DATABSE", "DELETED DATA FROm TEMPDATA TABLE");
-                                        Toast.makeText(getApplicationContext(), "Saved Map..", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-                                        dialog.dismiss();
-                                    } else {
-                                        Log.d("ERROR", "Error During Inserting in MyMap");
+        Button button = (Button) findViewById(R.id.fab);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (newDataBase.CheckTempData()) {
+                    final Dialog dialog;
+                    dialog = new Dialog(MainActivity.this);
+                    dialog.setContentView(R.layout.save_map_conform);
+                    dialog.setTitle("Save Map");
+                    Window window = dialog.getWindow();
+                    window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    dialog.show();
+                    Button mSaveMapButton = (Button) dialog.findViewById(R.id.SaveMapButton);
+                    Button mCancelMapButton = (Button) dialog.findViewById(R.id.CancelMapButton);
+                    final EditText mMapTitle = (EditText) dialog.findViewById(R.id.mapNameText);
+                    mSaveMapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (mMapTitle.getText().toString().length() > 0 && mMapTitle.getText().toString() != null) {
+                                String mMapName = mMapTitle.getText().toString();
+                                mTempDataList = new ArrayList<>();
+                                mTempDataList = newDataBase.GetFromTemp();
+                                JSONArray jsonArray = new JSONArray();
+                                ;
+                                JSONObject jsonObject;
+                                Log.d("mTempDataSize", String.valueOf(mTempDataList.size()));
+                                for (int i = 0; i < mTempDataList.size(); i++) {
+                                    try {
+                                        jsonObject = new JSONObject();
+                                        jsonObject.put("Id", mTempDataList.get(i).getId());
+                                        jsonObject.put("DestName", mTempDataList.get(i).getDestName());
+                                        jsonObject.put("DestId", mTempDataList.get(i).getDestId());
+                                        jsonObject.put("Lat", mTempDataList.get(i).getLat());
+                                        jsonObject.put("Long", mTempDataList.get(i).getLong());
+                                        jsonArray.put(jsonObject);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "Please Enter Valid Journey Name", Toast.LENGTH_SHORT).show();
                                 }
-                            }
-                        });
-                        mCancelMapButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
+                                Log.d("MainActivity: JSONDATA", jsonArray.toString());
+                                String date = DateFormat.getDateTimeInstance().format(new Date());
+                                if (newDataBase.SaveinMapTable(mMapName, jsonArray.toString(), date)) {
+                                    newDataBase.DeleteTempMaps();
+                                    Log.d("DATABSE", "DELETED DATA FROm TEMPDATA TABLE");
+                                    Toast.makeText(getApplicationContext(), "Saved Map..", Toast.LENGTH_SHORT).show();
 
+                                    dialog.dismiss();
+                                } else {
+                                    Log.d("ERROR", "Error During Inserting in MyMap");
+                                }
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Please Enter Valid Journey Name", Toast.LENGTH_SHORT).show();
                             }
-                        });
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(),"Please Enter Some Destination Names",Toast.LENGTH_SHORT).show();
-                    }
+                        }
+                    });
+                    mCancelMapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
 
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please Enter Some Destination Names", Toast.LENGTH_SHORT).show();
                 }
-            });
+
+            }
+        });
       /*  FloatingActionButton fab;
         fab = (FloatingActionButton) findViewById(R.id.fab);
 */
@@ -294,6 +294,7 @@ public class MainActivity extends AppCompatActivity
 
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
+
                 @Override
                 public View getInfoWindow(Marker mark) {
                     if (view == null) {
@@ -322,7 +323,6 @@ public class MainActivity extends AppCompatActivity
                 }
 
             });
-
 
 
             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), AnswerQuestion.class);
+                Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
                 startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -565,4 +565,11 @@ public class MainActivity extends AppCompatActivity
                 Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onDestroy() {
+
+        newDataBase = new NewDataBase(getApplicationContext());
+        newDataBase.DeleteTempMaps();
+        super.onDestroy();
+    }
 }

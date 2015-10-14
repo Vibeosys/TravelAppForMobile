@@ -34,6 +34,8 @@ public class App extends Application {
     private void copyDataBase()  {
 
         try {
+
+
             // Open your local db as the input stream
             InputStream myInput = getAssets().open(DB_NAME);
             // Path to the just created empty db

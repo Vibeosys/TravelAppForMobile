@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -134,6 +133,7 @@ public class NewDataBase extends SQLiteOpenHelper {
 
         // Inserting Row
         db.insert("Destination", null, values);
+
         //2nd argument is String containing nullColumnHack
         db.close(); // Closing database connection
     }
@@ -172,35 +172,50 @@ public class NewDataBase extends SQLiteOpenHelper {
 
     public List<String> getDestNames() {
         List<String> mListDestNames = new ArrayList<String>();
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        Cursor mgetDest = sqLiteDatabase.rawQuery("select * from Destination", null);
-        mgetDest.moveToFirst();
-        do {
-            mListDestNames.add(mgetDest.getString(mgetDest.getColumnIndex("DestName")));
-        } while (mgetDest.moveToNext());
+        try {
 
-        sqLiteDatabase.close();
+
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+            Cursor mgetDest = sqLiteDatabase.rawQuery("select * from Destination", null);
+            if (mgetDest != null) {
+                if (mgetDest.getCount() > 0) {
+                    mgetDest.moveToFirst();
+                    do {
+                        mListDestNames.add(mgetDest.getString(mgetDest.getColumnIndex("DestName")));
+                    } while (mgetDest.moveToNext());
+                }
+                mgetDest.close();
+                sqLiteDatabase.close();
+            }
+        } catch (CursorIndexOutOfBoundsException e) {
+            Log.e("getDestNames", e.toString());
+        }
         return mListDestNames;
     }
 
     public List<TempData> GetLatLong(String cDestName) {
         String mDestNameq = cDestName;
         List<TempData> mTempData = new ArrayList<TempData>();
-        SQLiteDatabase mGetLatLong = getReadableDatabase();
-        String mSql = "select DestId,DestName,Lat,Long from Destination where DestName=?";
-        Cursor mgetCursor = mGetLatLong.rawQuery(mSql, new String[]{mDestNameq});
+        try {
 
-        if (mgetCursor.moveToFirst()) {
-            TempData tempData = new TempData();
-            tempData.setmDestId(mgetCursor.getInt(mgetCursor.getColumnIndex("DestId")));
 
-            tempData.setmLat(mgetCursor.getDouble(mgetCursor.getColumnIndex("Lat")));
-            tempData.setmLong(mgetCursor.getDouble(mgetCursor.getColumnIndex("Long")));
-            mTempData.add(tempData);
+            SQLiteDatabase mGetLatLong = getReadableDatabase();
+            String mSql = "select DestId,Lat,Long from Destination where DestName=?";
+            Cursor mgetCursor = mGetLatLong.rawQuery(mSql, new String[]{mDestNameq});
 
+            if (mgetCursor.moveToFirst()) {
+                TempData tempData = new TempData();
+                tempData.setmDestId(mgetCursor.getInt(mgetCursor.getColumnIndex("DestId")));
+
+                tempData.setmLat(mgetCursor.getDouble(mgetCursor.getColumnIndex("Lat")));
+                tempData.setmLong(mgetCursor.getDouble(mgetCursor.getColumnIndex("Long")));
+                mTempData.add(tempData);
+
+            }
+            mGetLatLong.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+            Log.d("GetLatLong", e.getMessage());
         }
-        mGetLatLong.close();
-
         return mTempData;
     }
 
@@ -225,21 +240,42 @@ public class NewDataBase extends SQLiteOpenHelper {
         Log.d("TEMP TABLE", "SAVED IN TEMP TABLE");
         mSaveinTemp.close();
     }
+public List<MyImageDB> mUserImagesList() {
+        List<MyImageDB> theUserImagesList=new ArrayList<>();
 
-    public HashMap<String, Double> mGetLatLongFromTemp() {
-        HashMap<String, Double> theGetTempLatLong = new HashMap<>();
-        try {
-            SQLiteDatabase mGetLatLong = getReadableDatabase();
-            Cursor mcursor = mGetLatLong.rawQuery("select Lat,Long from TempData ORDER BY Id DESC", null);
+    SQLiteDatabase sqLiteDatabase=getReadableDatabase();
+    Cursor cursor=sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from My_Images",null);
+    if (cursor != null && cursor.moveToFirst()) {
+    do{
+        MyImageDB theMyImages =new MyImageDB(
+                cursor.getInt(cursor.getColumnIndex("ImageId")),
+               cursor.getString(cursor.getColumnIndex("ImagePath")),
+               cursor.getString(cursor.getColumnIndex("CreateDate"))
+                );
+        theUserImagesList.add(theMyImages);
+    }while (cursor.moveToNext());
+    }
+    cursor.close();
+    sqLiteDatabase.close();
+    return theUserImagesList;
+    }
+    public DestinationTempData mGetLatLongFromTemp(int theCurrentDestinationId) {
+        DestinationTempData destinationTempData = null;
+        SQLiteDatabase mGetLatLong = getReadableDatabase();
+        Cursor mcursor = mGetLatLong.rawQuery("select Id, DestId,DestName,Lat,Long from TempData Where DestId != ? ORDER BY Id DESC",
+                new String[]{String.valueOf(theCurrentDestinationId)});
+        if (mcursor != null && mcursor.moveToFirst()) {
+            destinationTempData = new DestinationTempData(mcursor.getInt(mcursor.getColumnIndex("Id")),
+                    mcursor.getInt(mcursor.getColumnIndex("DestId")),
+                    mcursor.getDouble(mcursor.getColumnIndex("Lat")),
+                    mcursor.getDouble(mcursor.getColumnIndex("Long")),
+                    mcursor.getString(mcursor.getColumnIndex("DestName"))
+            );
 
-            theGetTempLatLong.put("Lat", mcursor.getDouble(mcursor.getColumnIndex("Lat")));
-            Log.d("Temp Last Second Lat", String.valueOf(mcursor.getDouble(mcursor.getColumnIndex("Lat"))));
-            theGetTempLatLong.put("Long", mcursor.getDouble(mcursor.getColumnIndex("Long")));
-            mGetLatLong.close();
-        } catch (CursorIndexOutOfBoundsException e) {
-            e.printStackTrace();
         }
-        return theGetTempLatLong;
+        mcursor.close();
+        mGetLatLong.close();
+        return destinationTempData;
 
     }
 
@@ -268,13 +304,15 @@ public class NewDataBase extends SQLiteOpenHelper {
         }
     }
 
+
     boolean mSaveMyImages(String cImagePath, String cDate) {
         SQLiteDatabase thesqLiteDatabase = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("ImagePath", cImagePath);
-        contentValues.put("CreatedDate", cDate);
-        thesqLiteDatabase.insert("My_Images", null, contentValues);
-        return true;
+        contentValues.put("CreateDate", cDate);
+        long rows=thesqLiteDatabase.insert("My_Images", null, contentValues);
+         return true;
+
     }
 
     public void DeleteTempMaps() {
@@ -345,7 +383,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 mRoutes.setmRoutetripsNames(cursor.getString(cursor.getColumnIndex("RouteJson")));
                 mRoutes.setmRouteDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
                 mRouteLists.add(mRoutes);
-            }while (cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         sqLiteDatabase.close();

@@ -12,56 +12,62 @@ import android.widget.CompoundButton;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mahesh on 10/8/2015.
  */
 public class AnswerQuestion extends AppCompatActivity {
-ExpandableListView anweerslist;
-Context mContext;
+    ExpandableListView anweerslist;
+    Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       setContentView(R.layout.answerquestiolist);
-        anweerslist=(ExpandableListView)findViewById(R.id.answerquestionlist);
-        List<QuestionAnswers> mList=new ArrayList<QuestionAnswers>();
-        QuestionAnswers q1=new QuestionAnswers();
+        setContentView(R.layout.answerquestiolist);
+        anweerslist = (ExpandableListView) findViewById(R.id.answerquestionlist);
+        List<QuestionAnswers> mList = new ArrayList<QuestionAnswers>();
+        QuestionAnswers q1 = new QuestionAnswers();
         q1.setQuestion("How's Your experience?");
         q1.setAnswers(new String[]{"good", "bad", "very bad"});
-        QuestionAnswers q2=new QuestionAnswers();
+        QuestionAnswers q2 = new QuestionAnswers();
         q2.setQuestion("How's the Place?");
         q2.setAnswers(new String[]{"good", "bad"});
-        QuestionAnswers q3=new QuestionAnswers();
+        QuestionAnswers q3 = new QuestionAnswers();
         q3.setQuestion("What do you Expect from this Place?");
         q3.setAnswers(new String[]{"na", "river", "coolwind"});
         mList.add(q1);
         mList.add(q2);
         mList.add(q3);
-        anweerslist.setAdapter( new AnswerQuestionAdaptor(this,mList));
+        anweerslist.setAdapter(new AnswerQuestionAdaptor(this, mList));
+
         anweerslist.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-            CheckBox radioButton;
-                radioButton=(CheckBox)v.findViewById(R.id.answerqueestionoptiontext);
+                CheckBox radioButton;
+                radioButton = (CheckBox) v.findViewById(R.id.answerqueestionoptiontext);
                 radioButton.setChecked(true);
-                //if(radioButton.isChecked()==true)radioButton.setChecked(false);
+               // if(radioButton.isChecked()==true)radioButton.setChecked(false);
 
                 return false;
             }
         });
     }
-    public class AnswerQuestionAdaptor implements ExpandableListAdapter {
+
+    public class AnswerQuestionAdaptor implements ExpandableListAdapter, CompoundButton.OnCheckedChangeListener {
         Context mContext;
         List<QuestionAnswers> mLists;
-        HashMap<String,String> mAnswers;
+        HashMap<String, String> mAnswers;
+        HashMap<Integer, CheckBox> mChecked = new HashMap<>();
+        CheckBox checkBox;
+
         public AnswerQuestionAdaptor(AnswerQuestion answerQuestion, List<QuestionAnswers> mList) {
-            mContext=answerQuestion;
-            mLists=mList;
+            mContext = answerQuestion;
+            mLists = mList;
         }
 
         @Override
@@ -82,14 +88,14 @@ Context mContext;
 
         @Override
         public int getGroupCount() {
-            if(mLists!=null) return mLists.size();
-        return 0;
+            if (mLists != null) return mLists.size();
+            return 0;
         }
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            if(mLists!=null) return mLists.get(groupPosition).getAnswers().length;
-        return 0;
+            if (mLists != null) return mLists.get(groupPosition).getAnswers().length;
+            return 0;
         }
 
         @Override
@@ -113,8 +119,6 @@ Context mContext;
         }
 
 
-
-
         @Override
         public boolean hasStableIds() {
             return true;
@@ -132,10 +136,14 @@ Context mContext;
 
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            View theChild=getLayoutInflater().inflate(R.layout.answerquestionchild, null);
-            CheckBox theClicked=(CheckBox)theChild.findViewById(R.id.answerqueestionoptiontext);
-            TextView theAnsewers=(TextView)theChild.findViewById(R.id.answertext);
+            View theChild = getLayoutInflater().inflate(R.layout.answerquestionchild, null);
+            CheckBox theClicked = (CheckBox) theChild.findViewById(R.id.answerqueestionoptiontext);
+            theClicked.setOnCheckedChangeListener(this);
+             mChecked.put(childPosition,  theClicked);
+            theClicked.setTag(childPosition);
+            TextView theAnsewers = (TextView) theChild.findViewById(R.id.answertext);
             theAnsewers.setText(mLists.get(groupPosition).getAnswers()[childPosition]);
+
             //theClicked.setOnCheckedChangeListener(new OnChangeClickLitener());
             return theChild;
         }
@@ -171,12 +179,20 @@ Context mContext;
             return 0;
         }
 
-        private class OnChangeClickLitener implements CompoundButton.OnCheckedChangeListener {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            int position = (int) buttonView.getTag();
+            if (buttonView.isChecked() == true) {
+                for (Map.Entry<Integer,CheckBox> entry : mChecked.entrySet()) {
+                    int theId = entry.getKey();
+                    CheckBox theDestLatLong = (CheckBox) entry.getValue();
+                    theDestLatLong.setChecked(false);
 
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Toast.makeText(mContext, "Cliced" + isChecked, Toast.LENGTH_SHORT).show();
+                }
             }
+
+
         }
+
     }
 }
