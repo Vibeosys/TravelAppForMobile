@@ -1,15 +1,16 @@
 package com.vibeosys.travelapp;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,8 +42,14 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +71,13 @@ public class MainActivity extends AppCompatActivity
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
     List<Destination> mDestList;
     List<TempData> mTempData;
+    List<GetTemp> mTempDataList;
     NewDataBase newDataBase;
+    List<GetTemp> mTempDataShowList;
+    List<MyDestination> mDestinationList;
+    SharedPreferences sharedPref;
+    public static final String MyPREFERENCES = "MyPrefs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,39 +86,39 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
 
-
-        mDestList=new ArrayList<Destination>();
-        Destination destination=new Destination();
+        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        mDestList = new ArrayList<Destination>();
+        Destination destination = new Destination();
         destination.setmDestId(101);
         destination.setmDestName("Pune");
         destination.setmLat(18.5203);
         destination.setmLong(73.8567);
 
-        Destination destination1=new Destination();
+        Destination destination1 = new Destination();
         destination1.setmDestId(102);
         destination1.setmDestName("Mumbai");
         destination1.setmLat(18.9750);
         destination1.setmLong(72.8258);
 
-        Destination destination2=new Destination();
+        Destination destination2 = new Destination();
         destination2.setmDestId(103);
         destination2.setmDestName("Hyderabad");
         destination2.setmLat(17.3700);
         destination2.setmLong(78.4800);
 
-        Destination destination3=new Destination();
+        Destination destination3 = new Destination();
         destination3.setmDestId(104);
         destination3.setmDestName("Chennai");
         destination3.setmLat(13.0827);
         destination3.setmLong(80.2707);
 
-        Destination destination4=new Destination();
+        Destination destination4 = new Destination();
         destination4.setmDestId(105);
         destination4.setmDestName("VijayWada");
         destination4.setmLat(16.5083);
         destination4.setmLong(80.6417);
 
-        Destination destination5=new Destination();
+        Destination destination5 = new Destination();
         destination5.setmDestId(106);
         destination5.setmDestName("Nanded");
         destination5.setmLat(19.1500);
@@ -116,100 +130,172 @@ public class MainActivity extends AppCompatActivity
         mDestList.add(destination4);
         mDestList.add(destination5);
 
-        List<String> mDestinationNames=new ArrayList<String>();
-        UserDetails userDetails=new UserDetails();
-        newDataBase=new NewDataBase(getApplicationContext());
-       // newDataBase.AddUser(UserId,UserName);
-        newDataBase.GetUser();
-        mDestinationNames=newDataBase.getDestNames();
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDestinationNames);
-        text_dest.setAdapter(arrayAdapter);
+        List<String> mDestinationNames = new ArrayList<String>();
+        UserDetails userDetails = new UserDetails();
+        newDataBase = new NewDataBase(getApplicationContext());
+        // newDataBase.AddUser(UserId,UserName);
+//        newDataBase.GetUser();
 
-        //    newDataBase.addDestinations(mDestList);
-        text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //int id1=(Integer) parent.getSelectedItem();
-                HashMap<String,Double> mGetLatLongfromTemp=new HashMap<String, Double>();
-                HashMap<String,Double> mDrawLineHashMap=new HashMap<String, Double>();
-                String mDestName = (String) parent.getItemAtPosition(position);
-                mTempData=new ArrayList<TempData>();
-                TempData mtempdataq=new TempData();
-                mTempData=newDataBase.GetLatLong(mDestName);
-                mMap.addMarker(new MarkerOptions().position(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong())).title(mDestName));
-                newDataBase.SaveMapInTemp(mTempData, mDestName);
-                mDrawLineHashMap.put("Lat", mTempData.get(0).getmLat());
-                mDrawLineHashMap.put("Long", mTempData.get(0).getmLong());
-                mGetLatLongfromTemp=newDataBase.mGetLatLongFromTemp();
-                Toast.makeText(getApplicationContext(),String.valueOf(mDrawLineHashMap.get("Lat")),Toast.LENGTH_SHORT).show();
-           Toast.makeText(getApplicationContext(),String.valueOf(mGetLatLongfromTemp.get("Lat")),Toast.LENGTH_SHORT).show();
-/*
-                if(mGetLatLongfromTemp.get("Lat")!=null) {
+        newDataBase.addDestinations(mDestList);
+        mDestinationNames = newDataBase.getDestNames();
+        mDestinationList = new ArrayList<>();
+        mDestinationList = newDataBase.GetFromTempLatLong();
+      /* boolean temp=true;
+        if(temp) newDataBase.DeleteTempMaps();
+        else temp=false;*/
+//       Log.d("MainActivity",String.valueOf(mDestinationList.size()));
 
-                    mMap.addPolyline(new PolylineOptions().geodesic(true)
-                            .add(new LatLng(mDrawLineHashMap.get("Lat"), mDrawLineHashMap.get("Long")))
-                            .add(new LatLng(mGetLatLongfromTemp.get("Lat"), mGetLatLongfromTemp.get("Long"))).width(5).color(Color.RED)
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDestinationNames);
+            text_dest.setAdapter(arrayAdapter);
+          /*  mTempDataShowList = new ArrayList<>();
+            try {
+                if (newDataBase.CheckTempData()) {
+                    mTempDataShowList = newDataBase.GetFromTemp();//getting saved marker data from user
+                    for (int i = 0; i < mTempDataShowList.size(); i++) {
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(mTempDataShowList.get(i).getLat(), mTempDataShowList.get(i).getLong())).title(mTempDataShowList.get(i).getDestName()));
+                        //mMap.moveCamera(CameraUpdateFactory.newLatLng(theCurrentLatLong));
+                    }
 
-
-                    );
                 }
-*/
+
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
-        });
+          */
+        text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    //int id1=(Integer) parent.getSelectedItem();
+                    Log.d("Clicked", "Text Button");
+                    text_dest.setText("");
+                    text_dest.clearListSelection();
+                    text_dest.clearFocus();
+                    HashMap<String, Double> mGetLatLongfromTemp = new HashMap<String, Double>();
+                    String mDestName = null;
+                    mTempData = new ArrayList<>();
+                    mDestName = (String) parent.getItemAtPosition(position);
+                    mTempData = newDataBase.GetLatLong(mDestName);//Get Lat Long of DestName
+                    Log.d("MainActivitymTempData ", mTempData.toString());
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong())).title(mDestName));
+                    Log.d("MainActivity", String.valueOf(mTempData.get(0).getmLat()));
 
-        Button button = (Button) findViewById(R.id.fab);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
+                    newDataBase.SaveMapInTemp(mTempData, mDestName);
 
-                Snackbar.make(view, "Saved Map..", Snackbar.LENGTH_SHORT)
-                        .setAction("Action", null).show();
-            }
-        });
+                    mGetLatLongfromTemp = newDataBase.mGetLatLongFromTemp();//Get Last Known Lat Long from Temp
+                    Log.d("LATTTTTTTT", String.valueOf(mGetLatLongfromTemp.get("Lat")));
+                    CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong()));
+                    mMap.moveCamera(center);
+                    CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
+                    mMap.animateCamera(zoom);
+                    //Log.d("TempData",String.valueOf(mTempData.size()));
+                    if (mGetLatLongfromTemp.size() > 0) {
+                        mMap.addPolyline(new PolylineOptions().geodesic(true)
+                                        .add(new LatLng(mTempData.get(0).getmLat(), mTempData.get(0).getmLong()))
+                                        .add(new LatLng(mGetLatLongfromTemp.get("Lat"), mGetLatLongfromTemp.get("Long"))).width(5).color(Color.BLACK)
+                        );
+                    }
+
+                }
+            });
+
+            Button button = (Button) findViewById(R.id.fab);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(newDataBase.CheckTempData()) {
+                        final Dialog dialog;
+                        dialog = new Dialog(MainActivity.this);
+                        dialog.setContentView(R.layout.save_map_conform);
+                        dialog.setTitle("Save Map");
+                        Window window = dialog.getWindow();
+                        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        dialog.show();
+                        Button mSaveMapButton = (Button) dialog.findViewById(R.id.SaveMapButton);
+                        Button mCancelMapButton = (Button) dialog.findViewById(R.id.CancelMapButton);
+                        final EditText mMapTitle = (EditText) dialog.findViewById(R.id.mapNameText);
+                        mSaveMapButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (mMapTitle.getText().toString().length() > 0 && mMapTitle.getText().toString() != null) {
+                                    String mMapName = mMapTitle.getText().toString();
+                                    mTempDataList = new ArrayList<>();
+                                    mTempDataList = newDataBase.GetFromTemp();
+                                    JSONArray jsonArray = new JSONArray();
+                                    ;
+                                    JSONObject jsonObject;
+                                    Log.d("mTempDataSize", String.valueOf(mTempDataList.size()));
+                                    for (int i = 0; i < mTempDataList.size(); i++) {
+                                        try {
+                                            jsonObject = new JSONObject();
+                                            jsonObject.put("Id", mTempDataList.get(i).getId());
+                                            jsonObject.put("DestName", mTempDataList.get(i).getDestName());
+                                            jsonObject.put("DestId", mTempDataList.get(i).getDestId());
+                                            jsonObject.put("Lat", mTempDataList.get(i).getLat());
+                                            jsonObject.put("Long", mTempDataList.get(i).getLong());
+                                            jsonArray.put(jsonObject);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    Log.d("MainActivity: JSONDATA", jsonArray.toString());
+                                    String date = DateFormat.getDateTimeInstance().format(new Date());
+                                    if (newDataBase.SaveinMapTable(mMapName, jsonArray.toString(), date)) {
+                                        newDataBase.DeleteTempMaps();
+                                        Log.d("DATABSE", "DELETED DATA FROm TEMPDATA TABLE");
+                                        Toast.makeText(getApplicationContext(), "Saved Map..", Toast.LENGTH_SHORT).show();
+
+                                        dialog.dismiss();
+                                    } else {
+                                        Log.d("ERROR", "Error During Inserting in MyMap");
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Please Enter Valid Journey Name", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        mCancelMapButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+
+                            }
+                        });
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(),"Please Enter Some Destination Names",Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
       /*  FloatingActionButton fab;
         fab = (FloatingActionButton) findViewById(R.id.fab);
-
 */
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         try {
             if (mMap == null) {
                 mMap = ((MapFragment) getFragmentManager().
                         findFragmentById(R.id.map)).getMap();
             }
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.setDrawerListener(toggle);
+            toggle.syncState();
 
-           /* CameraUpdate center=
-                    CameraUpdateFactory.newLatLng(new LatLng(18.5203,
-                            73.8567));
-            CameraUpdate zoom=CameraUpdateFactory.zoomTo(20);
-            mMap.moveCamera(center);
-            mMap.animateCamera(zoom);*/
-            CameraUpdate center= CameraUpdateFactory.newLatLng(new LatLng(18.5203,73.8567));
-            CameraUpdate zoom=CameraUpdateFactory.zoomTo(10);
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView.setNavigationItemSelectedListener(this);
+
+            CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(21.0000, 78.0000));
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
             mMap.animateCamera(zoom);
             mMap.moveCamera(center);
 
-            //View v = getLayoutInflater().inflate(R.layout.info_window_layout, null);
-            //   mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
-                //  RelativeLayout relativeLayout;
-                //View v = getLayoutInflater().inflate(R.layout.info_window_layout, null);
-
                 @Override
                 public View getInfoWindow(Marker mark) {
-
-                    //* View view = getInfoWindow(marker);
-                    //view.setLayoutParams(new ViewGroup.LayoutParams().LayoutParams(200, 200));*//*
                     if (view == null) {
 
                         view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
@@ -238,18 +324,6 @@ public class MainActivity extends AppCompatActivity
             });
 
 
-           /* mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    View theInfo = findViewById(R.id.info_window);
-                    if (theInfo.getVisibility() == View.VISIBLE)
-                        theInfo.setVisibility(View.GONE);
-                    else
-                        theInfo.setVisibility(View.VISIBLE);
-
-                    return false;
-                }
-            });*/
 
             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
@@ -279,11 +353,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-   /* @Override
-    protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-    }*/
 
     void CustDialog(String title) {
         // Create custom dialog object
@@ -293,7 +362,7 @@ public class MainActivity extends AppCompatActivity
         // Set dialog title
         dialog.setTitle(title);
         Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT );
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.show();
         RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.item1);
         relativeLayout.setOnClickListener(new View.OnClickListener() {
@@ -318,20 +387,16 @@ public class MainActivity extends AppCompatActivity
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-Intent theIntent=new Intent(getApplicationContext(),AnswerQuestion.class);
- startActivity(theIntent);
+                Intent theIntent = new Intent(getApplicationContext(), AnswerQuestion.class);
+                startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
         });
         sendphoto_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent takephoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                imageURI = getOutputMedia(MEDIA_IMAGE);
-                takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageURI);
-                startActivityForResult(takephoto, CAMERA_CAPTURE_REQUEST_CODE);
-                Toast.makeText(getApplicationContext(), "Send Photo...", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, GridViewPhotos.class);
+                startActivity(intent);
 
 
             }
@@ -373,7 +438,7 @@ Intent theIntent=new Intent(getApplicationContext(),AnswerQuestion.class);
         // Set dialog title
         dialog.setTitle("Preview Image");
         Window window = dialog.getWindow();
-        window.setLayout(500, 500);
+        window.setLayout(600, 600);
         ImageView preview = (ImageView) dialog.findViewById(R.id.preview_image_dialog);
         preview.setImageBitmap(bitmap);
         dialog.show();
@@ -459,7 +524,8 @@ Intent theIntent=new Intent(getApplicationContext(),AnswerQuestion.class);
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            Toast.makeText(getApplicationContext(), "Created Map", Toast.LENGTH_SHORT).show();
+            mMap.clear();
+            newDataBase.DeleteTempMaps();
             return true;
         }
 
@@ -476,9 +542,11 @@ Intent theIntent=new Intent(getApplicationContext(),AnswerQuestion.class);
             Intent intent2 = new Intent(getApplicationContext(), ShowRouteList.class);
             startActivity(intent2);
 
+
         } else if (id == R.id.nav_gallery) {
             Intent intent2 = new Intent(getApplicationContext(), ShowMyPhotos.class);
             startActivity(intent2);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

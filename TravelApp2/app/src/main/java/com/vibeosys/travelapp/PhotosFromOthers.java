@@ -2,9 +2,11 @@ package com.vibeosys.travelapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -27,6 +29,17 @@ public class PhotosFromOthers extends AppCompatActivity {
 
 
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.home) {
+            NavUtils.navigateUpFromSameTask(PhotosFromOthers.this);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 }
 class ShowListAdaptor extends BaseAdapter{
@@ -36,7 +49,7 @@ ShowListAdaptor(Context context){
 }
 
     int [] mThumbIds= new int[]{
-            R.drawable.eiffeltower, R.drawable.dubaiimage, R.drawable.bridgeimage, R.drawable.beachimg, R.drawable.europeimg, R.drawable.ukimg
+             R.drawable.imageone, R.drawable.island, R.drawable.luxurytour, R.drawable.memorial, R.drawable.shutterstock,R.drawable.travelagents
     };
     @Override
     public int getCount() {
@@ -51,7 +64,7 @@ ShowListAdaptor(Context context){
 
     @Override
     public long getItemId(int position) {
-        Log.d("GetItemId Returned..",String.valueOf(position));
+        Log.d("GetItemId Returned..", String.valueOf(position));
         return position;
     }
 
@@ -63,7 +76,8 @@ ShowListAdaptor(Context context){
         TextView user=null;
         photo=(ImageView)view.findViewById(R.id.otherphotoview);
         user=(TextView)view.findViewById(R.id.user_text);
-        user.setText("Mahesh Giri");
+        user.setText("User");
+        user.setTextColor(103048);
         photo.setImageResource(mThumbIds[position]);
         return view;
     }

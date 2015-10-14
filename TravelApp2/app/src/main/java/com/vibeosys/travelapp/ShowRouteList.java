@@ -1,14 +1,12 @@
 package com.vibeosys.travelapp;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +16,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,9 @@ public class ShowRouteList extends AppCompatActivity {
     String [] to=new String[]{"Pune","Mumbai","Chennai","Banglore"};
     List<TextView> list=new ArrayList<TextView>(from.length);
     Context context;
-
+    NewDataBase newDataBase;
+    List<Routes> mRouteList;
+    int REQUESTCODE=100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,115 +44,93 @@ public class ShowRouteList extends AppCompatActivity {
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         listView=(ListView)findViewById(R.id.routelistview);
-        listView.setAdapter(new TravelCustomAdaptor(from, to));
-       context=getApplicationContext();
-       // HorizentalScrollView hp=new HorizentalScrollView(context);
+        context=getApplicationContext();
+        newDataBase=new NewDataBase(ShowRouteList.this);
+        mRouteList=newDataBase.getRouteList();
+        listView.setAdapter(new TravelCustomAdaptor(mRouteList));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-             //   Toast.makeText(getApplicationContext(), "My", Toast.LENGTH_SHORT).show();
+                Intent theRouteNameIntent = new Intent(ShowRouteList.this, ShowRoutesOnMap.class);
+                theRouteNameIntent.putExtra("theRouteName", mRouteList.get(position).getmRouteName());
+                startActivity(theRouteNameIntent);
             }
         });
     }
-class TravelCustomAdaptor extends BaseAdapter{
-String dest_from[];String dest_to[];
-    TravelCustomAdaptor(String t[],String[] v){
-        dest_from=t;
-        dest_to=v;
-    }
-    @Override
-    public int getCount() {
-        return dest_from.length;
-    }
 
-    @Override
-    public Object getItem(int position) {
-        return position;
-    }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    class TravelCustomAdaptor extends BaseAdapter {
+        List<Routes> theRouteList;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        LayoutInflater inflater = getLayoutInflater();
-        View row;
-       // LinearLayout linearLayout=new LinearLayout(context);
-        //linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-        row = inflater.inflate(R.layout.cust_routes, parent, false);
-        //LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        //layoutParams.weight=1;
-       // ImageView imageView=new ImageView(context);
-      //  imageView.setImageResource(R.drawable.arroyicon);
-        TextView title, detail;
-       // title=new TextView(context);
-     //   detail=new TextView(context);
-        //title.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        //title.setPadding(20, 20, 20, 20);
-        //title.setGravity(Gravity.CENTER_VERTICAL);
-        //title.setPadding(0, 0, 0, 30);
-        //title.setTypeface(null, Typeface.BOLD);
-        //title.setTextSize(17);
-        // detail.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,50));
-        //imageView.setLayoutParams(new ViewGroup.LayoutParams(25,25));
-
-         title = (TextView) row.findViewById(R.id.item_title);
-        detail = (TextView) row.findViewById(R.id.to_destination);
-        //i1=(ImageView)row.findViewById(R.id.img);
-
-       //   title.setText(dest_from[position]);
-       /* for(int i=0;i<=3;i++){
-            appendText(title, dest_from[i]);
-            if(i<3) appendDrawable(title,R.drawable.ic_trending_flat_black_24dp);
-
-        }
-       */   //  detail.setText(dest_to[position]);
-        for(int i=0;i<dest_to.length;i++){
-            detail.append(dest_to[i] + "\t");
-            if(i<dest_to.length-1) detail.append(Html.fromHtml("&#8594;")+" ");
-         //   detail.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arroyicon, 0, R.drawable.arroyicon, 0);
-        //    Log.d("TO", dest_to[i]);
+        TravelCustomAdaptor(List<Routes> cListRoutes) {
+            theRouteList = cListRoutes;
         }
 
-        //i1.setImageResource(imge[position]);
-      //  linearLayout.addView(title);
-//        linearLayout.addView(imageView);
-       // linearLayout.addView(detail);
-        return row;
-
-    }
-}
-
-    private void appendText(TextView textView1,String s){
-textView1.append(s);
-    }
-    private void appendDrawable(TextView title, int application) {
-        SpannableStringBuilder builder = new SpannableStringBuilder();
-        String THREE_SPACES = "   ";
-        builder.append(THREE_SPACES);
-        Drawable drawable = getResources().getDrawable(application);
-        assert drawable != null;
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        ImageSpan image = new ImageSpan(drawable);
-        builder.setSpan(image, 1, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        title.append(builder);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
+        @Override
+        public int getCount() {
+            return theRouteList.size();
         }
 
-        return super.onOptionsItemSelected(item);
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            LayoutInflater inflater = getLayoutInflater();
+            View row;
+            row = inflater.inflate(R.layout.cust_routes, parent, false);
+            TextView title, detail, textdatetext;
+
+            title = (TextView) row.findViewById(R.id.item_title);
+            detail = (TextView) row.findViewById(R.id.to_destination);
+            textdatetext = (TextView) row.findViewById(R.id.textdate);
+            title.setText(theRouteList.get(position).getmRouteName());
+            String date= theRouteList.get(position).getmRouteDate();
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat();
+
+            textdatetext.setText(date.substring(0,14));
+            List<String> theRouteNames = new ArrayList<>();
+            JSONArray theJsonArray;
+            JSONObject jsonObject;
+            try {
+                theJsonArray = new JSONArray(theRouteList.get(position).getmRoutetripsNames());
+                Log.d("SHOWROUTELIST :- JSON",theJsonArray.toString());
+                for (int i = 0; i < theJsonArray.length(); i++) {
+                    jsonObject = theJsonArray.getJSONObject(i);
+                    theRouteNames.add(jsonObject.getString("DestName"));
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < theRouteNames.size(); i++) {
+                detail.append(theRouteNames.get(i) + "\t");
+                if (i < theRouteNames.size() - 1) detail.append(Html.fromHtml("&#8594;"));
+
+
+            }
+
+            return row;
+        }
+
     }
-}
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+
+          if (id==R.id.home){
+                 NavUtils.getParentActivityIntent(this);
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+    }

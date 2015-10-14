@@ -21,7 +21,7 @@ Button login_button;
           UserDetails userDetails=new UserDetails();
                 userDetails.setUserId(101);
                 userDetails.setUsername("Mahesh");
-                Intent i= new Intent(getApplicationContext(),ConformOTPActivity.class);
+                Intent i= new Intent(getApplicationContext(),MainActivity.class);
                 startActivity(i);
             }
         });

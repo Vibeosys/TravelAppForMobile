@@ -23,9 +23,6 @@ import java.util.List;
 public class QuestionsFromOthers extends AppCompatActivity {
 
     ExpandableListView questionslistView;
-    String[] questions_text = {"Hows your experience?", "Do you like the Place?", "Hows your trip?"};
-    String[] answers_text = {"fine", "good", "wrost", "nice", "glorius", "bad"};
-    String[] counts_text = {"3", "2", "4", "3", "10", "10"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +36,8 @@ public class QuestionsFromOthers extends AppCompatActivity {
 
         Question q1 = new Question();
         q1.setmQuestion("Hows your experience?");
-        q1.setmAnswers(new String[]{"fine", "good", "wrost", "nice", "glorius", "bad"});
-        q1.setmType(new String[]{"2", "3", "6", "2", "6", "2"});
+        q1.setmAnswers(new String[]{"fine", "good", "wrost", "nice", "glorius"});
+        q1.setmType(new String[]{"2", "3", "6", "2", "6"});
 
         Question q2 = new Question();
         q2.setmQuestion("Do you like the Place?");
@@ -62,7 +59,6 @@ public class QuestionsFromOthers extends AppCompatActivity {
                 return false;
             }
         });
-
 
 
     }
@@ -91,8 +87,8 @@ public class QuestionsFromOthers extends AppCompatActivity {
 
         @Override
         public int getGroupCount() {
-            if(mList != null) {
-                return  mList.size();
+            if (mList != null) {
+                return mList.size();
             }
             return 0;
         }
@@ -100,8 +96,13 @@ public class QuestionsFromOthers extends AppCompatActivity {
         @Override
         public int getChildrenCount(int groupPosition) {
 
-            if(mList != null) {
-                return  mList.get(groupPosition).getmAnswers().length;
+            if (mList != null) {
+                int childCount = mList.get(groupPosition).getmAnswers().length;
+                if (childCount % 2 == 0) {
+                    return childCount / 2;
+                } else {
+                    return (childCount / 2) + 1;
+                }
             }
             return 0;
         }
@@ -114,7 +115,7 @@ public class QuestionsFromOthers extends AppCompatActivity {
         @Override
         public String getChild(int groupPosition, int childPosition) {
             return mList.get(groupPosition).getmAnswers()[childPosition];
-           // return null;
+            // return null;
         }
 
         @Override
@@ -146,11 +147,21 @@ public class QuestionsFromOthers extends AppCompatActivity {
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
+            childPosition = childPosition * 2;
             View aView = getLayoutInflater().inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
-            TextView theCount=(TextView) aView.findViewById(R.id.count);
+            TextView theCount = (TextView) aView.findViewById(R.id.count);
+
+            TextView theText2 = (TextView) aView.findViewById(R.id.textView);
+            TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
+
             theText.setText(mList.get(groupPosition).getmAnswers()[childPosition]);
             theCount.setText(mList.get(groupPosition).getmType()[childPosition]);
+
+            if(getChildrenCount(groupPosition) > childPosition) {
+                theText2.setText(mList.get(groupPosition).getmAnswers()[childPosition + 1]);
+                theCount2.setText(mList.get(groupPosition).getmType()[childPosition + 1]);
+            }
             return aView;
 
         }

@@ -1,13 +1,15 @@
 package com.vibeosys.travelapp;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -63,35 +65,63 @@ int [] mThumbIds= new int[]{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        FrameLayout frameLayout=new FrameLayout(mContext);
-        ViewGroup.LayoutParams layoutParams=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        TextView textView =null;
-        ImageView imageView=null;
-        //TextView textView;
+        View row = convertView;
+        ViewHolder viewHolder = null;
+        Bitmap bmp = null;
+        if(row==null) {
+            LayoutInflater theLayoutInflator = (LayoutInflater)mContext.getSystemService
+                    (Context.LAYOUT_INFLATER_SERVICE);;
+            row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
+            viewHolder = new ViewHolder();
+            viewHolder.imageView = (ImageView) row.findViewById(R.id.viewImage);
+            row.setTag(viewHolder);
 
-            imageView=new ImageView(mContext);
-            textView =new TextView(mContext);
+        }
+        else viewHolder = (ViewHolder) row.getTag();
 
-           // imageView.getLayoutParams().height=30;
-            //imageView.getLayoutParams().width=ViewGroup.LayoutParams.WRAP_CONTENT;
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            //imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            textView.setText("Created on 15-12-2015");
-            textView.setPadding(30,30,30,30);
+         //   bmp = decodeURI();
 
-            imageView.setImageResource(mThumbIds[position]);
-        // imageView.requestLayout();
+            //BitmapFactory.decodeFile(mUrls[position].getPath());
+            viewHolder.imageView.setImageBitmap(bmp);
+
+        return row;
 
 
-        frameLayout.addView(imageView);
-        frameLayout.addView(textView);
-        return frameLayout;
     }
 
     public ImageAdapter(Context c) {
         mContext = c;
     }
 
+
+    private static class ViewHolder {
+    ImageView imageView;
+    TextView textView;
+    }
+    public Bitmap decodeURI(String filePath){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filePath, options);
+
+        // Only scale if we need to
+        // (16384 buffer for img processing)
+        Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
+        if(options.outHeight * options.outWidth * 2 >= 16384){
+            // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
+            double sampleSize = scaleByHeight
+                    ? options.outHeight / 100
+                    : options.outWidth / 100;
+            options.inSampleSize =
+                    (int)Math.pow(2d, Math.floor(
+                            Math.log(sampleSize)/Math.log(2d)));
+        }
+
+        // Do the actual decoding
+        options.inJustDecodeBounds = false;
+        options.inTempStorage = new byte[512];
+        Bitmap output = BitmapFactory.decodeFile(filePath, options);
+
+        return output;
+    }
 
 }

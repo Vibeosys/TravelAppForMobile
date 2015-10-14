@@ -7,10 +7,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,8 +46,8 @@ Context mContext;
         anweerslist.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-            RadioButton radioButton;
-                radioButton=(RadioButton)v.findViewById(R.id.answerqueestionoptiontext);
+            CheckBox radioButton;
+                radioButton=(CheckBox)v.findViewById(R.id.answerqueestionoptiontext);
                 radioButton.setChecked(true);
                 //if(radioButton.isChecked()==true)radioButton.setChecked(false);
 
@@ -133,7 +133,7 @@ Context mContext;
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             View theChild=getLayoutInflater().inflate(R.layout.answerquestionchild, null);
-            RadioButton theClicked=(RadioButton)theChild.findViewById(R.id.answerqueestionoptiontext);
+            CheckBox theClicked=(CheckBox)theChild.findViewById(R.id.answerqueestionoptiontext);
             TextView theAnsewers=(TextView)theChild.findViewById(R.id.answertext);
             theAnsewers.setText(mLists.get(groupPosition).getAnswers()[childPosition]);
             //theClicked.setOnCheckedChangeListener(new OnChangeClickLitener());
