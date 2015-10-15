@@ -19,7 +19,7 @@ import java.net.URL;
  */
 public class MyApp extends Application {
 static final String URL="http://192.168.1.142:80/mysql2sqlite/createsqlite";
-    protected static String DB_NAME = "TravelAppDb";
+    protected static String DB_NAME = "TravelApp";
     static final String DB_PATH="/data/data/com.vibeosys.travelapp/databases/";
     @Override
     public void onCreate() {
