@@ -29,6 +29,7 @@ public class App extends Application {
         super.onCreate();
         mInstance = this;
         copyDataBase();
+
     }
 
     private void copyDataBase()  {
@@ -39,6 +40,7 @@ public class App extends Application {
             // Open your local db as the input stream
             InputStream myInput = getAssets().open(DB_NAME);
             // Path to the just created empty db
+
             File outFileName = getDatabasePath(DB_NAME);
             Log.d("TTTTGA", outFileName + " " + outFileName.list());
             if(!outFileName.exists()) {

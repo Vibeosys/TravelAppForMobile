@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity
         // newDataBase.AddUser(UserId,UserName);
 //        newDataBase.GetUser();
 
-        newDataBase.addDestinations(mDestList);
+ //       newDataBase.addDestinations(mDestList);
         mDestinationNames = newDataBase.getDestNames();
         mDestinationList = new ArrayList<>();
         mDestinationList = newDataBase.GetFromTempLatLong();
@@ -384,6 +384,14 @@ public class MainActivity extends AppCompatActivity
         });
         Button sendphoto_button = (Button) dialog.findViewById(R.id.button2);
         Button sendmsg_button = (Button) dialog.findViewById(R.id.button);
+        Button usercomments=(Button)dialog.findViewById(R.id.button3);
+        usercomments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
+                startActivity(theIntent);
+            }
+        });
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -397,8 +405,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GridViewPhotos.class);
                 startActivity(intent);
-
-
             }
         });
 
@@ -568,8 +574,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
 
-        newDataBase = new NewDataBase(getApplicationContext());
-        newDataBase.DeleteTempMaps();
+
         super.onDestroy();
     }
 }

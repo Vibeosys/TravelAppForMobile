@@ -16,7 +16,7 @@ import java.util.List;
  */
 
 public class NewDataBase extends SQLiteOpenHelper {
-    private static final String DB_NAME = "TravelAppDb";
+    private static final String DB_NAME = "TravelApp";
 
     private final Context mContext;
 
@@ -97,13 +97,14 @@ public class NewDataBase extends SQLiteOpenHelper {
                 "UserId    INT PRIMARY KEY NOT NULL," +
                 "UserName     TEXT NOT NULL" +
                 ")";
+
         String CREATE_MYUSER_TABLE = "CREATE TABLE myUser(" +
                 "UserId    INT PRIMARY KEY NOT NULL," +
                 "UserName     TEXT NOT NULL," +
                 "MobileNo     TEXT NOT NULL," +
                 "Active       BOOLEAN NOT NULL" +
                 ")";
-        db.execSQL(CREATE_ANSWERS_TABLE);
+        /*db.execSQL(CREATE_ANSWERS_TABLE);
         db.execSQL(CREATE_COMMENTSANDLIKES);
         db.execSQL(CREATE_CONFIG_TABLE);
         db.execSQL(CREATE_DESTINATION_TABLE);
@@ -115,7 +116,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         db.execSQL(CREATE_SYNC_TABLE);
         db.execSQL(CREATE_TEMPDATA_TABLE);
         db.execSQL(CREATE_USER_DATA);
-        db.execSQL(CREATE_MYUSER_TABLE);
+        db.execSQL(CREATE_MYUSER_TABLE);*/
 
         Log.d("CREATED", "SUCCESS");
     }
@@ -244,7 +245,7 @@ public List<MyImageDB> mUserImagesList() {
         List<MyImageDB> theUserImagesList=new ArrayList<>();
 
     SQLiteDatabase sqLiteDatabase=getReadableDatabase();
-    Cursor cursor=sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from My_Images",null);
+    Cursor cursor=sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from My_Images Order By CreateDate Desc",null);
     if (cursor != null && cursor.moveToFirst()) {
     do{
         MyImageDB theMyImages =new MyImageDB(

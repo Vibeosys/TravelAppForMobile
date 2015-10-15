@@ -1,5 +1,6 @@
 package com.vibeosys.travelapp;
 
+import android.app.Dialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,12 +9,19 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -30,20 +38,21 @@ import java.util.Map;
  * Created by mahesh on 10/12/2015.
  */
 public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallback {
-NewDataBase newDataBase;
+    NewDataBase newDataBase;
     List<Routes> mRouteList;
-HashMap<Integer,DestLatLong> mHashMapRoutes;
+    HashMap<Integer, DestLatLong> mHashMapRoutes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.showroutes);
-         newDataBase=new NewDataBase(ShowRoutesOnMap.this);
-        mRouteList=newDataBase.getRouteList();
-        Intent mIntent= getIntent();
-        String mRouteName=mIntent.getStringExtra("theRouteName");
-        mHashMapRoutes=new HashMap<>();
-        for(int i=0;i<mRouteList.size();i++){
-            if(mRouteName.equals(mRouteList.get(i).getmRouteName())){
+        newDataBase = new NewDataBase(ShowRoutesOnMap.this);
+        mRouteList = newDataBase.getRouteList();
+        Intent mIntent = getIntent();
+        String mRouteName = mIntent.getStringExtra("theRouteName");
+        mHashMapRoutes = new HashMap<>();
+        for (int i = 0; i < mRouteList.size(); i++) {
+            if (mRouteName.equals(mRouteList.get(i).getmRouteName())) {
                 JSONArray theJsonArray;
                 JSONObject jsonObject;
                 DestLatLong mDestLatLong;
@@ -52,17 +61,17 @@ HashMap<Integer,DestLatLong> mHashMapRoutes;
                     Log.d("SHOWROUTELIST :- JSON", theJsonArray.toString());
                     for (int j = 0; j < theJsonArray.length(); j++) {
                         jsonObject = theJsonArray.getJSONObject(j);
-                        mDestLatLong=new DestLatLong();
+                        mDestLatLong = new DestLatLong();
                         mDestLatLong.setLatitude(jsonObject.getDouble("Lat"));
                         mDestLatLong.setLongitude(jsonObject.getDouble("Long"));
                         mDestLatLong.setmDestName(jsonObject.getString("DestName"));
-                        int id=jsonObject.getInt("Id");
-                        mHashMapRoutes.put(id,mDestLatLong);
+                        int id = jsonObject.getInt("Id");
+                        mHashMapRoutes.put(id, mDestLatLong);
                     }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }catch (NullPointerException er){
+                } catch (NullPointerException er) {
                     er.printStackTrace();
                 }
             }
@@ -72,31 +81,91 @@ HashMap<Integer,DestLatLong> mHashMapRoutes;
         mapFragment.getMapAsync(this);
     }
 
+    void CustDialog(String title) {
+        // Create custom dialog object
+        final Dialog dialog = new Dialog(this);
+        // Include dialog.xml file
+        dialog.setContentView(R.layout.cust_dialog);
+        // Set dialog title
+        dialog.setTitle(title);
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
+        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.item1);
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentphoto = new Intent(getApplicationContext(), PhotosFromOthers.class);
+                startActivity(intentphoto);
+                Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.relativeLayout);
+        relativeLayout1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
+                startActivity(intentphoto);
+                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Button sendphoto_button = (Button) dialog.findViewById(R.id.button2);
+        Button sendmsg_button = (Button) dialog.findViewById(R.id.button);
+        sendmsg_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
+                startActivity(theIntent);
+                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        sendphoto_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShowRoutesOnMap.this, GridViewPhotos.class);
+                startActivity(intent);
+
+
+            }
+        });
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-       List<LatLong> theLatLongList=new ArrayList<>();
+        List<LatLong> theLatLongList = new ArrayList<>();
         LatLong theLatLong;
         LatLng theCurrentLatLong = null;
-        for(Map.Entry<Integer,DestLatLong> entry:mHashMapRoutes.entrySet()){
-     int theId=entry.getKey();
-            theLatLong=new LatLong();
-            DestLatLong theDestLatLong=entry.getValue();
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000),5));
+
+        for (Map.Entry<Integer, DestLatLong> entry : mHashMapRoutes.entrySet()) {
+            int theId = entry.getKey();
+            theLatLong = new LatLong();
+            DestLatLong theDestLatLong = entry.getValue();
             theLatLong.setmLat(theDestLatLong.getLatitude());
             theLatLong.setmLong(theDestLatLong.getLongitude());
-            theCurrentLatLong =new LatLng(theDestLatLong.getLatitude(),theDestLatLong.getLongitude());
-     theLatLongList.add(theLatLong);
-   googleMap.addMarker(new MarkerOptions().position(theCurrentLatLong).title(theDestLatLong.getmDestName()));
-     googleMap.moveCamera(CameraUpdateFactory.newLatLng(theCurrentLatLong));
+            theCurrentLatLong = new LatLng(theDestLatLong.getLatitude(), theDestLatLong.getLongitude());
+            theLatLongList.add(theLatLong);
+            googleMap.addMarker(new MarkerOptions().position(theCurrentLatLong).title(theDestLatLong.getmDestName()));
 
- }
-for(int i=0;i<theLatLongList.size()-1;i++){
-    googleMap.addPolyline(new PolylineOptions().geodesic(true)
-                    .add(new LatLng(theLatLongList.get(i).getmLat(),theLatLongList.get(i).getmLong()))
-                    .add(new LatLng(theLatLongList.get(i+1).getmLat(),theLatLongList.get(i+1).getmLong())).width(5).color(Color.BLACK)
-    );
-}
 
+        }
+        for (int i = 0; i < theLatLongList.size() - 1; i++) {
+            googleMap.addPolyline(new PolylineOptions().geodesic(true)
+                            .add(new LatLng(theLatLongList.get(i).getmLat(), theLatLongList.get(i).getmLong()))
+                            .add(new LatLng(theLatLongList.get(i + 1).getmLat(), theLatLongList.get(i + 1).getmLong())).width(5).color(Color.BLACK)
+            );
+
+
+        }
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+
+                CustDialog(marker.getTitle().toString());
+                return true;
+            }
+        });
     }
 
     @Override

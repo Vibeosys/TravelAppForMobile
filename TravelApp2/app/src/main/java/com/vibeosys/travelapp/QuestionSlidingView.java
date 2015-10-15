@@ -10,8 +10,11 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * Created by mahesh on 10/14/2015.
@@ -26,6 +29,11 @@ public class QuestionSlidingView extends FragmentActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.questionslidingview);
         mViewPager=(ViewPager)findViewById(R.id.pager);
+        // Make us non-modal, so that others can receive touch events.
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+
+        // ...but notify us that it happened.
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
@@ -41,14 +49,16 @@ public class QuestionSlidingView extends FragmentActivity{
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem()  +1);
+
             }
         });
         if((mViewPager.getCurrentItem() == mPagerAdapter.getCount() +1)){
             mNextButton.setText("Finish");
+            finish();
+            Toast.makeText(getApplicationContext(), "Clicked on finish", Toast.LENGTH_SHORT).show();
         }
-        else{
             mNextButton.setText("Next");
-        }
+
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -59,6 +69,18 @@ public class QuestionSlidingView extends FragmentActivity{
                 invalidateOptionsMenu();
             }
         });
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // If we've received a touch notification that the user has touched
+        // outside the app, finish the activity.
+        if (MotionEvent.ACTION_OUTSIDE == event.getAction()) {
+//            finish();
+            return true;
+        }
+
+        // Delegate everything else to Activity.
+        return super.onTouchEvent(event);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

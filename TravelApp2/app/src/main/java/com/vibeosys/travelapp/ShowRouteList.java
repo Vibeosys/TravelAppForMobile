@@ -115,7 +115,6 @@ public class ShowRouteList extends AppCompatActivity {
                 detail.append(theRouteNames.get(i) + "\t");
                 if (i < theRouteNames.size() - 1) detail.append(Html.fromHtml("&#8594;"));
 
-
             }
 
             return row;

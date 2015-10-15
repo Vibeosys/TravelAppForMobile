@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,13 +34,14 @@ public class ShowMyPhotos extends AppCompatActivity {
         getSupportActionBar().setTitle("My Photos");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
-
         showphoto_view = (ListView) findViewById(R.id.grid_images);
         newDataBase = new NewDataBase(this);
-        mUserImagesList = newDataBase.mUserImagesList();
-
-        showphoto_view.setAdapter(new ImageAdapter(this, mUserImagesList));
-
+        try {
+            mUserImagesList = newDataBase.mUserImagesList();
+            showphoto_view.setAdapter(new ImageAdapter(this, mUserImagesList));
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -107,10 +109,13 @@ class ImageAdapter extends BaseAdapter {
 
         bmp = decodeURI(myImageDBs.get(position).getmImagePath());
         //BitmapFactory.decodeFile(mUrls[position].getPath());
-
-        viewHolder.textView.setText(myImageDBs.get(position).getmCreatedDate());
+        String theDate=myImageDBs.get(position).getmCreatedDate();
+        String[] splited=theDate.split(",");
+        String[] dateYear=splited[1].split("\\s+");
+        Log.d("MyPhotos",dateYear[0]);
+        Log.d("MyPhotos", myImageDBs.get(position).getmCreatedDate());
+        viewHolder.textView.setText(splited[0]);
         viewHolder.imageView.setImageBitmap(bmp);
-
         return row;
 
 
