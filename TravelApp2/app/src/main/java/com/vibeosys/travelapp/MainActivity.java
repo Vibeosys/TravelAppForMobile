@@ -4,12 +4,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,7 +24,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,13 +44,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
@@ -69,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     private static final int MEDIA_IMAGE = 1;
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
     List<Destination> mDestList;
-
+    HashMap<String, Integer> mDestinationNames = new HashMap<>();
     List<GetTemp> mTempDataList;
     NewDataBase newDataBase;
     List<GetTemp> mTempDataShowList;
@@ -77,6 +72,24 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences sharedPref;
     public static final String MyPREFERENCES = "MyPrefs";
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        List<GetTemp> mList=new ArrayList<>();
+        mList=newDataBase.GetFromTemp();
+        if(!mList.isEmpty()){
+            for(int i=0;i<mList.size();i++){
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mList.get(i).getLat(),mList.get(i).getLong())).title(mList.get(i).getDestName()));
+                if(i>mList.size()-1){
+                    mMap.addPolyline(new PolylineOptions().geodesic(true)
+                            .add(new LatLng(mList.get(i).getLat(), mList.get(i).getLong()))
+                                    .add(new LatLng(mList.get(i + 1).getLat(), mList.get(i + 1).getLong())).width(5).color(Color.BLACK));
+
+                }
+            }
+        }
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,80 +100,32 @@ public class MainActivity extends AppCompatActivity
 
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         mDestList = new ArrayList<Destination>();
-        Destination destination = new Destination();
-        destination.setmDestId(101);
-        destination.setmDestName("Pune");
-        destination.setmLat(18.5203);
-        destination.setmLong(73.8567);
 
-        Destination destination1 = new Destination();
-        destination1.setmDestId(102);
-        destination1.setmDestName("Mumbai");
-        destination1.setmLat(18.9750);
-        destination1.setmLong(72.8258);
 
-        Destination destination2 = new Destination();
-        destination2.setmDestId(103);
-        destination2.setmDestName("Hyderabad");
-        destination2.setmLat(17.3700);
-        destination2.setmLong(78.4800);
-
-        Destination destination3 = new Destination();
-        destination3.setmDestId(104);
-        destination3.setmDestName("Chennai");
-        destination3.setmLat(13.0827);
-        destination3.setmLong(80.2707);
-
-        Destination destination4 = new Destination();
-        destination4.setmDestId(105);
-        destination4.setmDestName("VijayWada");
-        destination4.setmLat(16.5083);
-        destination4.setmLong(80.6417);
-
-        Destination destination5 = new Destination();
-        destination5.setmDestId(106);
-        destination5.setmDestName("Nanded");
-        destination5.setmLat(19.1500);
-        destination5.setmLong(77.3000);
-        mDestList.add(destination);
-        mDestList.add(destination1);
-        mDestList.add(destination2);
-        mDestList.add(destination3);
-        mDestList.add(destination4);
-        mDestList.add(destination5);
-
-        List<String> mDestinationNames = new ArrayList<String>();
         UserDetails userDetails = new UserDetails();
         newDataBase = new NewDataBase(getApplicationContext());
         // newDataBase.AddUser(UserId,UserName);
 //        newDataBase.GetUser();
 
- //       newDataBase.addDestinations(mDestList);
+        //       newDataBase.addDestinations(mDestList);
         mDestinationNames = newDataBase.getDestNames();
+
         mDestinationList = new ArrayList<>();
         mDestinationList = newDataBase.GetFromTempLatLong();
       /* boolean temp=true;
         if(temp) newDataBase.DeleteTempMaps();
         else temp=false;*/
 //       Log.d("MainActivity",String.valueOf(mDestinationList.size()));
+        List<String> mDestNames=new ArrayList<>();
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDestinationNames);
+        ArrayAdapter<String> arrayAdapter=null;
+        try {
+            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Collections.list(Collections.enumeration(mDestinationNames.keySet())));
+}catch (NullPointerException e){
+    e.printStackTrace();
+}
         text_dest.setAdapter(arrayAdapter);
-          /*  mTempDataShowList = new ArrayList<>();
-            try {
-                if (newDataBase.CheckTempData()) {
-                    mTempDataShowList = newDataBase.GetFromTemp();//getting saved marker data from user
-                    for (int i = 0; i < mTempDataShowList.size(); i++) {
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(mTempDataShowList.get(i).getLat(), mTempDataShowList.get(i).getLong())).title(mTempDataShowList.get(i).getDestName()));
-                        //mMap.moveCamera(CameraUpdateFactory.newLatLng(theCurrentLatLong));
-                    }
 
-                }
-
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-          */
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -173,7 +138,9 @@ public class MainActivity extends AppCompatActivity
                 String mDestName = null;
                 List<TempData> mCurrentDestinationData = new ArrayList<>();
                 mDestName = (String) parent.getItemAtPosition(position);
-                mCurrentDestinationData = newDataBase.GetLatLong(mDestName);//Get Lat Long of DestName
+                int mDestId = mDestinationNames.get(mDestName);//Get DestId of Selected Location
+                Log.d("MainActivity",String.valueOf(mDestId));
+                mCurrentDestinationData = newDataBase.GetLatLong(mDestId);//Get Lat Long of DestName
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
                 Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
@@ -290,8 +257,6 @@ public class MainActivity extends AppCompatActivity
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
             mMap.animateCamera(zoom);
             mMap.moveCamera(center);
-
-
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
 
@@ -328,23 +293,10 @@ public class MainActivity extends AppCompatActivity
             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
                 public void onInfoWindowClick(Marker mark) {
+                    int mDestId = mDestinationNames.get(mark.getTitle());
+                    Log.d("MainActivityMarker",""+mDestId);
+                    CustDialog(mark.getTitle(), mDestId);
 
-
-                    if (mark.getTitle().equals("Pune")) {
-                        CustDialog("Pune");
-                        Toast.makeText(MainActivity.this, mark.getTitle(), Toast.LENGTH_SHORT).show();// display toast
-
-                    }
-                    if (mark.getTitle().equals("Chennai")) {
-                        CustDialog("Chennai");
-                        Toast.makeText(MainActivity.this, mark.getTitle(), Toast.LENGTH_SHORT).show();// display toast
-
-                    }
-                    if (mark.getTitle().equals("Banglore")) {
-                        CustDialog("Banglore");
-                        Toast.makeText(MainActivity.this, mark.getTitle(), Toast.LENGTH_SHORT).show();// display toast
-
-                    }
                 }
             });
 
@@ -354,7 +306,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    void CustDialog(String title) {
+    void CustDialog(String title, final int cDestId) {
         // Create custom dialog object
         final Dialog dialog = new Dialog(this);
         // Include dialog.xml file
@@ -363,32 +315,42 @@ public class MainActivity extends AppCompatActivity
         dialog.setTitle(title);
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int count = newDataBase.ImageCount(cDestId);
+        int count1 = newDataBase.MsgCount(cDestId);
         dialog.show();
-        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.item1);
+        Log.d("INDialog",""+cDestId);
+        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
+        mCountPhotos.setText(String.valueOf(count));
+        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
+        mCountMsgs.setText(String.valueOf(count1));
+        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentphoto = new Intent(getApplicationContext(), PhotosFromOthers.class);
-                startActivity(intentphoto);
+                Intent intent = new Intent(getApplicationContext(), PhotosFromOthers.class);
+                intent.putExtra("DestId",cDestId);
+                startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }
         });
-        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.relativeLayout);
+        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.mymessages);
         relativeLayout1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
+                intentphoto.putExtra("DestId", cDestId);
                 startActivity(intentphoto);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
         });
-        Button sendphoto_button = (Button) dialog.findViewById(R.id.button2);
-        Button sendmsg_button = (Button) dialog.findViewById(R.id.button);
-        Button usercomments=(Button)dialog.findViewById(R.id.button3);
+        Button sendphoto_button = (Button) dialog.findViewById(R.id.senduserButton);
+        Button sendmsg_button = (Button) dialog.findViewById(R.id.sendbutton);
+        Button usercomments = (Button) dialog.findViewById(R.id.usercommentsButton);
         usercomments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
+                theIntent.putExtra("DestId", cDestId);
                 startActivity(theIntent);
             }
         });
@@ -396,6 +358,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
+                theIntent.putExtra("DestId", cDestId);
                 startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -404,76 +367,12 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GridViewPhotos.class);
+                intent.putExtra("DestId", cDestId);
                 startActivity(intent);
             }
         });
 
 
-    }
-
-    private Uri getOutputMedia(int mediaImage) {
-        return Uri.fromFile(getOutputFile(mediaImage));
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_CAPTURE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                previewImage();
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(getApplicationContext(), "Image Canceled By User.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Image Failed to Capture.", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    }
-
-    private void previewImage() {
-        final Dialog dialog = new Dialog(this);
-        // Include dialog.xml file
-        BitmapFactory.Options options = new BitmapFactory.Options();
-
-        // downsizing image as it throws OutOfMemory Exception for larger
-        // images
-        options.inSampleSize = 8;
-        final Bitmap bitmap = BitmapFactory.decodeFile(imageURI.getPath(),
-                options);
-        dialog.setContentView(R.layout.preview_image);
-        // Set dialog title
-        dialog.setTitle("Preview Image");
-        Window window = dialog.getWindow();
-        window.setLayout(600, 600);
-        ImageView preview = (ImageView) dialog.findViewById(R.id.preview_image_dialog);
-        preview.setImageBitmap(bitmap);
-        dialog.show();
-        Button sendphoto_button = (Button) dialog.findViewById(R.id.button3);
-        // Button sendmsg_button=(Button) dialog.findViewById(R.id.button);
-        sendphoto_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-    }
-
-    private File getOutputFile(int mediaImage) {
-        File fileDIr;
-        fileDIr = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), IMAGE_DIRECTORY_NAME);
-        if (!fileDIr.exists()) {
-            if (!fileDIr.mkdir()) {
-                Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed create "
-                        + IMAGE_DIRECTORY_NAME + " directory");
-                return null;
-            }
-        }
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        File mediaFile = null;
-        if (mediaImage == MEDIA_IMAGE)
-            mediaFile = new File(fileDIr.getAbsolutePath(), "IMG_" + timeStamp + ".jpg");
-
-        return mediaFile;
     }
 
 
@@ -571,10 +470,5 @@ public class MainActivity extends AppCompatActivity
                 Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    protected void onDestroy() {
 
-
-        super.onDestroy();
-    }
 }

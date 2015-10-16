@@ -201,8 +201,8 @@ public class GridViewPhotos extends AppCompatActivity {
      * function.
      */
    /* public static void getCameraImages(Context context) {
-        final String[] projection = { MediaStore.Images.Media.DATA };
-        final String selection = MediaStore.Images.Media.BUCKET_ID + " = ?";
+        final String[] projection = { MediaStore.usersImages.Media.DATA };
+        final String selection = MediaStore.usersImages.Media.BUCKET_ID + " = ?";
         final String[] selectionArgs = { CAMERA_IMAGE_BUCKET_ID };
 
         }

@@ -18,6 +18,9 @@ public class Destination {
 Destination(){
 
 }
+    Destination(int cDestId,String cDestName){
+
+    }
     public String getmDestName() {
         return mDestName;
     }

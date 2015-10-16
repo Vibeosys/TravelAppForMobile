@@ -19,7 +19,10 @@ import java.util.List;
 public class ScreenSlidePage extends Fragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
+    NewDataBase newDataBase=null;
+    List<SendQuestionAnswers> mListQuestionOptions=null;
     List<QuestionAnswers> mList = new ArrayList<QuestionAnswers>();
+    List<SendQuestionAnswers> mListAsksQuestions=null;
     public static ScreenSlidePage create(int pageNumber) {
         ScreenSlidePage fragment = new ScreenSlidePage();
         Bundle args = new Bundle();
@@ -32,6 +35,24 @@ public class ScreenSlidePage extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        newDataBase=new NewDataBase(getActivity());
+        mListQuestionOptions=new ArrayList<>();
+        mListQuestionOptions=newDataBase.mListAskQuestion();
+        mListAsksQuestions=new ArrayList<>();
+        for(int i=0;i<mListQuestionOptions.size();i++){
+            for (int j=i+1;j<mListQuestionOptions.size();j++){
+                if(mListQuestionOptions.get(i).getmQuestionId()==mListQuestionOptions.get(j).getmQuestionId()){
+                    SendQuestionAnswers questionAnswers=new SendQuestionAnswers();
+                    questionAnswers.setmOptionId(mListQuestionOptions.get(i).getmOptionId());
+                    questionAnswers.setmOptionId(mListQuestionOptions.get(j).getmOptionId());
+                    questionAnswers.setmOptionTextArr(new String[]{mListQuestionOptions.get(i).getmOptionText(), mListQuestionOptions.get(j).getmOptionText()});
+                    questionAnswers.setmQuestionText(mListQuestionOptions.get(i).getmQuestionText());
+                    questionAnswers.setmId(i);
+                    mListAsksQuestions.add(questionAnswers);
+                }
+            }
+        }
+
         QuestionAnswers q1 = new QuestionAnswers();
         q1.setQuestion("How's Your experience?");
         q1.setAnswers(new String[]{"good", "bad", "very bad"});
@@ -56,19 +77,21 @@ public class ScreenSlidePage extends Fragment {
 
         // Set the title view to show the page number.
         TextView textView=(TextView)rootView.findViewById(R.id.questionText);
-        textView.setText(mList.get(mPageNumber).getQuestion());
+        textView.setText(mListQuestionOptions.get(mPageNumber).getmQuestionText());
         RadioGroup radioGroup=(RadioGroup)rootView.findViewById(R.id.questionradiogroup);
         RadioButton theRadioButton;
-        int theRadioButtonlen=mList.get(mPageNumber).getAnswers().length;
+        int theRadioButtonlen=mListQuestionOptions.get(mPageNumber).getmOptionTextArr().length;
         for(int i=0;i<theRadioButtonlen;i++) {
             theRadioButton=new RadioButton(getActivity());
-            theRadioButton.setText(mList.get(i).getAnswers()[i]);
+            theRadioButton.setText(mListQuestionOptions.get(i).getmOptionTextArr()[i]);
             radioGroup.addView(theRadioButton);
+            radioGroup.setTag(mListQuestionOptions.get(i).getmOptionTextArr()[i]);
         }
      radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        Toast.makeText(getActivity(), "Clicked On", Toast.LENGTH_SHORT).show();
+        int id= (int) group.getTag();
+        Toast.makeText(getActivity(), "Clicked On"+id, Toast.LENGTH_SHORT).show();
     }
     });
         return rootView;

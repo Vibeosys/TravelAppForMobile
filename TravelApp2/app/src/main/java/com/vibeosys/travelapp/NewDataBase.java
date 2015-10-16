@@ -5,10 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -53,7 +55,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 "   Lat              DOUBLE    NOT NULL," +
                 "   Long             DOUBLE    NOT NULL" +
                 " )";
-        String CREATE_IMAGES_TABLE = "CREATE TABLE Images(" +
+        String CREATE_IMAGES_TABLE = "CREATE TABLE usersImages(" +
                 "   ImageId INTEGER PRIMARY KEY    AUTOINCREMENT," +
                 "   ImagePath           TEXT    NOT NULL," +
                 "   UserId              INT     NOT NULL," +
@@ -124,28 +126,96 @@ public class NewDataBase extends SQLiteOpenHelper {
     public void AddUser(int cUserId, String cUserName) {
         String Username = cUserName;
         int UserId = cUserId;
-
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put("UserId", UserId);
         values.put("UserName", Username);
         Log.d("ADDED", "SUCCESS");
-
         // Inserting Row
         db.insert("Destination", null, values);
-
         //2nd argument is String containing nullColumnHack
         db.close(); // Closing database connection
     }
 
+    List<usersImages> Images(int cDestId) {
+        List<usersImages> cImagePaths = new ArrayList<>();
+        SQLiteDatabase sqLiteDatabase=null;
+        Cursor cursor=null;
+                try {
+                    sqLiteDatabase=getReadableDatabase();
+                    cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});
+                    if (cursor != null) {
+                        if (cursor.getCount() > 0) {
+                            cursor.moveToFirst();
+                            do {
+                                usersImages theUsersImages = new usersImages(
+                                        cursor.getInt(cursor.getColumnIndex("ImageId")),
+                                        cursor.getString(cursor.getColumnIndex("ImagePath")),
+                                        cursor.getInt(cursor.getColumnIndex("DestId")),
+                                        cursor.getInt(cursor.getColumnIndex("UserId"))
+                                );
+                                cImagePaths.add(theUsersImages);
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    cursor.close();
+                    sqLiteDatabase.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+        return cImagePaths;
+    }
+
+    int MsgCount(int cDestId) {
+        int count = 0;
+        SQLiteDatabase sqLiteDatabase=null;
+        Cursor cursor=null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select * from answer where DestId=?", new String[]{String.valueOf(cDestId)});
+            count = cursor.getCount();
+            cursor.close();
+            sqLiteDatabase.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    int ImageCount(int cDestId) {
+        int count = 0;
+        SQLiteDatabase sqLiteDatabase=null;
+        Cursor cursor=null;
+        try{
+sqLiteDatabase   = getReadableDatabase();
+             cursor = sqLiteDatabase.rawQuery("select * from images where not imageseen and DestId=?", new String[]{String.valueOf(cDestId)});
+            count = cursor.getCount();
+            cursor.close();
+            sqLiteDatabase.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+
     public void GetUser() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from User ", null);
-        cursor.moveToFirst();
-        Log.d("USERID", cursor.getString(0));
-        Log.d("USERNAME", cursor.getString(1));
-        db.close();
+        SQLiteDatabase db=null;
+        Cursor cursor=null;
+        try {
+            db = this.getReadableDatabase();
+           cursor  = db.rawQuery("select * from User ", null);
+            cursor.moveToFirst();
+            Log.d("USERID", cursor.getString(0));
+            Log.d("USERNAME", cursor.getString(1));
+            db.close();
+
+        }catch (Exception e)
+        {
+e.printStackTrace();
+        }
     }
 
     public void addDestinations(List<Destination> cList) {
@@ -171,10 +241,9 @@ public class NewDataBase extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<String> getDestNames() {
-        List<String> mListDestNames = new ArrayList<String>();
+    public HashMap<String, Integer> getDestNames() {
+        HashMap<String, Integer> mListDestNames = new HashMap<>();
         try {
-
 
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor mgetDest = sqLiteDatabase.rawQuery("select * from Destination", null);
@@ -182,28 +251,31 @@ public class NewDataBase extends SQLiteOpenHelper {
                 if (mgetDest.getCount() > 0) {
                     mgetDest.moveToFirst();
                     do {
-                        mListDestNames.add(mgetDest.getString(mgetDest.getColumnIndex("DestName")));
+                        mListDestNames.put(mgetDest.getString(mgetDest.getColumnIndex("DestName")), mgetDest.getInt(mgetDest.getColumnIndex("DestId")));
                     } while (mgetDest.moveToNext());
                 }
                 mgetDest.close();
                 sqLiteDatabase.close();
+                return mListDestNames;
             }
         } catch (CursorIndexOutOfBoundsException e) {
-            Log.e("getDestNames", e.toString());
+            Log.e("Exception", e.toString());
+        } catch (SQLiteException e) {
+            Log.e("Exception", e.toString());
         }
-        return mListDestNames;
+        return null;
     }
 
-    public List<TempData> GetLatLong(String cDestName) {
-        String mDestNameq = cDestName;
+
+    public List<TempData> GetLatLong(int cDestId) {
+        int mDestNameq = cDestId;
         List<TempData> mTempData = new ArrayList<TempData>();
         try {
 
 
             SQLiteDatabase mGetLatLong = getReadableDatabase();
-            String mSql = "select DestId,Lat,Long from Destination where DestName=?";
-            Cursor mgetCursor = mGetLatLong.rawQuery(mSql, new String[]{mDestNameq});
-
+            String mSql = "select DestId,Lat,Long from Destination where DestId=?";
+            Cursor mgetCursor = mGetLatLong.rawQuery(mSql, new String[]{String.valueOf(mDestNameq)});
             if (mgetCursor.moveToFirst()) {
                 TempData tempData = new TempData();
                 tempData.setmDestId(mgetCursor.getInt(mgetCursor.getColumnIndex("DestId")));
@@ -213,6 +285,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 mTempData.add(tempData);
 
             }
+            mgetCursor.close();
             mGetLatLong.close();
         } catch (CursorIndexOutOfBoundsException e) {
             Log.d("GetLatLong", e.getMessage());
@@ -225,147 +298,232 @@ public class NewDataBase extends SQLiteOpenHelper {
         List<TempData> mSaveList = null;
         mSaveList = cListSave;
         String mDestName = cDestName;
-        SQLiteDatabase mSaveinTemp = getWritableDatabase();
-        TempData mTempDatainMap = new TempData();
-        ContentValues mSaveinTempValues = new ContentValues();
-        mSaveinTempValues.put("DestId", mSaveList.get(0).getmDestId());
-        mSaveinTempValues.put("DestName", mDestName);
-        mSaveinTempValues.put("Lat", mSaveList.get(0).getmLat());
-        mSaveinTempValues.put("Long", mSaveList.get(0).getmLong());
-        Log.d("TempData DestId", mSaveList.get(0).getmDestId() + "");
-        Log.d("TempData DestName", "" + mDestName);
-        Log.d("TempData DestLat", String.valueOf(mSaveList.get(0).getmLat()) + "");
-        Log.d("TempData DestLong", mSaveList.get(0).getmLong() + "");
+        SQLiteDatabase mSaveinTemp=null;
+        try {
+            mSaveinTemp = getWritableDatabase();
+            TempData mTempDatainMap = new TempData();
+            ContentValues mSaveinTempValues = new ContentValues();
+            mSaveinTempValues.put("DestId", mSaveList.get(0).getmDestId());
+            mSaveinTempValues.put("DestName", mDestName);
+            mSaveinTempValues.put("Lat", mSaveList.get(0).getmLat());
+            mSaveinTempValues.put("Long", mSaveList.get(0).getmLong());
+            Log.d("TempData DestId", mSaveList.get(0).getmDestId() + "");
+            Log.d("TempData DestName", "" + mDestName);
+            Log.d("TempData DestLat", String.valueOf(mSaveList.get(0).getmLat()) + "");
+            Log.d("TempData DestLong", mSaveList.get(0).getmLong() + "");
 
-        mSaveinTemp.insert("TempData", null, mSaveinTempValues);
-        Log.d("TEMP TABLE", "SAVED IN TEMP TABLE");
-        mSaveinTemp.close();
-    }
-public List<MyImageDB> mUserImagesList() {
-        List<MyImageDB> theUserImagesList=new ArrayList<>();
+            mSaveinTemp.insert("TempData", null, mSaveinTempValues);
+            Log.d("TEMP TABLE", "SAVED IN TEMP TABLE");
+            mSaveinTemp.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-    SQLiteDatabase sqLiteDatabase=getReadableDatabase();
-    Cursor cursor=sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from My_Images Order By CreateDate Desc",null);
-    if (cursor != null && cursor.moveToFirst()) {
-    do{
-        MyImageDB theMyImages =new MyImageDB(
-                cursor.getInt(cursor.getColumnIndex("ImageId")),
-               cursor.getString(cursor.getColumnIndex("ImagePath")),
-               cursor.getString(cursor.getColumnIndex("CreateDate"))
-                );
-        theUserImagesList.add(theMyImages);
-    }while (cursor.moveToNext());
     }
-    cursor.close();
-    sqLiteDatabase.close();
-    return theUserImagesList;
+
+    public List<MyImageDB> mUserImagesList() {
+        List<MyImageDB> theUserImagesList = new ArrayList<>();
+        SQLiteDatabase sqLiteDatabase=null;
+        Cursor cursor=null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDDate from MyImages Order By CreateDate Desc", null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    MyImageDB theMyImages = new MyImageDB(
+                            cursor.getInt(cursor.getColumnIndex("ImageId")),
+                            cursor.getString(cursor.getColumnIndex("ImagePath")),
+                            cursor.getString(cursor.getColumnIndex("CreateDate"))
+                    );
+                    theUserImagesList.add(theMyImages);
+                } while (cursor.moveToNext());
+
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return theUserImagesList;
     }
+
     public DestinationTempData mGetLatLongFromTemp(int theCurrentDestinationId) {
         DestinationTempData destinationTempData = null;
-        SQLiteDatabase mGetLatLong = getReadableDatabase();
-        Cursor mcursor = mGetLatLong.rawQuery("select Id, DestId,DestName,Lat,Long from TempData Where DestId != ? ORDER BY Id DESC",
-                new String[]{String.valueOf(theCurrentDestinationId)});
-        if (mcursor != null && mcursor.moveToFirst()) {
-            destinationTempData = new DestinationTempData(mcursor.getInt(mcursor.getColumnIndex("Id")),
-                    mcursor.getInt(mcursor.getColumnIndex("DestId")),
-                    mcursor.getDouble(mcursor.getColumnIndex("Lat")),
-                    mcursor.getDouble(mcursor.getColumnIndex("Long")),
-                    mcursor.getString(mcursor.getColumnIndex("DestName"))
-            );
+        SQLiteDatabase mGetLatLong = null;
+        Cursor mcursor = null;
+        try {
+            mGetLatLong = getReadableDatabase();
+            mcursor = mGetLatLong.rawQuery("select Id, DestId,DestName,Lat,Long from TempData Where DestId != ? ORDER BY Id DESC",
+                    new String[]{String.valueOf(theCurrentDestinationId)});
+            if (mcursor != null && mcursor.moveToFirst()) {
+                destinationTempData = new DestinationTempData(mcursor.getInt(mcursor.getColumnIndex("Id")),
+                        mcursor.getInt(mcursor.getColumnIndex("DestId")),
+                        mcursor.getDouble(mcursor.getColumnIndex("Lat")),
+                        mcursor.getDouble(mcursor.getColumnIndex("Long")),
+                        mcursor.getString(mcursor.getColumnIndex("DestName"))
+                );
 
+            }
+            mcursor.close();
+            mGetLatLong.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mcursor.close();
-        mGetLatLong.close();
         return destinationTempData;
 
     }
+public  List<SendQuestionAnswers> mListAskQuestion(){
+    List<SendQuestionAnswers> theListAskQuestions=null;
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    try{
+        theListAskQuestions=new ArrayList<>();
+        sqLiteDatabase=getReadableDatabase();
+        cursor=sqLiteDatabase.rawQuery("select Question.QuestionId, OPTIONS.OpTIONID, OPTIONS.optionText , Question.QuestionText from Question INNER JOIN OPTIONS where Question.QuestionId=OPTIONS.QuestionId",null);
+        if(cursor!=null){
+            if(cursor.getCount()>0){
+                cursor.moveToFirst();
+                do{
+                    SendQuestionAnswers sendQuestionAnswers=new SendQuestionAnswers(
+                            1,
+                            5,
+                            cursor.getInt(cursor.getColumnIndex("QuestionId")),
+                            cursor.getInt(cursor.getColumnIndex("OPTIONId")),
+                            cursor.getString(cursor.getColumnIndex("optionText")),
+                            cursor.getString(cursor.getColumnIndex("QuestionText")));
+                    theListAskQuestions.add(sendQuestionAnswers);
+                }while (cursor.moveToNext());
+            }
+        }
+
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return theListAskQuestions;
+}
+
 
     public List<MyDestination> GetFromTempLatLong() {
         List<MyDestination> mGetTempList = new ArrayList<>();
         SQLiteDatabase mGetFromTemp = getReadableDatabase();
         MyDestination mgetTemp;
-        Cursor metTempCursor = mGetFromTemp.rawQuery("select * from TempData", null);
-        metTempCursor.moveToFirst();
-        if (metTempCursor.getCount() > 0) {
-            do {
-                mgetTemp = new MyDestination();
-                // mgetTemp.setDestId(metTempCursor.getInt(metTempCursor.getColumnIndex("DestId")));
-                mgetTemp.setDestName(metTempCursor.getString(metTempCursor.getColumnIndex("DestName")));
-                //mgetTemp.setId(metTempCursor.getInt(metTempCursor.getColumnIndex("Id")));
-                mgetTemp.setLat(metTempCursor.getDouble(metTempCursor.getColumnIndex("Lat")));
-                mgetTemp.setLong(metTempCursor.getDouble(metTempCursor.getColumnIndex("Long")));
-                mGetTempList.add(mgetTemp);
-            } while (metTempCursor.moveToNext());
+        try {
+            Cursor metTempCursor = mGetFromTemp.rawQuery("select * from TempData", null);
+            metTempCursor.moveToFirst();
+            if (metTempCursor.getCount() > 0) {
+                do {
+                    mgetTemp = new MyDestination();
+                    // mgetTemp.setDestId(metTempCursor.getInt(metTempCursor.getColumnIndex("DestId")));
+                    mgetTemp.setDestName(metTempCursor.getString(metTempCursor.getColumnIndex("DestName")));
+                    //mgetTemp.setId(metTempCursor.getInt(metTempCursor.getColumnIndex("Id")));
+                    mgetTemp.setLat(metTempCursor.getDouble(metTempCursor.getColumnIndex("Lat")));
+                    mgetTemp.setLong(metTempCursor.getDouble(metTempCursor.getColumnIndex("Long")));
+                    mGetTempList.add(mgetTemp);
+                } while (metTempCursor.moveToNext());
+                metTempCursor.close();
+                mGetFromTemp.close();
 
-
-            mGetFromTemp.close();
-            return mGetTempList;
-        } else {
-            return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return mGetTempList;
     }
 
 
     boolean mSaveMyImages(String cImagePath, String cDate) {
-        SQLiteDatabase thesqLiteDatabase = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("ImagePath", cImagePath);
-        contentValues.put("CreateDate", cDate);
-        long rows=thesqLiteDatabase.insert("My_Images", null, contentValues);
-         return true;
+        try {
+            SQLiteDatabase thesqLiteDatabase = getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("ImagePath", cImagePath);
+            contentValues.put("CreateDate", cDate);
+            long rows = thesqLiteDatabase.insert("My_Images", null, contentValues);
+thesqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
 
     }
 
     public void DeleteTempMaps() {
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        sqLiteDatabase.execSQL("delete from TempData");
+        SQLiteDatabase sqLiteDatabase = null;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            sqLiteDatabase.execSQL("delete from TempData");
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Log.d("TEMPTABLE", "DELETED TEMP DATA");
-        sqLiteDatabase.close();
+
     }
 
     public List<GetTemp> GetFromTemp() {
         List<GetTemp> mGetTempList = new ArrayList<>();
-        SQLiteDatabase mGetFromTemp = getReadableDatabase();
+        SQLiteDatabase mGetFromTemp = null;
+        Cursor metTempCursor = null;
+        try {
+            mGetFromTemp = getReadableDatabase();
 
-        Cursor metTempCursor = mGetFromTemp.rawQuery("select * from TempData", null);
+            metTempCursor = mGetFromTemp.rawQuery("select * from TempData", null);
+            if (metTempCursor.moveToFirst()) {
+                do {
+                    GetTemp mgetTemp = new GetTemp();
+                    mgetTemp.setDestId(metTempCursor.getInt(metTempCursor.getColumnIndex("DestId")));
+                    mgetTemp.setDestName(metTempCursor.getString(metTempCursor.getColumnIndex("DestName")));
+                    mgetTemp.setId(metTempCursor.getInt(metTempCursor.getColumnIndex("Id")));
+                    mgetTemp.setLat(metTempCursor.getDouble(metTempCursor.getColumnIndex("Lat")));
+                    mgetTemp.setLong(metTempCursor.getDouble(metTempCursor.getColumnIndex("Long")));
+                    mGetTempList.add(mgetTemp);
+                } while (metTempCursor.moveToNext());
 
-        if (metTempCursor.moveToFirst()) {
-            do {
-                GetTemp mgetTemp = new GetTemp();
-                mgetTemp.setDestId(metTempCursor.getInt(metTempCursor.getColumnIndex("DestId")));
-                mgetTemp.setDestName(metTempCursor.getString(metTempCursor.getColumnIndex("DestName")));
-                mgetTemp.setId(metTempCursor.getInt(metTempCursor.getColumnIndex("Id")));
-                mgetTemp.setLat(metTempCursor.getDouble(metTempCursor.getColumnIndex("Lat")));
-                mgetTemp.setLong(metTempCursor.getDouble(metTempCursor.getColumnIndex("Long")));
-                mGetTempList.add(mgetTemp);
-            } while (metTempCursor.moveToNext());
+                metTempCursor.close();
+                mGetFromTemp.close();
 
-
-            mGetFromTemp.close();
-            return mGetTempList;
-        } else {
-            return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return mGetTempList;
     }
 
     boolean CheckTempData() {
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from TempData", null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0) {
-            return true;
+        Cursor cursor = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        boolean check=false;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select * from TempData", null);
+            cursor.moveToFirst();
+            if (cursor.getCount() > 0) {
+                check=true;
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return false;
+
+        return check;
     }
 
     boolean SaveinMapTable(String cMapTitle, String cJsonData, String cDate) {
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("RouteName", cMapTitle);
-        contentValues.put("RouteJson", cJsonData);
-        contentValues.put("CreatedDate", cDate);
+        long out = 0;
+        try {
+            SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("RouteName", cMapTitle);
+            contentValues.put("RouteJson", cJsonData);
+            contentValues.put("CreatedDate", cDate);
 
-        long out = sqLiteDatabase.insert("MyMap", null, contentValues);
+            out = sqLiteDatabase.insert("MyMap", null, contentValues);
+sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (out == -1) return false;
         else return true;
 
@@ -373,21 +531,25 @@ public List<MyImageDB> mUserImagesList() {
 
     List<Routes> getRouteList() {
         List<Routes> mRouteLists = new ArrayList<>();
+        try {
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery("select * from MyMap", null);
 
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from MyMap", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    Routes mRoutes = new Routes();
+                    mRoutes.setmRouteName(cursor.getString(cursor.getColumnIndex("RouteName")));
+                    mRoutes.setmRoutetripsNames(cursor.getString(cursor.getColumnIndex("RouteJson")));
+                    mRoutes.setmRouteDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    mRouteLists.add(mRoutes);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            sqLiteDatabase.close();
 
-        if (cursor.moveToFirst()) {
-            do {
-                Routes mRoutes = new Routes();
-                mRoutes.setmRouteName(cursor.getString(cursor.getColumnIndex("RouteName")));
-                mRoutes.setmRoutetripsNames(cursor.getString(cursor.getColumnIndex("RouteJson")));
-                mRoutes.setmRouteDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
-                mRouteLists.add(mRoutes);
-            } while (cursor.moveToNext());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        cursor.close();
-        sqLiteDatabase.close();
         return mRouteLists;
     }
 
@@ -397,7 +559,7 @@ public List<MyImageDB> mUserImagesList() {
         db.execSQL("DROP DATABASE IF EXISTS CommentAndLike");
         db.execSQL("DROP DATABASE IF EXISTS Config");
         db.execSQL("DROP DATABASE IF EXISTS  Destination");
-        db.execSQL("DROP DATABASE IF EXISTS Images");
+        db.execSQL("DROP DATABASE IF EXISTS usersImages");
         db.execSQL("DROP DATABASE IF EXISTS MyMap");
         db.execSQL("DROP DATABASE IF EXISTS My_Images");
         db.execSQL("DROP DATABASE IF EXISTS Option");

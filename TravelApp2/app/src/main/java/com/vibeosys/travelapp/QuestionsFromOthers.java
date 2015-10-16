@@ -23,6 +23,7 @@ import java.util.List;
 public class QuestionsFromOthers extends AppCompatActivity {
 
     ExpandableListView questionslistView;
+    NewDataBase newDataBase=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class QuestionsFromOthers extends AppCompatActivity {
         questionslistView = (ExpandableListView) findViewById(R.id.listView2);
 
         //questionslistView.setAdapter(new OthersQuestionsAdaptor(getApplicationContext()));
+newDataBase=new NewDataBase(this);
 
         final List<Question> questionsList = new ArrayList<Question>();
 

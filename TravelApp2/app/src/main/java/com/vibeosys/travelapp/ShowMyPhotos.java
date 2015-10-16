@@ -26,7 +26,6 @@ public class ShowMyPhotos extends AppCompatActivity {
     List<MyImageDB> mUserImagesList = null;
     NewDataBase newDataBase;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

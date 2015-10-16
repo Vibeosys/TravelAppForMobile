@@ -9,7 +9,7 @@
     android:layout_height="48dp"
     android:background="#F3F3F3"
     android:orientation="vertical"
-    android:id="@+id/item1">
+    android:id="@+id/userphoto">
 
     <!-- icon -->
     <ImageView
@@ -39,12 +39,13 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-
         android:gravity="center"
         android:text="10"
         android:textColor="#000"
         android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:id="@+id/photocounttext" />
+
 </RelativeLayout>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -52,8 +53,8 @@ android:layout_width="match_parent"
 android:layout_height="48dp"
 android:background="#F3F3F3"
 android:orientation="vertical"
-android:layout_below="@+id/item1"
-    android:id="@+id/relativeLayout">
+android:layout_below="@+id/userphoto"
+    android:id="@+id/mymessages">
 
 <!-- icon -->
 <ImageView
@@ -95,23 +96,22 @@ android:layout_below="@+id/item1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send \nMessage"
-        android:id="@+id/button"
-        android:layout_marginStart="25dp"
+        android:id="@+id/sendbutton"
         android:background="@drawable/shape"
         android:layout_marginRight="10dp"
         android:layout_weight="0.00"
-        android:layout_alignTop="@+id/button2"
+        android:layout_alignTop="@+id/usercommentsButton"
         android:layout_alignParentStart="true" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send \nPhoto"
         android:background="@drawable/shape"
-        android:id="@+id/button2"
+        android:id="@+id/senduserButton"
         android:layout_marginRight="10dp"
 
         android:layout_marginEnd="30dp"
-        android:layout_below="@+id/relativeLayout"
+        android:layout_below="@+id/mymessages"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="22dp" />
 
@@ -120,11 +120,11 @@ android:layout_below="@+id/item1"
         android:layout_height="wrap_content"
         android:text="User\nComments"
         android:background="@drawable/shape"
-        android:id="@+id/button3"
+        android:id="@+id/usercommentsButton"
         android:layout_marginRight="10dp"
 
-        android:layout_alignTop="@+id/button2"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignTop="@+id/senduserButton"
+        android:layout_toStartOf="@+id/senduserButton" />
 
 
 </RelativeLayout>

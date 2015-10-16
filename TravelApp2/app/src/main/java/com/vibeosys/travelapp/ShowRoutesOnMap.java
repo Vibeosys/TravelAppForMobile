@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -90,31 +91,47 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         dialog.setTitle(title);
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
+
+        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
+
         dialog.show();
-        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.item1);
+        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentphoto = new Intent(getApplicationContext(), PhotosFromOthers.class);
-                startActivity(intentphoto);
+                Intent intent = new Intent(getApplicationContext(), PhotosFromOthers.class);
+
+                startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }
         });
-        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.relativeLayout);
+        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.mymessages);
         relativeLayout1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
+
                 startActivity(intentphoto);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
         });
-        Button sendphoto_button = (Button) dialog.findViewById(R.id.button2);
-        Button sendmsg_button = (Button) dialog.findViewById(R.id.button);
+        Button sendphoto_button = (Button) dialog.findViewById(R.id.senduserButton);
+        Button sendmsg_button = (Button) dialog.findViewById(R.id.sendbutton);
+        Button usercomments = (Button) dialog.findViewById(R.id.usercommentsButton);
+        usercomments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
+
+                startActivity(theIntent);
+            }
+        });
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
+
                 startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -122,10 +139,9 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         sendphoto_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ShowRoutesOnMap.this, GridViewPhotos.class);
+                Intent intent = new Intent(getApplicationContext(), GridViewPhotos.class);
+
                 startActivity(intent);
-
-
             }
         });
     }

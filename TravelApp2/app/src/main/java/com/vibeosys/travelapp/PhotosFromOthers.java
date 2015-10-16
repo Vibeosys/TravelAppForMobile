@@ -15,12 +15,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
 /**
  * Created by mahesh on 10/6/2015.
  */
 public class PhotosFromOthers extends AppCompatActivity {
     ListView other_photo_list;
-
+ List<usersImages> mPhotoList=null;
+    int mDestId;
+    NewDataBase newDataBase=null;
     public interface BtnClickListener {
         public abstract void onBtnClick(int position);
     }
@@ -29,14 +35,19 @@ public class PhotosFromOthers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.otherphotolist);
+        newDataBase=new NewDataBase(PhotosFromOthers.this);
         other_photo_list = (ListView) findViewById(R.id.otherlistView);
+        Bundle extras = getIntent().getExtras();
+        mDestId= extras.getInt("DestId");
+        Log.d("PhotosFromOthers",""+mDestId);
+        mPhotoList=newDataBase.Images(mDestId);
         other_photo_list.setAdapter(new ShowListAdaptor(getApplicationContext(), new BtnClickListener() {
             @Override
             public void onBtnClick(int position) {
              Intent intent=new Intent(getApplicationContext(),UserLikes.class);
                 startActivity(intent);
             }
-        }));
+        },mPhotoList));
 
 
     }
@@ -58,22 +69,17 @@ public class PhotosFromOthers extends AppCompatActivity {
 class ShowListAdaptor extends BaseAdapter {
     Context mcontext;
     PhotosFromOthers.BtnClickListener mbtnClickListener = null;
-
-    ShowListAdaptor(Context context, PhotosFromOthers.BtnClickListener btnClickListener) {
+    List<usersImages> thePhotoList=null;
+    ShowListAdaptor(Context context, PhotosFromOthers.BtnClickListener btnClickListener, List<usersImages> mPhotoList) {
         this.mcontext = context;
         this.mbtnClickListener = btnClickListener;
-
+        this.thePhotoList=mPhotoList;
     }
-
-    int[] mThumbIds = new int[]{
-            R.drawable.imageone, R.drawable.island, R.drawable.luxurytour, R.drawable.memorial, R.drawable.shutterstock, R.drawable.travelagents
-    };
-
-
 
     @Override
     public int getCount() {
-        return mThumbIds.length;
+        if(thePhotoList!=null) return thePhotoList.size();
+        else return 0;
     }
 
     @Override
@@ -98,7 +104,7 @@ class ShowListAdaptor extends BaseAdapter {
         user = (TextView) view.findViewById(R.id.user_text);
         user.setText("User");
         user.setTextColor(103048);
-        photo.setImageResource(mThumbIds[position]);
+        Picasso.with(mcontext).load(thePhotoList.get(position).getmImagePaths()).into(photo);
         photo.setTag(position);
         photo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,5 +117,4 @@ class ShowListAdaptor extends BaseAdapter {
         });
         return view;
     }
-
 }

@@ -9,7 +9,7 @@
         android:layout_height="80dp"
         android:background="#ffffff"
         android:orientation="horizontal"
-        android:id="@+id/item1"
+        android:id="@+id/userphoto"
         android:layout_margin="2dp"
         android:weightSum="1">
 
