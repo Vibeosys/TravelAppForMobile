@@ -2,6 +2,7 @@ package com.vibeosys.travelapp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,9 +23,9 @@ public class ScreenSlidePage extends Fragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
     NewDataBase newDataBase=null;
-    List<SendQuestionAnswers> mListQuestionOptions=null;
-    List<QuestionAnswers> mList = new ArrayList<QuestionAnswers>();
-    List<SendQuestionAnswers> mListAsksQuestions=null;
+    List<SendQuestionAnswers> mListQuestions=null;
+    List<SendQuestionAnswers> mListOptions=null;
+    HashMap<String,Options> mListQuestionsAnswers=null;
     public static ScreenSlidePage create(int pageNumber) {
         ScreenSlidePage fragment = new ScreenSlidePage();
         Bundle args = new Bundle();
@@ -36,40 +39,37 @@ public class ScreenSlidePage extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         newDataBase=new NewDataBase(getActivity());
-        mListQuestionOptions=new ArrayList<>();
-        mListQuestionOptions=newDataBase.mListAskQuestion();
-        mListAsksQuestions=new ArrayList<>();
-        for(int i=0;i<mListQuestionOptions.size();i++){
-            for (int j=i+1;j<mListQuestionOptions.size();j++){
-                if(mListQuestionOptions.get(i).getmQuestionId()==mListQuestionOptions.get(j).getmQuestionId()){
-                    SendQuestionAnswers questionAnswers=new SendQuestionAnswers();
-                    questionAnswers.setmOptionId(mListQuestionOptions.get(i).getmOptionId());
-                    questionAnswers.setmOptionId(mListQuestionOptions.get(j).getmOptionId());
-                    questionAnswers.setmOptionTextArr(new String[]{mListQuestionOptions.get(i).getmOptionText(), mListQuestionOptions.get(j).getmOptionText()});
-                    questionAnswers.setmQuestionText(mListQuestionOptions.get(i).getmQuestionText());
-                    questionAnswers.setmId(i);
-                    mListAsksQuestions.add(questionAnswers);
-                }
-            }
-        }
 
-        QuestionAnswers q1 = new QuestionAnswers();
-        q1.setQuestion("How's Your experience?");
-        q1.setAnswers(new String[]{"good", "bad", "very bad"});
-        QuestionAnswers q2 = new QuestionAnswers();
-        q2.setQuestion("How's the Place?");
-        q2.setAnswers(new String[]{"good", "bad"});
-        QuestionAnswers q3 = new QuestionAnswers();
-        q3.setQuestion("What do you Expect from this Place?");
-        q3.setAnswers(new String[]{"na", "river", "coolwind"});
-        mList.add(q1);
-        mList.add(q2);
-        mList.add(q3);
+        mListQuestions=newDataBase.mListQuestions();
+        Log.d("Questions", "" + mListQuestions.size());
+
+      if(mListQuestions!=null&&mListQuestions.size()>0) {
+          Options options=null;
+          mListQuestionsAnswers=new HashMap<>();
+          for(int i = 0;i<mListQuestions.size();i++){
+              mListOptions=new ArrayList<>();
+              String m=mListQuestions.get(i).getmQuestionText();
+              mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId());
+              options = new Options();
+              String[] option=new String[mListOptions.size()];
+              int [] optionids=new int[mListOptions.size()];
+              for(int j=0;j<mListOptions.size();j++) {
+                option[j]=mListOptions.get(j).getmOptionText();
+                optionids[j]=mListOptions.get(j).getmOptionId();
+              }
+              options.setmOptionText(option);
+              options.setmOptionIds(optionids);
+
+              mListQuestionsAnswers.put(m,options);
+          }
+
+      }
+
         mPageNumber = getArguments().getInt(ARG_PAGE);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout containing a title and body text.
         ViewGroup rootView = (ViewGroup) inflater
@@ -77,21 +77,34 @@ public class ScreenSlidePage extends Fragment {
 
         // Set the title view to show the page number.
         TextView textView=(TextView)rootView.findViewById(R.id.questionText);
-        textView.setText(mListQuestionOptions.get(mPageNumber).getmQuestionText());
+        List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));//Questions List
+        textView.setText(keyList.get(mPageNumber));
         RadioGroup radioGroup=(RadioGroup)rootView.findViewById(R.id.questionradiogroup);
-        RadioButton theRadioButton;
-        int theRadioButtonlen=mListQuestionOptions.get(mPageNumber).getmOptionTextArr().length;
+        final ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
+        Log.d("ListOptions",""+valueList.size());
+        int theRadioButtonlen=valueList.get(mPageNumber).getmOptionText().length;
+
         for(int i=0;i<theRadioButtonlen;i++) {
-            theRadioButton=new RadioButton(getActivity());
-            theRadioButton.setText(mListQuestionOptions.get(i).getmOptionTextArr()[i]);
+            RadioButton  theRadioButton=new RadioButton(getActivity());
+            theRadioButton.setText(valueList.get(mPageNumber).mOptionText[i]);
+            theRadioButton.setId(valueList.get(mPageNumber).mOptionIds[i]);
             radioGroup.addView(theRadioButton);
-            radioGroup.setTag(mListQuestionOptions.get(i).getmOptionTextArr()[i]);
         }
+
+        radioGroup.setTag(valueList.get(mPageNumber).getmOptionId());
+        radioGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
      radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         int id= (int) group.getTag();
-        Toast.makeText(getActivity(), "Clicked On"+id, Toast.LENGTH_SHORT).show();
+        int lo=   group.getCheckedRadioButtonId();
+        Toast.makeText(getActivity(), "Clicked On"+lo, Toast.LENGTH_SHORT).show();
     }
     });
         return rootView;

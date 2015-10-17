@@ -279,7 +279,6 @@ e.printStackTrace();
             if (mgetCursor.moveToFirst()) {
                 TempData tempData = new TempData();
                 tempData.setmDestId(mgetCursor.getInt(mgetCursor.getColumnIndex("DestId")));
-
                 tempData.setmLat(mgetCursor.getDouble(mgetCursor.getColumnIndex("Lat")));
                 tempData.setmLong(mgetCursor.getDouble(mgetCursor.getColumnIndex("Long")));
                 mTempData.add(tempData);
@@ -318,7 +317,6 @@ e.printStackTrace();
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public List<MyImageDB> mUserImagesList() {
@@ -374,30 +372,77 @@ e.printStackTrace();
         return destinationTempData;
 
     }
-public  List<SendQuestionAnswers> mListAskQuestion(){
-    List<SendQuestionAnswers> theListAskQuestions=null;
+
+public List<SendQuestionAnswers> mListQuestions(){
+    List<SendQuestionAnswers> mListQuestions=null;
     SQLiteDatabase sqLiteDatabase=null;
     Cursor cursor=null;
     try{
+        sqLiteDatabase=getReadableDatabase();
+        mListQuestions=new ArrayList<>();
+        cursor=sqLiteDatabase.rawQuery("select questionid,questiontext from question",null);
+        SendQuestionAnswers sendQuestionAnswers;
+        if(cursor!=null&&cursor.getCount()>0){
+            cursor.moveToFirst();
+            do{
+                sendQuestionAnswers=new SendQuestionAnswers();
+sendQuestionAnswers.setmQuestionId(cursor.getInt(cursor.getColumnIndex("QuestionId")));
+sendQuestionAnswers.setmQuestionText(cursor.getString(cursor.getColumnIndex("QuestionText")));
+                mListQuestions.add(sendQuestionAnswers);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        sqLiteDatabase.close();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return mListQuestions;
+}
+public int CountOfUsers(int cOptionId){
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    int count=0;
+    try{
+        sqLiteDatabase=getReadableDatabase();
+        cursor=sqLiteDatabase.rawQuery("select * from answer where optionid=?",new String[]{String.valueOf(cOptionId)});
+        if(cursor!=null&&cursor.getCount()>0){
+            cursor.moveToFirst();
+            count=cursor.getCount();
+        }
+        cursor.close();
+        sqLiteDatabase.close();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return count;
+}
+
+
+
+public  List<SendQuestionAnswers> mListOptions(int cQuestionId){
+    List<SendQuestionAnswers> theListAskQuestions=null;
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    int mQuestionId=cQuestionId;
+    try{
         theListAskQuestions=new ArrayList<>();
         sqLiteDatabase=getReadableDatabase();
-        cursor=sqLiteDatabase.rawQuery("select Question.QuestionId, OPTIONS.OpTIONID, OPTIONS.optionText , Question.QuestionText from Question INNER JOIN OPTIONS where Question.QuestionId=OPTIONS.QuestionId",null);
+        SendQuestionAnswers sendQuestionAnswers;
+        cursor=sqLiteDatabase.rawQuery("select OpTIONID,optionText from  OPTIONS where questionid=?",new String[]{String.valueOf(cQuestionId)});
         if(cursor!=null){
             if(cursor.getCount()>0){
                 cursor.moveToFirst();
                 do{
-                    SendQuestionAnswers sendQuestionAnswers=new SendQuestionAnswers(
-                            1,
-                            5,
-                            cursor.getInt(cursor.getColumnIndex("QuestionId")),
-                            cursor.getInt(cursor.getColumnIndex("OPTIONId")),
-                            cursor.getString(cursor.getColumnIndex("optionText")),
-                            cursor.getString(cursor.getColumnIndex("QuestionText")));
+                    sendQuestionAnswers=new SendQuestionAnswers();
+                    sendQuestionAnswers.setmOptionId(cursor.getInt(0));
+                    sendQuestionAnswers.setmOptionText(cursor.getString(1));
                     theListAskQuestions.add(sendQuestionAnswers);
-                }while (cursor.moveToNext());
+                    }while (cursor.moveToNext());
             }
         }
-
+cursor.close();
+sqLiteDatabase.close();
+        Log.d("theListAskQuestions", "" + theListAskQuestions.size());
     }catch (Exception e){
         e.printStackTrace();
     }

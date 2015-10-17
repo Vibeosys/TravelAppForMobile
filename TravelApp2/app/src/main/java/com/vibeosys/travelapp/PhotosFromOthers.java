@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -104,8 +105,10 @@ class ShowListAdaptor extends BaseAdapter {
         user = (TextView) view.findViewById(R.id.user_text);
         user.setText("User");
         user.setTextColor(103048);
-        Picasso.with(mcontext).load(thePhotoList.get(position).getmImagePaths()).into(photo);
+
+        Picasso.with(mcontext).load(thePhotoList.get(position).getmImagePaths()).fetch((Callback) photo);
         photo.setTag(position);
+
         photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

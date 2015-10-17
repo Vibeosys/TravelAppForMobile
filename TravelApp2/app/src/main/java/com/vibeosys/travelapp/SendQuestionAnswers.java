@@ -8,6 +8,7 @@ int mQuestionId;
 String mQuestionText;
 int mOptionId;
 String mOptionText;
+    int mOptionIdArr[];
 String mOptionTextArr[];
     int mId;
 
@@ -22,6 +23,15 @@ String mOptionTextArr[];
     SendQuestionAnswers(){
 
     }
+    SendQuestionAnswers(int cQuestionId,String cQuestionText){
+this.mQuestionId=cQuestionId;
+this.mQuestionText=cQuestionText;
+    }
+    SendQuestionAnswers(int QuestionId,int cOptionId,String cOptionText){
+        this.mOptionId=cOptionId;
+        this.mQuestionId=QuestionId;
+        this.mOptionText=cOptionText;
+    }
     SendQuestionAnswers(int cUserId,int DestId,int cQuestionId,int OptionId,String OptionText,String QuestionText){
 this.UserId=cUserId;
 this.DestId=DestId;
@@ -30,8 +40,17 @@ this.mOptionText=OptionText;
 this.mQuestionId=cQuestionId;
 this.mQuestionText=QuestionText;
     }
-SendQuestionAnswers(int id,String cQuestionText,int OptionId,String cOptionText[]){
-  this.mOptionId=OptionId;
+
+    public int[] getmOptionIdArr() {
+        return mOptionIdArr;
+    }
+
+    public void setmOptionIdArr(int[] mOptionIdArr) {
+        this.mOptionIdArr = mOptionIdArr;
+    }
+
+    SendQuestionAnswers(int id,String cQuestionText,int OptionId[],String cOptionText[]){
+  this.mOptionIdArr=OptionId;
   this.mOptionTextArr=cOptionText;
   this.mId=id;
   this.mQuestionText=cQuestionText;

@@ -20,7 +20,7 @@ import android.widget.Toast;
  * Created by mahesh on 10/14/2015.
  */
 public class QuestionSlidingView extends FragmentActivity{
-    private static final int NUM_PAGES = 3;
+    private static final int NUM_PAGES =3;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     Button mPrevButton,mNextButton;
@@ -48,7 +48,7 @@ public class QuestionSlidingView extends FragmentActivity{
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewPager.setCurrentItem(mViewPager.getCurrentItem()  +1);
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
 
             }
         });

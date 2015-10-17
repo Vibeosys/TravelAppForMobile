@@ -5,6 +5,7 @@ import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
@@ -12,9 +13,9 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vibeosys.travelapp.data.Question;
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,40 +25,48 @@ public class QuestionsFromOthers extends AppCompatActivity {
 
     ExpandableListView questionslistView;
     NewDataBase newDataBase=null;
-
+    List<SendQuestionAnswers> mListQuestions=null;
+    List<SendQuestionAnswers> mListOptions=null;
+    HashMap<String,Options> mListQuestionsAnswers=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.otherquestionlist_layout);
         questionslistView = (ExpandableListView) findViewById(R.id.listView2);
-
-        //questionslistView.setAdapter(new OthersQuestionsAdaptor(getApplicationContext()));
 newDataBase=new NewDataBase(this);
+        newDataBase=new NewDataBase(this);
+        mListQuestions=newDataBase.mListQuestions();
+        Log.d("Questions", "" + mListQuestions.size());
 
-        final List<Question> questionsList = new ArrayList<Question>();
+        if(mListQuestions!=null&&mListQuestions.size()>0) {
+            Options options=null;
+            mListQuestionsAnswers=new HashMap<>();
+            for(int i = 0;i<mListQuestions.size();i++){
+                mListOptions=new ArrayList<>();
+                String m=mListQuestions.get(i).getmQuestionText();
+                mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId());
+                options = new Options();
+                String[] option=new String[mListOptions.size()];
+                int [] optionids=new int[mListOptions.size()];
+                int [] UsersCount=new int[mListOptions.size()];
+                for(int j=0;j<mListOptions.size();j++) {
+                    option[j]=mListOptions.get(j).getmOptionText();
+                    optionids[j]=mListOptions.get(j).getmOptionId();
+                    UsersCount[j]=newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId());
+                }
+                options.setmOptionText(option);
+                options.setmOptionIds(optionids);
+                options.setmUserCounts(UsersCount);
+                mListQuestionsAnswers.put(m,options);
+            }
 
-        Question q1 = new Question();
-        q1.setmQuestion("Hows your experience?");
-        q1.setmAnswers(new String[]{"fine", "good", "wrost", "nice", "glorius"});
-        q1.setmType(new String[]{"2", "3", "6", "2", "6"});
-
-        Question q2 = new Question();
-        q2.setmQuestion("Do you like the Place?");
-        q2.setmAnswers(new String[]{"good", "bad", "na"});
-        q2.setmType(new String[]{"3", "4", "2"});
-        Question q3 = new Question();
-        q3.setmQuestion("Do you like the Place?");
-        q3.setmAnswers(new String[]{"Fine", "Great"});
-        q3.setmType(new String[]{"2", "3"});
-        questionsList.add(q1);
-        questionsList.add(q2);
-        questionsList.add(q3);
-        questionslistView.setAdapter(new OthersQuestionsAdaptor(this, questionsList));
+        }
+        questionslistView.setAdapter(new OthersQuestionsAdaptor(this, mListQuestionsAnswers));
 
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(getApplicationContext(), "Clicked On.." + questionsList.get(groupPosition).getmAnswers()[childPosition], Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Clicked On.." + mListOptions.get(groupPosition), Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -69,9 +78,10 @@ newDataBase=new NewDataBase(this);
     private class OthersQuestionsAdaptor implements ExpandableListAdapter {
 
         private Context mContext;
-        private List<Question> mList;
-
-        OthersQuestionsAdaptor(Context aContext, List<Question> aList) {
+        private HashMap<String,Options> mList;
+        List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
+       ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
+        OthersQuestionsAdaptor(Context aContext, HashMap<String, Options> aList) {
             mContext = aContext;
             mList = aList;
         }
@@ -89,8 +99,8 @@ newDataBase=new NewDataBase(this);
 
         @Override
         public int getGroupCount() {
-            if (mList != null) {
-                return mList.size();
+            if (keyList != null) {
+                return keyList.size();
             }
             return 0;
         }
@@ -98,8 +108,8 @@ newDataBase=new NewDataBase(this);
         @Override
         public int getChildrenCount(int groupPosition) {
 
-            if (mList != null) {
-                int childCount = mList.get(groupPosition).getmAnswers().length;
+            if (valueList != null) {
+                int childCount = valueList.get(groupPosition).getmOptionText().length;
                 if (childCount % 2 == 0) {
                     return childCount / 2;
                 } else {
@@ -110,13 +120,13 @@ newDataBase=new NewDataBase(this);
         }
 
         @Override
-        public Question getGroup(int groupPosition) {
+        public Options getGroup(int groupPosition) {
             return mList.get(groupPosition);
         }
 
         @Override
         public String getChild(int groupPosition, int childPosition) {
-            return mList.get(groupPosition).getmAnswers()[childPosition];
+            return valueList.get(groupPosition).getmOptionText()[childPosition];
             // return null;
         }
 
@@ -141,31 +151,26 @@ newDataBase=new NewDataBase(this);
             questionslistView.expandGroup(groupPosition);
             theView.setTextSize(20);
             theView.setTypeface(Typeface.DEFAULT_BOLD);
-            theView.setText(mList.get(groupPosition).getmQuestion());
+            theView.setText(keyList.get(groupPosition));
 
             return theView;
         }
 
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
             childPosition = childPosition * 2;
             View aView = getLayoutInflater().inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
             TextView theCount = (TextView) aView.findViewById(R.id.count);
-
             TextView theText2 = (TextView) aView.findViewById(R.id.textView);
             TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
-
-            theText.setText(mList.get(groupPosition).getmAnswers()[childPosition]);
-            theCount.setText(mList.get(groupPosition).getmType()[childPosition]);
-
+            theText.setText(valueList.get(groupPosition).getmOptionText()[childPosition]);
+            theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
             if(getChildrenCount(groupPosition) > childPosition) {
-                theText2.setText(mList.get(groupPosition).getmAnswers()[childPosition + 1]);
-                theCount2.setText(mList.get(groupPosition).getmType()[childPosition + 1]);
+                theText2.setText(valueList.get(groupPosition).getmOptionText()[childPosition+1]);
+                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]+1));
             }
             return aView;
-
         }
 
         @Override
