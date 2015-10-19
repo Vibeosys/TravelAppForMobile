@@ -51,4 +51,5 @@
     </string-array>
     <string name="action_finish">Finish</string>
     <string name="action_next">Next</string>
+    <string name="no_network_connection_toast">No Network Connection</string>
 </resources>
