@@ -14,10 +14,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
 /**
@@ -36,10 +34,10 @@ public class PhotosFromOthers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.otherphotolist);
-        newDataBase=new NewDataBase(PhotosFromOthers.this);
         other_photo_list = (ListView) findViewById(R.id.otherlistView);
+        newDataBase=new NewDataBase(PhotosFromOthers.this);
         Bundle extras = getIntent().getExtras();
-        mDestId= extras.getInt("DestId");
+//        mDestId= extras.getInt("DestId");
         Log.d("PhotosFromOthers",""+mDestId);
         mPhotoList=newDataBase.Images(mDestId);
         other_photo_list.setAdapter(new ShowListAdaptor(getApplicationContext(), new BtnClickListener() {
@@ -49,8 +47,6 @@ public class PhotosFromOthers extends AppCompatActivity {
                 startActivity(intent);
             }
         },mPhotoList));
-
-
     }
 
     @Override
@@ -61,10 +57,8 @@ public class PhotosFromOthers extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(PhotosFromOthers.this);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
 }
 
 class ShowListAdaptor extends BaseAdapter {

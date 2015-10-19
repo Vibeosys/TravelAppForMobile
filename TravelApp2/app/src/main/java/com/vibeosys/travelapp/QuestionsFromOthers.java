@@ -29,15 +29,13 @@ public class QuestionsFromOthers extends AppCompatActivity {
     List<SendQuestionAnswers> mListOptions=null;
     HashMap<String,Options> mListQuestionsAnswers=null;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
         setContentView(R.layout.otherquestionlist_layout);
         questionslistView = (ExpandableListView) findViewById(R.id.listView2);
-newDataBase=new NewDataBase(this);
         newDataBase=new NewDataBase(this);
         mListQuestions=newDataBase.mListQuestions();
         Log.d("Questions", "" + mListQuestions.size());
-
         if(mListQuestions!=null&&mListQuestions.size()>0) {
             Options options=null;
             mListQuestionsAnswers=new HashMap<>();
@@ -62,7 +60,6 @@ newDataBase=new NewDataBase(this);
 
         }
         questionslistView.setAdapter(new OthersQuestionsAdaptor(this, mListQuestionsAnswers));
-
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
@@ -70,33 +67,25 @@ newDataBase=new NewDataBase(this);
                 return false;
             }
         });
-
-
     }
 
-
     private class OthersQuestionsAdaptor implements ExpandableListAdapter {
-
         private Context mContext;
         private HashMap<String,Options> mList;
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
-       ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
+        ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
         OthersQuestionsAdaptor(Context aContext, HashMap<String, Options> aList) {
             mContext = aContext;
             mList = aList;
         }
-
-
         @Override
         public void registerDataSetObserver(DataSetObserver observer) {
 
         }
-
         @Override
         public void unregisterDataSetObserver(DataSetObserver observer) {
 
         }
-
         @Override
         public int getGroupCount() {
             if (keyList != null) {
@@ -104,7 +93,6 @@ newDataBase=new NewDataBase(this);
             }
             return 0;
         }
-
         @Override
         public int getChildrenCount(int groupPosition) {
 
@@ -118,18 +106,15 @@ newDataBase=new NewDataBase(this);
             }
             return 0;
         }
-
         @Override
         public Options getGroup(int groupPosition) {
             return mList.get(groupPosition);
         }
-
         @Override
         public String getChild(int groupPosition, int childPosition) {
             return valueList.get(groupPosition).getmOptionText()[childPosition];
             // return null;
         }
-
         @Override
         public long getGroupId(int groupPosition) {
             return groupPosition;
@@ -152,7 +137,6 @@ newDataBase=new NewDataBase(this);
             theView.setTextSize(20);
             theView.setTypeface(Typeface.DEFAULT_BOLD);
             theView.setText(keyList.get(groupPosition));
-
             return theView;
         }
 
@@ -177,12 +161,10 @@ newDataBase=new NewDataBase(this);
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return true;
         }
-
         @Override
         public boolean areAllItemsEnabled() {
             return true;
         }
-
         @Override
         public boolean isEmpty() {
             return false;
@@ -190,12 +172,10 @@ newDataBase=new NewDataBase(this);
 
         @Override
         public void onGroupExpanded(int groupPosition) {
-
         }
 
         @Override
         public void onGroupCollapsed(int groupPosition) {
-
         }
 
         @Override

@@ -20,10 +20,11 @@ import android.widget.Toast;
  * Created by mahesh on 10/14/2015.
  */
 public class QuestionSlidingView extends FragmentActivity{
-    private static final int NUM_PAGES =3;
+    private static int NUM_PAGES;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     Button mPrevButton,mNextButton;
+    NewDataBase newDataBase=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +32,11 @@ public class QuestionSlidingView extends FragmentActivity{
         mViewPager=(ViewPager)findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-
+      int no;
+       no=getIntent().getExtras().getInt("DestId");
+        newDataBase=new NewDataBase(this);
+     int pages=newDataBase.Questions(no);
+        NUM_PAGES=pages;
         // ...but notify us that it happened.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 

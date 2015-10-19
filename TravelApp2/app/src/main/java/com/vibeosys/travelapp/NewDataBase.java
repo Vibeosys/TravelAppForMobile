@@ -18,11 +18,12 @@ import java.util.List;
  */
 
 public class NewDataBase extends SQLiteOpenHelper {
-    private static final String DB_NAME = "TravelApp";
+    private static final String DB_NAME = "/data/data/com.vibeosys.travelapp/app_databases/TravelApp";
 
     private final Context mContext;
 
     public NewDataBase(Context context) {
+
         super(context, DB_NAME, null, 1);
         this.mContext = context;
     }
@@ -143,7 +144,9 @@ public class NewDataBase extends SQLiteOpenHelper {
         Cursor cursor=null;
                 try {
                     sqLiteDatabase=getReadableDatabase();
-                    cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});
+                    /*cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});*/
+                    cursor = sqLiteDatabase.rawQuery("select * from Images",null);
+
                     if (cursor != null) {
                         if (cursor.getCount() > 0) {
                             cursor.moveToFirst();
@@ -166,6 +169,54 @@ public class NewDataBase extends SQLiteOpenHelper {
 
         return cImagePaths;
     }
+
+List<CommentsAndLikes> DestinationComments(int DestId){
+    List<CommentsAndLikes> DestComments=null;
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    try{
+        sqLiteDatabase=getReadableDatabase();
+        DestComments=new ArrayList<>();
+        cursor=sqLiteDatabase.rawQuery("select * from comment_and_like NATURAL JOIN user where destid=? and user.userid=comment_and_like.userid;",new  String[]{String.valueOf(DestId)});
+        if(cursor!=null){
+            if(cursor.getCount()>0){
+                cursor.moveToFirst();
+                do{
+CommentsAndLikes commentsAndLikes=new CommentsAndLikes(
+        cursor.getInt(cursor.getColumnIndex("UserId")),
+        cursor.getInt(cursor.getColumnIndex("DestId")),
+        cursor.getString(cursor.getColumnIndex("CommentText")),
+        cursor.getString(cursor.getColumnIndex("UserName"))
+);
+                    DestComments.add(commentsAndLikes);
+
+                }while (cursor.moveToNext());
+            }
+        }
+        cursor.close();
+        sqLiteDatabase.close();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return DestComments;
+}
+int Questions(int DestId){
+    int noOfQuestions=0;
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    try{
+        sqLiteDatabase=getReadableDatabase();
+        cursor=sqLiteDatabase.rawQuery("select * from question",null);
+        if(cursor!=null){
+            cursor.moveToFirst();
+            noOfQuestions=cursor.getCount();
+        }
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return noOfQuestions;
+}
+
 
     int MsgCount(int cDestId) {
         int count = 0;
@@ -325,7 +376,7 @@ e.printStackTrace();
         Cursor cursor=null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDDate from MyImages Order By CreateDate Desc", null);
+            cursor = sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from MyImages Order By CreateDate Desc", null);
             if (cursor != null && cursor.moveToFirst()) {
                 do {
                     MyImageDB theMyImages = new MyImageDB(
@@ -484,7 +535,7 @@ return theListAskQuestions;
             ContentValues contentValues = new ContentValues();
             contentValues.put("ImagePath", cImagePath);
             contentValues.put("CreateDate", cDate);
-            long rows = thesqLiteDatabase.insert("My_Images", null, contentValues);
+            long rows = thesqLiteDatabase.insert("MyImages", null, contentValues);
 thesqLiteDatabase.close();
         } catch (Exception e) {
             e.printStackTrace();

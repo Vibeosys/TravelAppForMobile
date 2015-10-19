@@ -300,7 +300,6 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -327,7 +326,7 @@ public class MainActivity extends AppCompatActivity
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PhotosFromOthers.class);
+                Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
                 intent.putExtra("DestId",cDestId);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
@@ -371,10 +370,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-
-
     }
-
 
     @Override
     public void onBackPressed() {
@@ -464,7 +460,6 @@ public class MainActivity extends AppCompatActivity
         Log.e("TAG", "onConnectionFailed: ConnectionResult.getErrorCode() = "
                 + connectionResult.getErrorCode());
 
-        // TODO(Developer): Check error code and notify the user of error state and resolution.
         Toast.makeText(this,
                 "Could not connect to Google API Client: Error " + connectionResult.getErrorCode(),
                 Toast.LENGTH_SHORT).show();

@@ -97,7 +97,6 @@ class ImageAdapter extends BaseAdapter {
         if (row == null) {
             LayoutInflater theLayoutInflator = (LayoutInflater) mContext.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            ;
             row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
             viewHolder = new ViewHolder();
             viewHolder.imageView = (ImageView) row.findViewById(R.id.viewImage);

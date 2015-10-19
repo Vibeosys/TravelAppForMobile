@@ -26,9 +26,9 @@ import java.util.List;
 public class ShowDestinationCommentsAdaptor extends BaseAdapter {
  Context mContext;
     List<MyImageDB> mUserImagesList = null;
-    List<DestinationCommentsODA> mListDestinationComments=new ArrayList<>();
-    public ShowDestinationCommentsAdaptor(Context destinationComments, List<DestinationCommentsODA> mListDestination) {
-   this.mContext=destinationComments;
+    List<CommentsAndLikes> mListDestinationComments=new ArrayList<>();
+    public ShowDestinationCommentsAdaptor(Context destinationComments,List<CommentsAndLikes> mListDestination) {
+    this.mContext=destinationComments;
     this.mListDestinationComments=mListDestination;
     }
 
@@ -36,15 +36,12 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
     public boolean areAllItemsEnabled() {
         return true;
     }
-
     @Override
     public boolean isEnabled(int position) {
         return true;
     }
-
     @Override
     public void registerDataSetObserver(DataSetObserver observer) {
-
     }
 
     @Override
@@ -87,9 +84,9 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
             viewrow.setTag(viewHolder);
         }
         else viewHolder=(ViewHolder)viewrow.getTag();
-            viewHolder.textView1.setText(mListDestinationComments.get(position).getmUserCommnet());
-            viewHolder.textView.setText(mListDestinationComments.get(position).getUsername());
-       // viewHolder.imageView.setImageBitmap();
+            viewHolder.textView1.setText(mListDestinationComments.get(position).getmCommentText());
+            viewHolder.textView.setText(mListDestinationComments.get(position).getUserName());
+
             return viewrow;
     }
 

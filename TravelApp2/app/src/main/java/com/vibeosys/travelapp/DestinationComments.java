@@ -13,7 +13,9 @@ import java.util.List;
  */
 public class DestinationComments extends AppCompatActivity {
 ListView mDestinationCommentListView;
-List<DestinationCommentsODA> mListDestination;
+
+    List<CommentsAndLikes> mListDestination=null;
+    NewDataBase newDataBase=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,21 +23,11 @@ List<DestinationCommentsODA> mListDestination;
         mDestinationCommentListView=(ListView)findViewById(R.id.commenntlistview);
         mListDestination=new ArrayList<>();
         setTitle("Comments By User");
-          DestinationCommentsODA destinationCommentsODA=new DestinationCommentsODA();
-         destinationCommentsODA.setmUserCommnet("It was nice experience");
-         destinationCommentsODA.setUsername("Anand");
-         destinationCommentsODA.setUserId(101);
-         DestinationCommentsODA destinationCommentsODA1=new DestinationCommentsODA();
-        destinationCommentsODA1.setmUserCommnet("It was bad experience");
-        destinationCommentsODA1.setUsername("Mahesh");
-        destinationCommentsODA1.setUserId(102);
-        DestinationCommentsODA destinationCommentsODA2=new DestinationCommentsODA();
-        destinationCommentsODA2.setmUserCommnet("Amaze. experience");
-        destinationCommentsODA2.setUsername("Niteen");
-        destinationCommentsODA2.setUserId(103);
-        mListDestination.add(destinationCommentsODA);
-        mListDestination.add(destinationCommentsODA1);
-        mListDestination.add(destinationCommentsODA2);
+        int DestId= getIntent().getExtras().getInt("DestId");
+        newDataBase=new NewDataBase(this);
+        mListDestination=new ArrayList<>();
+         mListDestination=newDataBase.DestinationComments(DestId);
+
         Log.d("DestinationComment",String.valueOf(mListDestination.size()));
         mDestinationCommentListView.setAdapter(new ShowDestinationCommentsAdaptor(getApplicationContext(),mListDestination));
 

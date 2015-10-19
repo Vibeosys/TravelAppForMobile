@@ -100,7 +100,7 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PhotosFromOthers.class);
+                Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
 
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
