@@ -36,7 +36,7 @@ public class UserLikeAdaptor extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return mUserList.get(position).getUserId();
+        return mUserList.get(position).getDestId();
     }
 
     @Override

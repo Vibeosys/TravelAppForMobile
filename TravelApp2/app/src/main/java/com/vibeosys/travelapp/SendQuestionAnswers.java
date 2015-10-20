@@ -32,7 +32,7 @@ this.mQuestionText=cQuestionText;
         this.mQuestionId=QuestionId;
         this.mOptionText=cOptionText;
     }
-    SendQuestionAnswers(int cUserId,int DestId,int cQuestionId,int OptionId,String OptionText,String QuestionText){
+    SendQuestionAnswers(String cUserId,int DestId,int cQuestionId,int OptionId,String OptionText,String QuestionText){
 this.UserId=cUserId;
 this.DestId=DestId;
 this.mOptionId=OptionId;

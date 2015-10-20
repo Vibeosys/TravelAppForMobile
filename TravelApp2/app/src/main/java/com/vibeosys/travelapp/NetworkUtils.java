@@ -12,7 +12,7 @@ public class NetworkUtils {
 
     /* Method to check network availability
     * */
-    public boolean isActiveNetworkAvailable(Context aContext){
+    public static boolean isActiveNetworkAvailable(Context aContext){
 
         boolean theStatus = false;
         ConnectivityManager theConManager = (ConnectivityManager)aContext.getSystemService(Context.CONNECTIVITY_SERVICE);

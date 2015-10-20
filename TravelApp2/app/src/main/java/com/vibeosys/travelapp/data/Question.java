@@ -8,6 +8,8 @@ public class Question {
     private String[] mAnswers;
     private String mQuestion;
     private String mType[];
+    private String mQuestionText[];
+    private int QuestionId[];
 
 
     public String[] getmType() {
@@ -40,5 +42,19 @@ public class Question {
         this.mQuestion = mQuestion;
     }
 
+    public String[] getmQuestionText() {
+        return mQuestionText;
+    }
 
+    public void setmQuestionText(String[] mQuestionText) {
+        this.mQuestionText = mQuestionText;
+    }
+
+    public int[] getQuestionId() {
+        return QuestionId;
+    }
+
+    public void setQuestionId(int[] questionId) {
+        QuestionId = questionId;
+    }
 }

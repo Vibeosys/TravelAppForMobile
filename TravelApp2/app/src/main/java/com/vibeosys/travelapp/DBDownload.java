@@ -1,44 +1,29 @@
 package com.vibeosys.travelapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.UUID;
 
 /**
- * Base Activity will give the basic implementation with async task support and other things
+ * Created by mahesh on 10/20/2015.
  */
-public class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback{
-int id;
-    protected void fetchData(final String aServiceUrl, final boolean aShowProgressDlg,int id){
-        Log.d("BaseActivity","IN Base");
-        this.id=id;
-        new BackgroundTask(aShowProgressDlg).execute(aServiceUrl);
+public class DBDownload extends AsyncTask<String, Void, String>{
+private Context mContext;
+UUID uuid;
+    DBDownload(Context context){
+        mContext=context;
     }
-    
-    @Override
-    public void onSuccess(String aData,int id) {
-        Log.d("BaseActivity","IN Base");
-    }
-
-    @Override
-    public void onFailure(String aData,int id) {
-        Log.d("BaseActivity","IN Base");
-    }
-
-
-    class BackgroundTask extends AsyncTask<String, Void, String> {
-
         private boolean mShowProgressDlg;
         private ProgressDialog mProgressDialog;
-        public BackgroundTask(boolean aShowProgressDlg){
-            mShowProgressDlg = aShowProgressDlg;
-        }
+
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -47,20 +32,34 @@ int id;
             }
 
             if(s != null) {
-                onSuccess(s,id);
+                onSuccess(s);
             }
             else {
-                onFailure(null,id);
+                onFailure(null);
             }
 
         }
 
-        @Override
+    private void onFailure(String o) {
+
+    }
+
+    private void onSuccess(String s) {
+
+    }
+
+    @Override
         protected String doInBackground(String... params) {
 
             try {
                 URL url = new URL(params[0]);
                 HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                uuid= UUID.randomUUID();
+                String data = URLEncoder.encode("UserId", "UTF-8")
+                        + "=" + URLEncoder.encode(String.valueOf(uuid), "UTF-8");
+                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                wr.write( data );
+                wr.flush();
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String dataLine = null;
                 StringBuffer dataBuffer = new StringBuffer();
@@ -79,10 +78,9 @@ int id;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(mShowProgressDlg) {
-                mProgressDialog = new ProgressDialog(BaseActivity.this);
+                mProgressDialog = new ProgressDialog(mContext);
                 mProgressDialog.show();
-            }
-        }
+
+
     }
 }

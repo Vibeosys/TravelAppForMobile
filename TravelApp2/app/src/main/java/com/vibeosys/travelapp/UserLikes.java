@@ -22,15 +22,15 @@ public class UserLikes extends AppCompatActivity {
 
         mUserLikesList = new ArrayList<>();
         CommentsAndLikes commentsAndLikes = new CommentsAndLikes();
-        commentsAndLikes.setUserId(101);
+        commentsAndLikes.setUserId("101");
         commentsAndLikes.setUsername("Mahesh");
         commentsAndLikes.setmLikeCount(8);
         CommentsAndLikes commentsAndLikes1 = new CommentsAndLikes();
-        commentsAndLikes1.setUserId(102);
+        commentsAndLikes1.setUserId("102");
         commentsAndLikes1.setUsername("Anand");
         commentsAndLikes1.setmLikeCount(10);
         CommentsAndLikes commentsAndLikes2 = new CommentsAndLikes();
-        commentsAndLikes2.setUserId(103);
+        commentsAndLikes2.setUserId("103");
         commentsAndLikes2.setUsername("Niteen");
         commentsAndLikes2.setmLikeCount(12);
         mUserLikesList.add(commentsAndLikes);

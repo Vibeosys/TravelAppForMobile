@@ -1,19 +1,21 @@
 package com.vibeosys.travelapp;
-
 import android.app.Dialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,24 +41,133 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.vibeosys.travelapp.data.Answer;
+import com.vibeosys.travelapp.data.Comment;
+import com.vibeosys.travelapp.data.Images;
+import com.vibeosys.travelapp.data.Like;
+import com.vibeosys.travelapp.data.Option;
+import com.vibeosys.travelapp.data.Question;
+import com.vibeosys.travelapp.data.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
+JSONArray jsonArray;
+JSONObject jsonObject1;
+List<Images> mListImages;
+List<User> mListUsers;
+List<Question> mListQuestion;
+List<Answer> mListAnswers;
+List<Option> mListOptions;
+List<com.vibeosys.travelapp.data.Destination> mListDestinations;
+List<Comment> mListComments;
+List<Like> mListLike;
+    @Override
+    public void onFailure(String aData,int id) {
+        super.onFailure(aData,id);
+        Log.d("Failed to Load","Data"+aData.toString());
+    }
+
+    @Override
+    public void onSuccess(String aData,int id) {
+        super.onSuccess(aData,id);
+        if(id==1){//Download
+            try {
+
+                jsonObject1=new JSONObject(aData);
+                JSONArray jsonArray=jsonObject1.getJSONArray("data");
+
+              for (int i=0;i<jsonArray.length();i++){
+                  JSONObject jsonObject=jsonArray.getJSONObject(i);
+                  if(jsonObject.has("Comment")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Comment"});
+                      download.setmValue(new String[]{jsonObject.getString("Comment")});
+                      Log.d("Comments Value",""+jsonObject.getString("Comment"));
+                  }
+                  if(jsonObject.has("Like")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Like"});
+                      download.setmValue(new String[]{jsonObject.getString("Like")});
+                      Log.d("Likes Values", ""+jsonObject.getString("Like"));
+                  }
+                  if(jsonObject.has("Destination")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Destination"});
+                      download.setmValue(new String[]{jsonObject.getString("Destination")});
+                      Log.d("Destination Values", ""+jsonObject.getString("Destination"));
+                  }
+                  if(jsonObject.has("Answer")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Answer"});
+                      download.setmValue(new String[]{jsonObject.getString("Answer")});
+                      Log.d("Answer Values", ""+jsonObject.getString("Answer"));
+                  }
+                  if(jsonObject.has("Options")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Options"});
+                      download.setmValue(new String[]{jsonObject.getString("Options")});
+                      Log.d("Options Values", ""+jsonObject.getString("Options"));
+                  }
+                  if(jsonObject.has("Question")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Question"});
+                      download.setmValue(new String[]{jsonObject.getString("Question")});
+                      Log.d("Questions Values", ""+jsonObject.getString("Question"));
+                  }
+                  if(jsonObject.has("Images")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"Images"});
+                      download.setmValue(new String[]{jsonObject.getString("Images")});
+                      Log.d("Images Values", ""+jsonObject.getString("Images"));
+                  }
+                  if (jsonObject.has("User")){
+                      Download download = new Download();
+                      download.setmKey(new String[]{"User"});
+                      download.setmValue(new String[]{jsonObject.getString("User")});
+                      Log.d("User Values", ""+jsonObject.getString("User"));
+                  }
+
+              }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("Loaded Data", "Data" + aData.toString());
+        }
+        if(id==2){//Upload
+
+        }
+
+    }
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private GoogleMapOptions googleMapOptions;
     private Marker myMarker;
+    UUID uuid;
     AutoCompleteTextView text_dest;
     Uri imageURI;
     private static final int IMAGE_CAPTURE_CODE = 100;
@@ -64,6 +175,9 @@ public class MainActivity extends AppCompatActivity
     private static final int MEDIA_IMAGE = 1;
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
     List<Destination> mDestList;
+    static final String URL = "http://192.168.1.6/travelwebapp/api/v1/downloadDb";
+    protected static String DB_NAME = "TravelApp";
+    static final String DB_PATH = "databases";
     HashMap<String, Integer> mDestinationNames = new HashMap<>();
     List<GetTemp> mTempDataList;
     NewDataBase newDataBase;
@@ -71,7 +185,8 @@ public class MainActivity extends AppCompatActivity
     List<MyDestination> mDestinationList;
     SharedPreferences sharedPref;
     public static final String MyPREFERENCES = "MyPrefs";
-
+    LayoutInflater layoutInflater;
+    SharedPreferences.Editor editor;
     @Override
     protected void onResume() {
         super.onResume();
@@ -88,19 +203,46 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+         editor=sharedPref.edit();
+
+        if(NetworkUtils.isActiveNetworkAvailable(this)) {
+
+            ContextWrapper ctw = new ContextWrapper(getApplicationContext());
+            File directory = ctw.getDir(DB_PATH, Context.MODE_PRIVATE);
+            File internalfile = new File(directory, DB_NAME);
+
+            if(!internalfile.exists()) {
+               copyDatabase(internalfile);
+            }
+            String url= getResources().getString(R.string.URL);
+            String UserId=sharedPref.getString("UserId", null);
+            Log.d("UserId",UserId);
+            super.fetchData(url+"download"+"?"+"tempid="+UserId,true,1);//id 1=>download 2=>upload
+      }
+
+        else {
+            layoutInflater=getLayoutInflater();
+            View view=layoutInflater.inflate(R.layout.cust_toast,null);
+             Toast toast=new Toast(this);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+            toast.setView(view);//setting the view of custom toast layout
+            toast.show();
+        }
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
 
-        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         mDestList = new ArrayList<Destination>();
-
 
         UserDetails userDetails = new UserDetails();
         newDataBase = new NewDataBase(getApplicationContext());
@@ -125,7 +267,6 @@ public class MainActivity extends AppCompatActivity
     e.printStackTrace();
 }
         text_dest.setAdapter(arrayAdapter);
-
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -249,21 +390,17 @@ public class MainActivity extends AppCompatActivity
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.setDrawerListener(toggle);
             toggle.syncState();
-
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
-
             CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(21.0000, 78.0000));
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
             mMap.animateCamera(zoom);
             mMap.moveCamera(center);
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
-
                 @Override
                 public View getInfoWindow(Marker mark) {
                     if (view == null) {
-
                         view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
                         view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
                         View phtotosView = view.findViewById(R.id.item_title);
@@ -273,8 +410,6 @@ public class MainActivity extends AppCompatActivity
                                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
                             }
                         });
-
-
                         //    view.setLayoutParams(new ViewGroup.LayoutParams(200,200));
                         TextView title = (TextView) view.findViewById(R.id.textView3);
                         title.setText(mark.getTitle());
@@ -286,10 +421,7 @@ public class MainActivity extends AppCompatActivity
                 public View getInfoContents(Marker marker) {
                     return null;
                 }
-
             });
-
-
             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
                 public void onInfoWindowClick(Marker mark) {
@@ -304,6 +436,97 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
+    private void copyDatabase(File internalfile) {
+        NetworkUtils n = new NetworkUtils();
+        java.net.URL url = null;
+        HttpURLConnection urlConnection = null;
+        OutputStream myOutput = null;
+        byte[] buffer = null;
+        InputStream inputStream = null;
+        BufferedReader bufferedReader;
+        try {
+            if (n.isActiveNetworkAvailable(getApplicationContext())) {
+                uuid= UUID.randomUUID();
+                String data = "tempid"
+                        + "=" + String.valueOf(uuid);
+                url = new URL(URL+"?"+data);
+                editor.putString("UserId", String.valueOf(uuid));
+                editor.commit();
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                Log.d("STATUS", "Request Sended...");
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                urlConnection.setDoOutput(true);
+                urlConnection.setUseCaches(false);
+                urlConnection.setConnectTimeout(20000);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.connect();
+
+               /* OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
+                wr.write(data);
+                wr.flush();
+               */ int Http_Result = urlConnection.getResponseCode();
+                String res=urlConnection.getResponseMessage().toString();
+                Log.d("ResponseMessage",res);
+                Log.d("RESPONSE CODE", String.valueOf(Http_Result));
+                switch (Http_Result) {
+                    case HttpURLConnection.HTTP_OK:
+                        inputStream = urlConnection.getInputStream();
+                        buffer = new byte[1024];
+                        myOutput = new FileOutputStream(internalfile);
+                        int length;
+                        while ((length = inputStream.read(buffer)) > 0) {
+                            myOutput.write(buffer, 0, length);
+                        }
+                        myOutput.flush();
+                        myOutput.close();
+                        inputStream.close();
+                        break;
+                    case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+                        Log.d("STATUS ", "Time Out Occours During Connecting to server..");
+                        break;
+                    case HttpURLConnection.HTTP_BAD_GATEWAY:
+                        Log.d("STATUS ", "BAD GATEWAY REQUEST ...");
+                        break;
+                    case HttpURLConnection.HTTP_INTERNAL_ERROR:
+                        Log.d("STATUS ", "HTTP INTERNAL ERROR");
+                        break;
+                    case HttpURLConnection.HTTP_UNAUTHORIZED:
+                        Log.d("STATUS ", "HTTP UNAUTHORIZED.");
+                        break;
+                    case HttpURLConnection.HTTP_NOT_FOUND:
+                        Log.d("STATUS", "HTTP NOT FOUND..");
+                        break;
+                    case HttpURLConnection.HTTP_BAD_METHOD:
+                        Log.d("STATUS", "HTTP_BAD_METHOD");
+                        break;
+
+                }
+                //  content=stringBuilder.toString();
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Please Connect to Internet", Toast.LENGTH_SHORT).show();
+            }
+        } catch (ConnectException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+         /*catch (JSONException e) {
+            e.printStackTrace();
+     /*   }*//* catch (JSONException e) {
+                e.printStackTrace();
+            }
+*/
+    }
+
 
     void CustDialog(String title, final int cDestId) {
         // Create custom dialog object

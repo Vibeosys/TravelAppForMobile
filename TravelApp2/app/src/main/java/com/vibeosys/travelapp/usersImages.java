@@ -4,9 +4,9 @@ package com.vibeosys.travelapp;
  * Created by mahesh on 10/16/2015.
  */
 public class usersImages extends UserDetails {
-    int mImageId;
+    String mImageId;
     String mImagePaths;
- usersImages(int cImageId,String cImagePath,int cDestId,int cUserId){
+ usersImages(String cImageId,String cImagePath,int cDestId,String cUserId){
     this.mImageId= cImageId;
     this.mImagePaths=cImagePath;
     this.UserId=cUserId;
@@ -14,11 +14,11 @@ public class usersImages extends UserDetails {
 
  }
 
-    public int getmImageId() {
+    public String getmImageId() {
         return mImageId;
     }
 
-    public void setmImageId(int mImageId) {
+    public void setmImageId(String mImageId) {
         this.mImageId = mImageId;
     }
 

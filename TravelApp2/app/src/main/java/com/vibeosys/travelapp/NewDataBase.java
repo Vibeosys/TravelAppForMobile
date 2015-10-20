@@ -34,13 +34,13 @@ public class NewDataBase extends SQLiteOpenHelper {
 
         String CREATE_ANSWERS_TABLE = "CREATE TABLE Answer(" +
                 "   AnswerId INT PRIMARY KEY     NOT NULL," +
-                "   UserId                INT    NOT NULL," +
+                "   UserId                TEXT    NOT NULL," +
                 "   DestId                INT    NOT NULL," +
                 "   OptionId              INT    NOT NULL," +
                 "   CreatedDate           DATETIME   NOT NULL" +
                 " )";
         String CREATE_COMMENTSANDLIKES = "CREATE TABLE CommentAndLike(" +
-                "   UserId       INT            NOT NULL," +
+                "   UserId       TEXT            NOT NULL," +
                 "   DestId       INT            NOT NULL," +
                 "   LIkeCount          INT     NOT NULL," +
                 "   CommentText        TEXT    NULL," +
@@ -59,7 +59,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         String CREATE_IMAGES_TABLE = "CREATE TABLE usersImages(" +
                 "   ImageId INTEGER PRIMARY KEY    AUTOINCREMENT," +
                 "   ImagePath           TEXT    NOT NULL," +
-                "   UserId              INT     NOT NULL," +
+                "   UserId              TEXT     NOT NULL," +
                 "   DestId              INT     NOT NULL," +
                 "   ImageSeen           BOOLEAN NOT NULL" +
                 ")";
@@ -85,7 +85,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 ")";
         String CREATE_SYNC_TABLE = "CREATE TABLE Sync(" +
                 "SyncAutoNo INT PRIMARY KEY NOT NULL," +
-                "UserId     INT NOT NULL," +
+                "UserId     TEXT NOT NULL," +
                 "JsonSync   TEXT NOT NULL," +
                 "TableName  TEXT NOT NULL      " +
                 ")";
@@ -97,12 +97,12 @@ public class NewDataBase extends SQLiteOpenHelper {
                 "   Long             DOUBLE NOT NULL\n" +
                 "    )";
         String CREATE_USER_DATA = "CREATE TABLE User(" +
-                "UserId    INT PRIMARY KEY NOT NULL," +
+                "UserId    TEXT PRIMARY KEY NOT NULL," +
                 "UserName     TEXT NOT NULL" +
                 ")";
 
         String CREATE_MYUSER_TABLE = "CREATE TABLE myUser(" +
-                "UserId    INT PRIMARY KEY NOT NULL," +
+                "UserId    TEXT PRIMARY KEY NOT NULL," +
                 "UserName     TEXT NOT NULL," +
                 "MobileNo     TEXT NOT NULL," +
                 "Active       BOOLEAN NOT NULL" +
@@ -124,9 +124,9 @@ public class NewDataBase extends SQLiteOpenHelper {
         Log.d("CREATED", "SUCCESS");
     }
 
-    public void AddUser(int cUserId, String cUserName) {
+    public void AddUser(String cUserId, String cUserName) {
         String Username = cUserName;
-        int UserId = cUserId;
+        String UserId = cUserId;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("UserId", UserId);
@@ -152,10 +152,10 @@ public class NewDataBase extends SQLiteOpenHelper {
                             cursor.moveToFirst();
                             do {
                                 usersImages theUsersImages = new usersImages(
-                                        cursor.getInt(cursor.getColumnIndex("ImageId")),
+                                        cursor.getString(cursor.getColumnIndex("ImageId")),
                                         cursor.getString(cursor.getColumnIndex("ImagePath")),
                                         cursor.getInt(cursor.getColumnIndex("DestId")),
-                                        cursor.getInt(cursor.getColumnIndex("UserId"))
+                                        cursor.getString(cursor.getColumnIndex("UserId"))
                                 );
                                 cImagePaths.add(theUsersImages);
                             } while (cursor.moveToNext());
@@ -183,7 +183,7 @@ List<CommentsAndLikes> DestinationComments(int DestId){
                 cursor.moveToFirst();
                 do{
 CommentsAndLikes commentsAndLikes=new CommentsAndLikes(
-        cursor.getInt(cursor.getColumnIndex("UserId")),
+        cursor.getString(cursor.getColumnIndex("UserId")),
         cursor.getInt(cursor.getColumnIndex("DestId")),
         cursor.getString(cursor.getColumnIndex("CommentText")),
         cursor.getString(cursor.getColumnIndex("UserName"))

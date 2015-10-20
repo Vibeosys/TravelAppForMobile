@@ -4,7 +4,7 @@ package com.vibeosys.travelapp;
  * Created by mahesh on 10/9/2015.
  */
 public class UserDetails {
-    protected int UserId;
+    protected String UserId;
     protected String Username;
     protected int DestId;
 
@@ -24,11 +24,11 @@ public class UserDetails {
         Username = username;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return UserId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         UserId = userId;
     }
 }

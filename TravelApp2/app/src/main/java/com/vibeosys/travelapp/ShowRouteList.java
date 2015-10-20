@@ -29,9 +29,6 @@ import java.util.List;
  */
 public class ShowRouteList extends AppCompatActivity {
     ListView listView;
-    String [] from=new String[]{"Mumbai","Pune","Banglore","Chennai"};
-    String [] to=new String[]{"Pune","Mumbai","Chennai","Banglore"};
-    List<TextView> list=new ArrayList<TextView>(from.length);
     Context context;
     NewDataBase newDataBase;
     List<Routes> mRouteList;
