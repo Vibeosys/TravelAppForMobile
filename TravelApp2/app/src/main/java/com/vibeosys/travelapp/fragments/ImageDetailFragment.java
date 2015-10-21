@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,6 +24,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.vibeosys.travelapp.ImageDetailActivity;
+import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.ImageWorker;
 import com.vibeosys.travelapp.util.Utils;

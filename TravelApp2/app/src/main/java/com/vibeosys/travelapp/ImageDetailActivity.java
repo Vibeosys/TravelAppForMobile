@@ -32,6 +32,8 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ListView;
 
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.fragments.ImageDetailFragment;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.Utils;

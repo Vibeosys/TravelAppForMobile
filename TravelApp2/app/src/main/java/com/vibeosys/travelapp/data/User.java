@@ -1,34 +1,50 @@
 package com.vibeosys.travelapp.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mahesh on 10/20/2015.
  */
 public class User {
-private String mUserId[];
-private String mUserName[];
-private String mPhotoURL[];
+private String UserId;
+private String UserName;
+private String PhotoURL;
 
-    public String[] getmUserId() {
-        return mUserId;
+    public String getUserId() {
+        return UserId;
     }
 
-    public void setmUserId(String[] mUserId) {
-        this.mUserId = mUserId;
+    public void setUserId(String userId) {
+        this.UserId = userId;
     }
 
-    public String[] getmUserName() {
-        return mUserName;
+    public String getUserName() {
+        return UserName;
     }
 
-    public void setmUserName(String[] mUserName) {
-        this.mUserName = mUserName;
+    public void setUserName(String userName) {
+        this.UserName = userName;
     }
 
-    public String[] getmPhotoURL() {
-        return mPhotoURL;
+    public String getPhotoURL() {
+        return PhotoURL;
     }
 
-    public void setmPhotoURL(String[] mPhotoURL) {
-        this.mPhotoURL = mPhotoURL;
+    public void setPhotoURL(String photoURL) {
+        this.PhotoURL = photoURL;
     }
+
+    public static List<User> deserializeSting(ArrayList<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<User> userssList=new ArrayList<>();
+        for(String serializedString: serializedStringList){
+            User deserizeedUsers= gson.fromJson(serializedString, User.class);
+            userssList.add(deserizeedUsers);
+        }
+        return userssList;
+    }
+
 }

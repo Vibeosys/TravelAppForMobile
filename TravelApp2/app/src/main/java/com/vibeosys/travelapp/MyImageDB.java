@@ -15,7 +15,7 @@ public class MyImageDB extends MyImages {
 
     int mId;
 
-MyImageDB(int cImageId,String cImagePath,String cCreatedDate){
+public MyImageDB(int cImageId, String cImagePath, String cCreatedDate){
     this.mImageId=cImageId;
     this.mImagePath=cImagePath;
     this.mCreatedDate=cCreatedDate;

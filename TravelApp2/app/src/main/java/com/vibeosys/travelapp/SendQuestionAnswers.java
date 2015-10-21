@@ -20,7 +20,7 @@ String mOptionTextArr[];
         this.mId = mId;
     }
 
-    SendQuestionAnswers(){
+    public SendQuestionAnswers(){
 
     }
     SendQuestionAnswers(int cQuestionId,String cQuestionText){

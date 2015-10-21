@@ -22,7 +22,7 @@ public class CommentsAndLikes extends UserDetails {
     CommentsAndLikes( int cUserId, int cDestId, int cLikeCount, String cCommentText, String cCommentDate) {
 
     }
-    CommentsAndLikes(String UserId,int DestId,String commentText,String username){
+    public CommentsAndLikes(String UserId, int DestId, String commentText, String username){
         this.UserId=UserId;
         this.DestId=DestId;
         this.mCommentText=commentText;

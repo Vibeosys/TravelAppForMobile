@@ -1,34 +1,51 @@
 package com.vibeosys.travelapp.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mahesh on 10/20/2015.
  */
 public class Option {
-private int mOptionsId[];
-private String mOptionText[];
-private int mQuestionId[];
+private int OptionsId;
+private String OptionText;
+private int QuestionId;
 
-    public int[] getmOptionsId() {
-        return mOptionsId;
+    public int getOptionId() {
+        return OptionsId;
     }
 
-    public void setmOptionsId(int[] mOptionsId) {
-        this.mOptionsId = mOptionsId;
+    public void setOptionsId(int optionsId) {
+        this.OptionsId = optionsId;
     }
 
-    public String[] getmOptionText() {
-        return mOptionText;
+    public String getOptionText() {
+        return OptionText;
     }
 
-    public void setmOptionText(String[] mOptionText) {
-        this.mOptionText = mOptionText;
+    public void setOptionText(String optionText) {
+        this.OptionText = optionText;
     }
 
-    public int[] getmQuestionId() {
-        return mQuestionId;
+    public int getQuestionId() {
+        return QuestionId;
     }
 
-    public void setmQuestionId(int[] mQuestionId) {
-        this.mQuestionId = mQuestionId;
+    public void setQuestionId(int questionId) {
+        this.QuestionId = questionId;
     }
+
+    public static List<Option> deserializeSting(ArrayList<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<Option> optionsList=new ArrayList<>();
+
+        for(String serializedString: serializedStringList){
+            Option deserizeedImages= gson.fromJson(serializedString, Option.class);
+            optionsList.add(deserizeedImages);
+        }
+        return optionsList;
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.tasks;
 
 /**
  * Callback for handling async task states

@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.Adaptors;
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -16,6 +16,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.vibeosys.travelapp.CommentsAndLikes;
+import com.vibeosys.travelapp.MyImageDB;
+import com.vibeosys.travelapp.R;
 
 import java.util.ArrayList;
 import java.util.List;

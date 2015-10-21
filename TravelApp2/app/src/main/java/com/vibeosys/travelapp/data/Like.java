@@ -1,25 +1,41 @@
 package com.vibeosys.travelapp.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mahesh on 10/20/2015.
  */
 public class Like {
-private String mUserId[];
-private String  mDestId[];
+    private String UserId;
+    private int DestId;
 
-    public String[] getmUserId() {
-        return mUserId;
+    public String getUserId() {
+        return UserId;
     }
 
-    public void setmUserId(String[] mUserId) {
-        this.mUserId = mUserId;
+    public void setUserId(String userId) {
+        this.UserId = userId;
     }
 
-    public String[] getmDestId() {
-        return mDestId;
+    public int getDestId() {
+        return DestId;
     }
 
-    public void setmDestId(String[] mDestId) {
-        this.mDestId = mDestId;
+    public void setDestId(int destId) {
+        this.DestId = destId;
+    }
+
+    public static List<Like> deserializeSting(ArrayList<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<Like> likeList=new ArrayList<>();
+
+        for(String serializedString: serializedStringList){
+            Like deserizeedLike= gson.fromJson(serializedString, Like.class);
+            likeList.add(deserizeedLike);
+        }
+        return likeList;
     }
 }

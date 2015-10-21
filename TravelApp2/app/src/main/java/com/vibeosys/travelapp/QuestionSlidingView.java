@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+
 /**
  * Created by mahesh on 10/14/2015.
  */

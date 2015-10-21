@@ -22,6 +22,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,7 +48,7 @@ public class GridViewPhotos extends AppCompatActivity {
     private String[] mNames = null;
     private Cursor cc = null;
     private Uri imageUri;
-    private  NewDataBase newDataBase;
+    private NewDataBase newDataBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

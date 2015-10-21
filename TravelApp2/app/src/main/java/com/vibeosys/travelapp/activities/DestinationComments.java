@@ -1,9 +1,14 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
+
+import com.vibeosys.travelapp.Adaptors.ShowDestinationCommentsAdaptor;
+import com.vibeosys.travelapp.CommentsAndLikes;
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.R;
 
 import java.util.ArrayList;
 import java.util.List;

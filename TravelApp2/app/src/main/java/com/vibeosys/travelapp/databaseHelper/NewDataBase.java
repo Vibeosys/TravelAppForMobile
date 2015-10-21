@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.databaseHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +8,23 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.vibeosys.travelapp.CommentsAndLikes;
+import com.vibeosys.travelapp.Destination;
+import com.vibeosys.travelapp.DestinationTempData;
+import com.vibeosys.travelapp.GetTemp;
+import com.vibeosys.travelapp.MyDestination;
+import com.vibeosys.travelapp.MyImageDB;
+import com.vibeosys.travelapp.Routes;
+import com.vibeosys.travelapp.SendQuestionAnswers;
+import com.vibeosys.travelapp.TempData;
+import com.vibeosys.travelapp.data.Answer;
+import com.vibeosys.travelapp.data.Comment;
+import com.vibeosys.travelapp.data.Images;
+import com.vibeosys.travelapp.data.Like;
+import com.vibeosys.travelapp.data.Option;
+import com.vibeosys.travelapp.data.User;
+import com.vibeosys.travelapp.usersImages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,90 +155,342 @@ public class NewDataBase extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
-    List<usersImages> Images(int cDestId) {
-        List<usersImages> cImagePaths = new ArrayList<>();
-        SQLiteDatabase sqLiteDatabase=null;
-        Cursor cursor=null;
-                try {
-                    sqLiteDatabase=getReadableDatabase();
-                    /*cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});*/
-                    cursor = sqLiteDatabase.rawQuery("select * from Images",null);
+    public boolean insertComment(List<Comment> listComment) {
+        List<Comment> mListComment =null;
+        SQLiteDatabase database = null;
+        mListComment = listComment;
+        ContentValues contentValues = null;
+        long id=-1;
+        try {
+            database = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < mListComment.size(); i++) {
+                contentValues.put("commentText", listComment.get(i).getCommentText());
+                contentValues.put("DestId", listComment.get(i).getDestId());
+                contentValues.put("UserId", listComment.get(i).getUserId());
+                 id = database.insert("Comment_and_like", null, contentValues);
+                Log.d("Updated Databse", String.valueOf(id));
+                Log.d("Updated Column", listComment.get(i).getCommentText());
+                contentValues.clear();
+            }
+            database.close();
+            Log.d("Comment Table","Inserted in Comment");
+    if(id!=-1) {
+        return true;
+    }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-                    if (cursor != null) {
-                        if (cursor.getCount() > 0) {
-                            cursor.moveToFirst();
-                            do {
-                                usersImages theUsersImages = new usersImages(
-                                        cursor.getString(cursor.getColumnIndex("ImageId")),
-                                        cursor.getString(cursor.getColumnIndex("ImagePath")),
-                                        cursor.getInt(cursor.getColumnIndex("DestId")),
-                                        cursor.getString(cursor.getColumnIndex("UserId"))
-                                );
-                                cImagePaths.add(theUsersImages);
-                            } while (cursor.moveToNext());
-                        }
-                    }
-                    cursor.close();
-                    sqLiteDatabase.close();
-                }catch (Exception e){
-                    e.printStackTrace();
+        return false;
+    }
+
+public int LikeCount(int DestId, String UserId, SQLiteDatabase sqLiteDatabase1){
+ int likeCount=0;
+    SQLiteDatabase sqLiteDatabase=sqLiteDatabase1;
+    Cursor cursor=null;
+    try {
+        sqLiteDatabase=getReadableDatabase();
+        cursor=sqLiteDatabase.rawQuery("select LikeCount from comment_and_like where destid=? and userid=?",new String[]{String.valueOf(DestId),String.valueOf(UserId)});
+        if(cursor!=null){
+            if(cursor.getCount()>0){
+                cursor.moveToFirst();
+                likeCount=cursor.getInt(cursor.getColumnIndex("LikeCount"));
+            }
+            cursor.close();
+
+        }
+        Log.d("Like Table Like Count",""+likeCount);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return likeCount+1;
+}
+
+    public boolean insertLikes(List<Like> listLikes) {
+        List<Like> mListLikes = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        SQLiteDatabase sqLiteDatabase1=null;
+        mListLikes = listLikes;
+        ContentValues contentValues = null;
+        long id=-1;
+        int countvalue=0;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < mListLikes.size(); i++) {
+                countvalue=LikeCount(mListLikes.get(i).getDestId(), mListLikes.get(i).getUserId(),sqLiteDatabase1);
+                contentValues=new ContentValues();
+                contentValues.put("LikeCount",countvalue);
+                id = sqLiteDatabase.update("Comment_and_like",contentValues,"userid=? and DestId=?",new String[]{mListLikes.get(i).getUserId(),
+                        String.valueOf(mListLikes.get(i).getDestId())});
+                Log.d("Updated Databse", String.valueOf(id));
+                contentValues.clear();
+            }
+            Log.d("Like_and_Comments Table","Inserted in Like Table"+id);
+            if(id!=-1) {
+                return true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        sqLiteDatabase.close();
+        return false;
+    }
+
+public boolean insertDestination(List<com.vibeosys.travelapp.data.Destination> DestList){
+    List<com.vibeosys.travelapp.data.Destination> mDestList=null;
+    mDestList=DestList;
+    SQLiteDatabase sqLiteDatabase=null;
+    ContentValues contentValues=null;
+    long count=-1;
+    try {
+        sqLiteDatabase=getWritableDatabase();
+        contentValues=new ContentValues();
+
+        for(int i=0;i<mDestList.size();i++){
+            contentValues.put("DestId",mDestList.get(i).getDestId());
+            contentValues.put("DestName",mDestList.get(i).getDestName());
+            contentValues.put("Lat",mDestList.get(i).getLat());
+            contentValues.put("Long",mDestList.get(i).getLong());
+            count= sqLiteDatabase.insert("Destination",null,contentValues);
+            contentValues.clear();
+        }
+sqLiteDatabase.close();
+    if(count!=-1){
+        return true;
+    }
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    Log.d("Destination Table","Inserted in Destination"+count);
+    return false;
+}
+
+    public     boolean insertImages(List<Images> ImagesList){
+        List<Images> mImagesList=null;
+        mImagesList=ImagesList;
+        SQLiteDatabase sqLiteDatabase=null;
+        ContentValues contentValues=null;
+        long count=-1;
+        try {
+            sqLiteDatabase=getWritableDatabase();
+            contentValues=new ContentValues();
+            for(int i=0;i<mImagesList.size();i++){
+                contentValues.put("DestId",mImagesList.get(i).getDestId());
+                contentValues.put("UserId",mImagesList.get(i).getUserId());
+                contentValues.put("ImageID",mImagesList.get(i).getImageId());
+                contentValues.put("ImagePath",mImagesList.get(i).getImagePath());
+                contentValues.put("ImageSeen",mImagesList.get(i).getImageSeen());
+                count= sqLiteDatabase.insert("Images",null,contentValues);
+                contentValues.clear();
+            }
+            sqLiteDatabase.close();
+            if(count!=-1){
+                Log.d("Images Table","Inserted in Images");
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public  boolean insertUsers(List<User> UsersList){
+        List<User> musersList=null;
+        musersList=UsersList;
+        SQLiteDatabase sqLiteDatabase=null;
+        ContentValues contentValues=null;
+        long count=-1;
+        try {
+            sqLiteDatabase=getWritableDatabase();
+            contentValues=new ContentValues();
+            for(int i=0;i<musersList.size();i++){
+                contentValues.put("UserId",musersList.get(i).getUserId());
+                contentValues.put("UserName",musersList.get(i).getUserName());
+                contentValues.put("PhotoURL",musersList.get(i).getPhotoURL());
+                count= sqLiteDatabase.insert("User",null,contentValues);
+                contentValues.clear();
+            }
+            sqLiteDatabase.close();
+            if(count!=-1){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+Log.d("User Table","Inserted in User Table"+count);
+        return false;
+    }
+
+    public  boolean insertQuestions(List<com.vibeosys.travelapp.data.Question> QuestionsList){
+        List<com.vibeosys.travelapp.data.Question> mQuestionsList=null;
+        mQuestionsList=QuestionsList;
+        SQLiteDatabase sqLiteDatabase=null;
+        ContentValues contentValues=null;
+        long count=-1;
+        try {
+            sqLiteDatabase=getWritableDatabase();
+            contentValues=new ContentValues();
+            for(int i=0;i<mQuestionsList.size();i++){
+                contentValues.put("QuestionId",mQuestionsList.get(i).getQuestionId());
+                contentValues.put("QuestionText",mQuestionsList.get(i).getQuestionText());
+                count= sqLiteDatabase.insert("Question",null,contentValues);
+                contentValues.clear();
+            }
+            sqLiteDatabase.close();
+            if(count!=-1){
+                return true;
+            }
+            Log.d("Inserted in Question","Question Table"+count);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public  boolean insertOptions(List<Option> OptionsList){
+        List<Option> mOptionsList=null;
+        mOptionsList=OptionsList;
+        SQLiteDatabase sqLiteDatabase=null;
+        ContentValues contentValues=null;
+        long count=-1;
+        try {
+            sqLiteDatabase=getWritableDatabase();
+            contentValues=new ContentValues();
+            for(int i=0;i<mOptionsList.size();i++){
+                contentValues.put("QuestionId",mOptionsList.get(i).getQuestionId());
+                contentValues.put("OptionText",mOptionsList.get(i).getOptionText());
+                contentValues.put("OptionId",mOptionsList.get(i).getOptionId());
+                count= sqLiteDatabase.insert("Option",null,contentValues);
+                contentValues.clear();
+            }
+            sqLiteDatabase.close();
+            if(count!=-1){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+Log.d("Qptions Table ","Inserted in Option Table"+count);
+        return false;
+    }
+
+    public  boolean insertAnswers(List<Answer> AnswersList){
+        List<Answer> mAnswersList=null;
+        mAnswersList=AnswersList;
+        SQLiteDatabase sqLiteDatabase=null;
+        ContentValues contentValues=null;
+        long count=-1;
+        try {
+            sqLiteDatabase=getWritableDatabase();
+            contentValues=new ContentValues();
+            for(int i=0;i<mAnswersList.size();i++){
+                contentValues.put("AnswerId",mAnswersList.get(i).getAnswerId());
+                contentValues.put("DestId",mAnswersList.get(i).getDestId());
+                contentValues.put("OptionId",mAnswersList.get(i).getOptionId());
+                contentValues.put("UserId",mAnswersList.get(i).getUserId());
+                count= sqLiteDatabase.insert("Answer",null,contentValues);
+                contentValues.clear();
+            }
+            sqLiteDatabase.close();
+            if(count!=-1){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        Log.d("Answer Table","Inserted in Answer Table"+count);
+        return false;
+    }
+
+    public List<usersImages> Images(int cDestId) {
+        List<usersImages> cImagePaths = new ArrayList<>();
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+                    /*cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});*/
+            cursor = sqLiteDatabase.rawQuery("select * from Images", null);
+
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    do {
+                        usersImages theUsersImages = new usersImages(
+                                cursor.getString(cursor.getColumnIndex("ImageId")),
+                                cursor.getString(cursor.getColumnIndex("ImagePath")),
+                                cursor.getInt(cursor.getColumnIndex("DestId")),
+                                cursor.getString(cursor.getColumnIndex("UserId"))
+                        );
+                        cImagePaths.add(theUsersImages);
+                    } while (cursor.moveToNext());
                 }
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return cImagePaths;
     }
 
-List<CommentsAndLikes> DestinationComments(int DestId){
-    List<CommentsAndLikes> DestComments=null;
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    try{
-        sqLiteDatabase=getReadableDatabase();
-        DestComments=new ArrayList<>();
-        cursor=sqLiteDatabase.rawQuery("select * from comment_and_like NATURAL JOIN user where destid=? and user.userid=comment_and_like.userid;",new  String[]{String.valueOf(DestId)});
-        if(cursor!=null){
-            if(cursor.getCount()>0){
-                cursor.moveToFirst();
-                do{
-CommentsAndLikes commentsAndLikes=new CommentsAndLikes(
-        cursor.getString(cursor.getColumnIndex("UserId")),
-        cursor.getInt(cursor.getColumnIndex("DestId")),
-        cursor.getString(cursor.getColumnIndex("CommentText")),
-        cursor.getString(cursor.getColumnIndex("UserName"))
-);
-                    DestComments.add(commentsAndLikes);
+    public List<CommentsAndLikes> DestinationComments(int DestId) {
+        List<CommentsAndLikes> DestComments = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            DestComments = new ArrayList<>();
+            cursor = sqLiteDatabase.rawQuery("select * from comment_and_like NATURAL JOIN user where destid=? and user.userid=comment_and_like.userid;", new String[]{String.valueOf(DestId)});
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    do {
+                        CommentsAndLikes commentsAndLikes = new CommentsAndLikes(
+                                cursor.getString(cursor.getColumnIndex("UserId")),
+                                cursor.getInt(cursor.getColumnIndex("DestId")),
+                                cursor.getString(cursor.getColumnIndex("CommentText")),
+                                cursor.getString(cursor.getColumnIndex("UserName"))
+                        );
+                        DestComments.add(commentsAndLikes);
 
-                }while (cursor.moveToNext());
+                    } while (cursor.moveToNext());
+                }
             }
+            cursor.close();
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        cursor.close();
-        sqLiteDatabase.close();
-    }catch (Exception e){
-        e.printStackTrace();
+        return DestComments;
     }
-return DestComments;
-}
-int Questions(int DestId){
-    int noOfQuestions=0;
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    try{
-        sqLiteDatabase=getReadableDatabase();
-        cursor=sqLiteDatabase.rawQuery("select * from question",null);
-        if(cursor!=null){
-            cursor.moveToFirst();
-            noOfQuestions=cursor.getCount();
+
+    public int Questions(int DestId) {
+        int noOfQuestions = 0;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select * from question", null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                noOfQuestions = cursor.getCount();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    }catch (Exception e){
-        e.printStackTrace();
+        return noOfQuestions;
     }
-return noOfQuestions;
-}
 
 
-    int MsgCount(int cDestId) {
+    public int MsgCount(int cDestId) {
         int count = 0;
-        SQLiteDatabase sqLiteDatabase=null;
-        Cursor cursor=null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
             cursor = sqLiteDatabase.rawQuery("select * from answer where DestId=?", new String[]{String.valueOf(cDestId)});
@@ -229,43 +498,42 @@ return noOfQuestions;
             cursor.close();
             sqLiteDatabase.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return count;
     }
 
-    int ImageCount(int cDestId) {
+    public int ImageCount(int cDestId) {
         int count = 0;
-        SQLiteDatabase sqLiteDatabase=null;
-        Cursor cursor=null;
-        try{
-sqLiteDatabase   = getReadableDatabase();
-             cursor = sqLiteDatabase.rawQuery("select * from images where not imageseen and DestId=?", new String[]{String.valueOf(cDestId)});
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select * from images where not imageseen and DestId=?", new String[]{String.valueOf(cDestId)});
             count = cursor.getCount();
             cursor.close();
             sqLiteDatabase.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return count;
     }
 
     public void GetUser() {
-        SQLiteDatabase db=null;
-        Cursor cursor=null;
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
         try {
             db = this.getReadableDatabase();
-           cursor  = db.rawQuery("select * from User ", null);
+            cursor = db.rawQuery("select * from User ", null);
             cursor.moveToFirst();
             Log.d("USERID", cursor.getString(0));
             Log.d("USERNAME", cursor.getString(1));
             db.close();
 
-        }catch (Exception e)
-        {
-e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -348,7 +616,7 @@ e.printStackTrace();
         List<TempData> mSaveList = null;
         mSaveList = cListSave;
         String mDestName = cDestName;
-        SQLiteDatabase mSaveinTemp=null;
+        SQLiteDatabase mSaveinTemp = null;
         try {
             mSaveinTemp = getWritableDatabase();
             TempData mTempDatainMap = new TempData();
@@ -365,15 +633,15 @@ e.printStackTrace();
             mSaveinTemp.insert("TempData", null, mSaveinTempValues);
             Log.d("TEMP TABLE", "SAVED IN TEMP TABLE");
             mSaveinTemp.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public List<MyImageDB> mUserImagesList() {
         List<MyImageDB> theUserImagesList = new ArrayList<>();
-        SQLiteDatabase sqLiteDatabase=null;
-        Cursor cursor=null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
             cursor = sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from MyImages Order By CreateDate Desc", null);
@@ -391,7 +659,7 @@ e.printStackTrace();
             cursor.close();
             sqLiteDatabase.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return theUserImagesList;
@@ -424,81 +692,81 @@ e.printStackTrace();
 
     }
 
-public List<SendQuestionAnswers> mListQuestions(){
-    List<SendQuestionAnswers> mListQuestions=null;
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    try{
-        sqLiteDatabase=getReadableDatabase();
-        mListQuestions=new ArrayList<>();
-        cursor=sqLiteDatabase.rawQuery("select questionid,questiontext from question",null);
-        SendQuestionAnswers sendQuestionAnswers;
-        if(cursor!=null&&cursor.getCount()>0){
-            cursor.moveToFirst();
-            do{
-                sendQuestionAnswers=new SendQuestionAnswers();
-sendQuestionAnswers.setmQuestionId(cursor.getInt(cursor.getColumnIndex("QuestionId")));
-sendQuestionAnswers.setmQuestionText(cursor.getString(cursor.getColumnIndex("QuestionText")));
-                mListQuestions.add(sendQuestionAnswers);
-            }while (cursor.moveToNext());
-        }
-        cursor.close();
-        sqLiteDatabase.close();
-    }catch (Exception e){
-        e.printStackTrace();
-    }
-return mListQuestions;
-}
-public int CountOfUsers(int cOptionId){
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    int count=0;
-    try{
-        sqLiteDatabase=getReadableDatabase();
-        cursor=sqLiteDatabase.rawQuery("select * from answer where optionid=?",new String[]{String.valueOf(cOptionId)});
-        if(cursor!=null&&cursor.getCount()>0){
-            cursor.moveToFirst();
-            count=cursor.getCount();
-        }
-        cursor.close();
-        sqLiteDatabase.close();
-    }catch (Exception e){
-        e.printStackTrace();
-    }
-return count;
-}
-
-
-
-public  List<SendQuestionAnswers> mListOptions(int cQuestionId){
-    List<SendQuestionAnswers> theListAskQuestions=null;
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    int mQuestionId=cQuestionId;
-    try{
-        theListAskQuestions=new ArrayList<>();
-        sqLiteDatabase=getReadableDatabase();
-        SendQuestionAnswers sendQuestionAnswers;
-        cursor=sqLiteDatabase.rawQuery("select OpTIONID,optionText from  OPTIONS where questionid=?",new String[]{String.valueOf(cQuestionId)});
-        if(cursor!=null){
-            if(cursor.getCount()>0){
+    public List<SendQuestionAnswers> mListQuestions() {
+        List<SendQuestionAnswers> mListQuestions = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            mListQuestions = new ArrayList<>();
+            cursor = sqLiteDatabase.rawQuery("select questionid,questiontext from question", null);
+            SendQuestionAnswers sendQuestionAnswers;
+            if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                do{
-                    sendQuestionAnswers=new SendQuestionAnswers();
-                    sendQuestionAnswers.setmOptionId(cursor.getInt(0));
-                    sendQuestionAnswers.setmOptionText(cursor.getString(1));
-                    theListAskQuestions.add(sendQuestionAnswers);
-                    }while (cursor.moveToNext());
+                do {
+                    sendQuestionAnswers = new SendQuestionAnswers();
+                    sendQuestionAnswers.setmQuestionId(cursor.getInt(cursor.getColumnIndex("QuestionId")));
+                    sendQuestionAnswers.setmQuestionText(cursor.getString(cursor.getColumnIndex("QuestionText")));
+                    mListQuestions.add(sendQuestionAnswers);
+                } while (cursor.moveToNext());
             }
+            cursor.close();
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-cursor.close();
-sqLiteDatabase.close();
-        Log.d("theListAskQuestions", "" + theListAskQuestions.size());
-    }catch (Exception e){
-        e.printStackTrace();
+        return mListQuestions;
     }
-return theListAskQuestions;
-}
+
+    public int CountOfUsers(int cOptionId) {
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        int count = 0;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select * from answer where optionid=?", new String[]{String.valueOf(cOptionId)});
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getCount();
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+
+    public List<SendQuestionAnswers> mListOptions(int cQuestionId) {
+        List<SendQuestionAnswers> theListAskQuestions = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        int mQuestionId = cQuestionId;
+        try {
+            theListAskQuestions = new ArrayList<>();
+            sqLiteDatabase = getReadableDatabase();
+            SendQuestionAnswers sendQuestionAnswers;
+            cursor = sqLiteDatabase.rawQuery("select OpTIONID,optionText from  OPTIONS where questionid=?", new String[]{String.valueOf(cQuestionId)});
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    do {
+                        sendQuestionAnswers = new SendQuestionAnswers();
+                        sendQuestionAnswers.setmOptionId(cursor.getInt(0));
+                        sendQuestionAnswers.setmOptionText(cursor.getString(1));
+                        theListAskQuestions.add(sendQuestionAnswers);
+                    } while (cursor.moveToNext());
+                }
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+            Log.d("theListAskQuestions", "" + theListAskQuestions.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return theListAskQuestions;
+    }
 
 
     public List<MyDestination> GetFromTempLatLong() {
@@ -529,14 +797,14 @@ return theListAskQuestions;
     }
 
 
-    boolean mSaveMyImages(String cImagePath, String cDate) {
+    public boolean mSaveMyImages(String cImagePath, String cDate) {
         try {
             SQLiteDatabase thesqLiteDatabase = getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put("ImagePath", cImagePath);
             contentValues.put("CreateDate", cDate);
             long rows = thesqLiteDatabase.insert("MyImages", null, contentValues);
-thesqLiteDatabase.close();
+            thesqLiteDatabase.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -586,16 +854,16 @@ thesqLiteDatabase.close();
         return mGetTempList;
     }
 
-    boolean CheckTempData() {
+    public boolean CheckTempData() {
         Cursor cursor = null;
         SQLiteDatabase sqLiteDatabase = null;
-        boolean check=false;
+        boolean check = false;
         try {
             sqLiteDatabase = getReadableDatabase();
             cursor = sqLiteDatabase.rawQuery("select * from TempData", null);
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
-                check=true;
+                check = true;
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -606,7 +874,7 @@ thesqLiteDatabase.close();
         return check;
     }
 
-    boolean SaveinMapTable(String cMapTitle, String cJsonData, String cDate) {
+    public boolean SaveinMapTable(String cMapTitle, String cJsonData, String cDate) {
         long out = 0;
         try {
             SQLiteDatabase sqLiteDatabase = getWritableDatabase();
@@ -616,7 +884,7 @@ thesqLiteDatabase.close();
             contentValues.put("CreatedDate", cDate);
 
             out = sqLiteDatabase.insert("MyMap", null, contentValues);
-sqLiteDatabase.close();
+            sqLiteDatabase.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -625,7 +893,7 @@ sqLiteDatabase.close();
 
     }
 
-    List<Routes> getRouteList() {
+    public List<Routes> getRouteList() {
         List<Routes> mRouteLists = new ArrayList<>();
         try {
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();

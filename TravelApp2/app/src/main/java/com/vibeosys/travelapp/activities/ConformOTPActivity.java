@@ -1,10 +1,13 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+
+import com.vibeosys.travelapp.MainActivity;
+import com.vibeosys.travelapp.R;
 
 /**
  * Created by mahesh on 10/2/2015.

@@ -16,6 +16,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

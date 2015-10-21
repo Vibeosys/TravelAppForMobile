@@ -1,4 +1,5 @@
 package com.vibeosys.travelapp;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -41,13 +42,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.vibeosys.travelapp.data.Answer;
-import com.vibeosys.travelapp.data.Comment;
-import com.vibeosys.travelapp.data.Images;
-import com.vibeosys.travelapp.data.Like;
-import com.vibeosys.travelapp.data.Option;
-import com.vibeosys.travelapp.data.Question;
-import com.vibeosys.travelapp.data.User;
+import com.google.gson.Gson;
+import com.vibeosys.travelapp.activities.DestinationComments;
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseActivity;
+import com.vibeosys.travelapp.util.NetworkUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,91 +73,102 @@ import java.util.UUID;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
-JSONArray jsonArray;
-JSONObject jsonObject1;
-List<Images> mListImages;
-List<User> mListUsers;
-List<Question> mListQuestion;
-List<Answer> mListAnswers;
-List<Option> mListOptions;
-List<com.vibeosys.travelapp.data.Destination> mListDestinations;
-List<Comment> mListComments;
-List<Like> mListLike;
+
     @Override
-    public void onFailure(String aData,int id) {
-        super.onFailure(aData,id);
-        Log.d("Failed to Load","Data"+aData.toString());
+    public void onFailure(String aData, int id) {
+        super.onFailure(aData, id);
+        try {
+            Log.d("Failed to Load", "Data" + aData.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void onSuccess(String aData,int id) {
-        super.onSuccess(aData,id);
-        if(id==1){//Download
-            try {
+    public void onSuccess(String aData, int id) {
+        super.onSuccess(aData, id);
+        if (id == 1) {//Download
 
-                jsonObject1=new JSONObject(aData);
-                JSONArray jsonArray=jsonObject1.getJSONArray("data");
+            /*    jsonObject1 = new JSONObject(aData);
+                JSONArray jsonArray = jsonObject1.getJSONArray("data");
+                if (jsonArray.length() > 0) {
+                    mListDownload = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        if (jsonObject.has("Comment")) {
+                            Download download = new Download();
+                            download.setmKey("Comment");
+                            download.setmValue(new String[]{jsonObject.getString("Comment")});
+                            mListDownload.add(download);
+                            Log.d("Comments Value", "" + jsonObject.getString("Comment"));
+                        }
 
-              for (int i=0;i<jsonArray.length();i++){
-                  JSONObject jsonObject=jsonArray.getJSONObject(i);
-                  if(jsonObject.has("Comment")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Comment"});
-                      download.setmValue(new String[]{jsonObject.getString("Comment")});
-                      Log.d("Comments Value",""+jsonObject.getString("Comment"));
-                  }
-                  if(jsonObject.has("Like")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Like"});
-                      download.setmValue(new String[]{jsonObject.getString("Like")});
-                      Log.d("Likes Values", ""+jsonObject.getString("Like"));
-                  }
-                  if(jsonObject.has("Destination")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Destination"});
-                      download.setmValue(new String[]{jsonObject.getString("Destination")});
-                      Log.d("Destination Values", ""+jsonObject.getString("Destination"));
-                  }
-                  if(jsonObject.has("Answer")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Answer"});
-                      download.setmValue(new String[]{jsonObject.getString("Answer")});
-                      Log.d("Answer Values", ""+jsonObject.getString("Answer"));
-                  }
-                  if(jsonObject.has("Options")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Options"});
-                      download.setmValue(new String[]{jsonObject.getString("Options")});
-                      Log.d("Options Values", ""+jsonObject.getString("Options"));
-                  }
-                  if(jsonObject.has("Question")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Question"});
-                      download.setmValue(new String[]{jsonObject.getString("Question")});
-                      Log.d("Questions Values", ""+jsonObject.getString("Question"));
-                  }
-                  if(jsonObject.has("Images")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"Images"});
-                      download.setmValue(new String[]{jsonObject.getString("Images")});
-                      Log.d("Images Values", ""+jsonObject.getString("Images"));
-                  }
-                  if (jsonObject.has("User")){
-                      Download download = new Download();
-                      download.setmKey(new String[]{"User"});
-                      download.setmValue(new String[]{jsonObject.getString("User")});
-                      Log.d("User Values", ""+jsonObject.getString("User"));
-                  }
+                        if (jsonObject.has("Like")) {
+                            Download download = new Download();
+                            download.setmKey("Like");
+                            download.setmValue(new String[]{jsonObject.getString("Like")});
+                            mListDownload.add(download);
+                            Log.d("Likes Values", "" + jsonObject.getString("Like"));
+                        }
 
-              }
+                        if (jsonObject.has("Destination")) {
+                            Download download = new Download();
+                            download.setmKey("Destination");
+                            download.setmValue(new String[]{jsonObject.getString("Destination")});
+                            mListDownload.add(download);
+                            Log.d("Destination Values", "" + jsonObject.getString("Destination"));
+                        }
 
+                        if (jsonObject.has("Answer")) {
+                            Download download = new Download();
+                            download.setmKey("Answer");
+                            download.setmValue(new String[]{jsonObject.getString("Answer")});
+                            mListDownload.add(download);
+                            Log.d("Answer Values", "" + jsonObject.getString("Answer"));
+                        }
+
+                        if (jsonObject.has("Options")) {
+                            Download download = new Download();
+                            download.setmKey("Options");
+                            download.setmValue(new String[]{jsonObject.getString("Options")});
+                            mListDownload.add(download);
+                            Log.d("Options Values", "" + jsonObject.getString("Options"));
+                        }
+
+                        if (jsonObject.has("Question")) {
+                            Download download = new Download();
+                            download.setmKey("Question");
+                            download.setmValue(new String[]{jsonObject.getString("Question")});
+                            mListDownload.add(download);
+                            Log.d("Questions Values", "" + jsonObject.getString("Question"));
+                        }
+                        if (jsonObject.has("Images")) {
+                            Download download = new Download();
+                            download.setmKey("Images");
+                            download.setmValue(new String[]{jsonObject.getString("Images")});
+                            mListDownload.add(download);
+                            Log.d("Images Values", "" + jsonObject.getString("Images"));
+                        }
+
+                        if (jsonObject.has("User")) {
+                            Download download = new Download();
+                            download.setmKey("User");
+                            download.setmValue(new String[]{jsonObject.getString("User")});
+                            mListDownload.add(download);
+                            Log.d("User Values", "" + jsonObject.getString("User"));
+                        }
+
+                    }
+
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
-
-            Log.d("Loaded Data", "Data" + aData.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+            //         Log.d("Loaded Data", "Data" + mListDownload.size());
         }
-        if(id==2){//Upload
+        if (id == 2) {//Upload
 
         }
 
@@ -187,18 +197,19 @@ List<Like> mListLike;
     public static final String MyPREFERENCES = "MyPrefs";
     LayoutInflater layoutInflater;
     SharedPreferences.Editor editor;
+
     @Override
     protected void onResume() {
         super.onResume();
-        List<GetTemp> mList=new ArrayList<>();
-        mList=newDataBase.GetFromTemp();
-        if(!mList.isEmpty()){
-            for(int i=0;i<mList.size();i++){
-                mMap.addMarker(new MarkerOptions().position(new LatLng(mList.get(i).getLat(),mList.get(i).getLong())).title(mList.get(i).getDestName()));
-                if(i>mList.size()-1){
+        List<GetTemp> mList = new ArrayList<>();
+        mList = newDataBase.GetFromTemp();
+        if (!mList.isEmpty()) {
+            for (int i = 0; i < mList.size(); i++) {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mList.get(i).getLat(), mList.get(i).getLong())).title(mList.get(i).getDestName()));
+                if (i > mList.size() - 1) {
                     mMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(mList.get(i).getLat(), mList.get(i).getLong()))
-                                    .add(new LatLng(mList.get(i + 1).getLat(), mList.get(i + 1).getLong())).width(5).color(Color.BLACK));
+                            .add(new LatLng(mList.get(i + 1).getLat(), mList.get(i + 1).getLong())).width(5).color(Color.BLACK));
 
                 }
             }
@@ -210,27 +221,27 @@ List<Like> mListLike;
         super.onCreate(savedInstanceState);
 
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-         editor=sharedPref.edit();
+        editor = sharedPref.edit();
 
-        if(NetworkUtils.isActiveNetworkAvailable(this)) {
-
+        Gson gson = new Gson();
+        newDataBase = new NewDataBase(getApplicationContext());
+       //  newDataBase.insertComment(commentList);
+        if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
             File directory = ctw.getDir(DB_PATH, Context.MODE_PRIVATE);
             File internalfile = new File(directory, DB_NAME);
-
-            if(!internalfile.exists()) {
-               copyDatabase(internalfile);
+            if (!internalfile.exists()) {
+                copyDatabase(internalfile);
             }
-            String url= getResources().getString(R.string.URL);
-            String UserId=sharedPref.getString("UserId", null);
-            Log.d("UserId",UserId);
-            super.fetchData(url+"download"+"?"+"tempid="+UserId,true,1);//id 1=>download 2=>upload
-      }
-
-        else {
-            layoutInflater=getLayoutInflater();
-            View view=layoutInflater.inflate(R.layout.cust_toast,null);
-             Toast toast=new Toast(this);
+            String url = getResources().getString(R.string.URL);
+            String UserId = sharedPref.getString("UserId", null);
+            Log.d("UserId", UserId);
+            super.fetchData(url + "download" + "?" + "tempid=" + UserId, true, 1);//id 1=>download 2=>upload
+Log.d("Download Calling..","DownloadUrl:-"+url);
+        } else {
+            layoutInflater = getLayoutInflater();
+            View view = layoutInflater.inflate(R.layout.cust_toast, null);
+            Toast toast = new Toast(this);
             toast.setDuration(Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.setView(view);//setting the view of custom toast layout
@@ -245,7 +256,7 @@ List<Like> mListLike;
         mDestList = new ArrayList<Destination>();
 
         UserDetails userDetails = new UserDetails();
-        newDataBase = new NewDataBase(getApplicationContext());
+
         // newDataBase.AddUser(UserId,UserName);
 //        newDataBase.GetUser();
 
@@ -258,14 +269,14 @@ List<Like> mListLike;
         if(temp) newDataBase.DeleteTempMaps();
         else temp=false;*/
 //       Log.d("MainActivity",String.valueOf(mDestinationList.size()));
-        List<String> mDestNames=new ArrayList<>();
+        List<String> mDestNames = new ArrayList<>();
 
-        ArrayAdapter<String> arrayAdapter=null;
+        ArrayAdapter<String> arrayAdapter = null;
         try {
-            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Collections.list(Collections.enumeration(mDestinationNames.keySet())));
-}catch (NullPointerException e){
-    e.printStackTrace();
-}
+            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, Collections.list(Collections.enumeration(mDestinationNames.keySet())));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
         text_dest.setAdapter(arrayAdapter);
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -280,7 +291,7 @@ List<Like> mListLike;
                 List<TempData> mCurrentDestinationData = new ArrayList<>();
                 mDestName = (String) parent.getItemAtPosition(position);
                 int mDestId = mDestinationNames.get(mDestName);//Get DestId of Selected Location
-                Log.d("MainActivity",String.valueOf(mDestId));
+                Log.d("MainActivity", String.valueOf(mDestId));
                 mCurrentDestinationData = newDataBase.GetLatLong(mDestId);//Get Lat Long of DestName
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
@@ -398,6 +409,7 @@ List<Like> mListLike;
             mMap.moveCamera(center);
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
+
                 @Override
                 public View getInfoWindow(Marker mark) {
                     if (view == null) {
@@ -426,7 +438,7 @@ List<Like> mListLike;
 
                 public void onInfoWindowClick(Marker mark) {
                     int mDestId = mDestinationNames.get(mark.getTitle());
-                    Log.d("MainActivityMarker",""+mDestId);
+                    Log.d("MainActivityMarker", "" + mDestId);
                     CustDialog(mark.getTitle(), mDestId);
 
                 }
@@ -447,10 +459,10 @@ List<Like> mListLike;
         BufferedReader bufferedReader;
         try {
             if (n.isActiveNetworkAvailable(getApplicationContext())) {
-                uuid= UUID.randomUUID();
+                uuid = UUID.randomUUID();
                 String data = "tempid"
                         + "=" + String.valueOf(uuid);
-                url = new URL(URL+"?"+data);
+                url = new URL(URL + "?" + data);
                 editor.putString("UserId", String.valueOf(uuid));
                 editor.commit();
 
@@ -467,9 +479,10 @@ List<Like> mListLike;
                /* OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
                 wr.write(data);
                 wr.flush();
-               */ int Http_Result = urlConnection.getResponseCode();
-                String res=urlConnection.getResponseMessage().toString();
-                Log.d("ResponseMessage",res);
+               */
+                int Http_Result = urlConnection.getResponseCode();
+                String res = urlConnection.getResponseMessage().toString();
+                Log.d("ResponseMessage", res);
                 Log.d("RESPONSE CODE", String.valueOf(Http_Result));
                 switch (Http_Result) {
                     case HttpURLConnection.HTTP_OK:
@@ -540,7 +553,7 @@ List<Like> mListLike;
         int count = newDataBase.ImageCount(cDestId);
         int count1 = newDataBase.MsgCount(cDestId);
         dialog.show();
-        Log.d("INDialog",""+cDestId);
+        Log.d("INDialog", "" + cDestId);
         TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
         mCountPhotos.setText(String.valueOf(count));
         TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
@@ -550,7 +563,7 @@ List<Like> mListLike;
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
-                intent.putExtra("DestId",cDestId);
+                intent.putExtra("DestId", cDestId);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }

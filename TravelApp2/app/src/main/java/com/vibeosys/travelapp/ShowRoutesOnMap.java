@@ -25,6 +25,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.vibeosys.travelapp.activities.DestinationComments;
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
 import org.json.JSONArray;
 import org.json.JSONException;

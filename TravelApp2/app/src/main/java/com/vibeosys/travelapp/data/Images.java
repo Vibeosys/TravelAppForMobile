@@ -1,43 +1,68 @@
 package com.vibeosys.travelapp.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mahesh on 10/20/2015.
  */
 public class Images {
-String mImageId[];
-String mImagePath[];
-String mUserId[];
-int mDestId[];
+String ImageId;
+String ImagePath;
+String UserId;
+int DestId;
+Boolean ImageSeen;
 
-    public String[] getmImageId() {
-        return mImageId;
+    public Boolean getImageSeen() {
+        return ImageSeen;
     }
 
-    public void setmImageId(String[] mImageId) {
-        this.mImageId = mImageId;
+    public void setImageSeen(Boolean imageSeen) {
+        ImageSeen = imageSeen;
     }
 
-    public String[] getmImagePath() {
-        return mImagePath;
+    public String getImageId() {
+        return ImageId;
     }
 
-    public void setmImagePath(String[] mImagePath) {
-        this.mImagePath = mImagePath;
+    public void setImageId(String imageId) {
+        this.ImageId = imageId;
     }
 
-    public String[] getmUserId() {
-        return mUserId;
+    public String getImagePath() {
+        return ImagePath;
     }
 
-    public void setmUserId(String[] mUserId) {
-        this.mUserId = mUserId;
+    public void setImagePath(String imagePath) {
+        this.ImagePath = imagePath;
     }
 
-    public int[] getmDestId() {
-        return mDestId;
+    public String getUserId() {
+        return UserId;
     }
 
-    public void setmDestId(int[] mDestId) {
-        this.mDestId = mDestId;
+    public void setUserId(String userId) {
+        this.UserId = userId;
+    }
+
+    public int getDestId() {
+        return DestId;
+    }
+
+    public void setDestId(int destId) {
+        this.DestId = destId;
+    }
+
+    public static List<Images> deserializeSting(ArrayList<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<Images> imagesList=new ArrayList<>();
+
+        for(String serializedString: serializedStringList){
+            Images deserizeedImages= gson.fromJson(serializedString, Images.class);
+            imagesList.add(deserizeedImages);
+        }
+        return imagesList;
     }
 }

@@ -1,60 +1,41 @@
 package com.vibeosys.travelapp.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Created by mahesh on 10/7/2015.
+ * Created by mahesh on 10/21/2015.
  */
 public class Question {
+int QuestionId;
+String QuestionText;
 
-    private String[] mAnswers;
-    private String mQuestion;
-    private String mType[];
-    private String mQuestionText[];
-    private int QuestionId[];
-
-
-    public String[] getmType() {
-        return mType;
-    }
-
-    public void setmType(String[] mType) {
-        this.mType = mType;
-    }
-
-
-
-    public Question() {
-
-    }
-
-    public String[] getmAnswers() {
-        return mAnswers;
-    }
-
-    public void setmAnswers(String[] mAnswers) {
-        this.mAnswers = mAnswers;
-    }
-
-    public String getmQuestion() {
-        return mQuestion;
-    }
-
-    public void setmQuestion(String mQuestion) {
-        this.mQuestion = mQuestion;
-    }
-
-    public String[] getmQuestionText() {
-        return mQuestionText;
-    }
-
-    public void setmQuestionText(String[] mQuestionText) {
-        this.mQuestionText = mQuestionText;
-    }
-
-    public int[] getQuestionId() {
+    public int getQuestionId() {
         return QuestionId;
     }
 
-    public void setQuestionId(int[] questionId) {
+    public void setQuestionId(int questionId) {
         QuestionId = questionId;
+    }
+
+    public String getQuestionText() {
+        return QuestionText;
+    }
+
+    public void setQuestionText(String questionText) {
+        QuestionText = questionText;
+    }
+
+    public static List<Question> deserializeSting(ArrayList<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<Question> questionsList=new ArrayList<>();
+
+        for(String serializedString: serializedStringList){
+            Question deserizeedQuestions= gson.fromJson(serializedString, Question.class);
+            questionsList.add(deserizeedQuestions);
+        }
+        return questionsList;
     }
 }

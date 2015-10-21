@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.Adaptors;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+
+import com.vibeosys.travelapp.CommentsAndLikes;
+import com.vibeosys.travelapp.R;
 
 import java.util.List;
 

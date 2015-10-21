@@ -1,43 +1,69 @@
 package com.vibeosys.travelapp.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mahesh on 10/20/2015.
  */
 public class Answer {
-String mAnswerId[];
-String mUserId[];
-String mDestId[];
-String mOptionId[];
+    String AnswerId;
+    String UserId;
+    String DestId;
+    String OptionId;
+    String CreatedDate;
 
-    public String[] getmAnswerId() {
-        return mAnswerId;
+    public String getCreatedDate() {
+        return CreatedDate;
     }
 
-    public void setmAnswerId(String[] mAnswerId) {
-        this.mAnswerId = mAnswerId;
+    public void setCreatedDate(String createdDate) {
+        CreatedDate = createdDate;
     }
 
-    public String[] getmUserId() {
-        return mUserId;
+    public String getAnswerId() {
+        return AnswerId;
     }
 
-    public void setmUserId(String[] mUserId) {
-        this.mUserId = mUserId;
+    public void setAnswerId(String AnswerId) {
+        this.AnswerId = AnswerId;
     }
 
-    public String[] getmDestId() {
-        return mDestId;
+    public String getUserId() {
+        return UserId;
     }
 
-    public void setmDestId(String[] mDestId) {
-        this.mDestId = mDestId;
+    public void setUserId(String UserId) {
+        this.UserId = UserId;
     }
 
-    public String[] getmOptionId() {
-        return mOptionId;
+    public String getDestId() {
+        return DestId;
     }
 
-    public void setmOptionId(String[] mOptionId) {
-        this.mOptionId = mOptionId;
+    public void setDestId(String DestId) {
+        this.DestId = DestId;
     }
+
+    public String getOptionId() {
+        return OptionId;
+    }
+
+    public void setOptionId(String OptionId) {
+        this.OptionId = OptionId;
+    }
+
+   public static List<Answer> deserializeSting(ArrayList<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<Answer> answersList=new ArrayList<>();
+
+        for(String serializedString: serializedStringList){
+         Answer deserizeedAnswer= gson.fromJson(serializedString, Answer.class);
+            answersList.add(deserizeedAnswer);
+        }
+        return answersList;
+    }
+
 }

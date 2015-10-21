@@ -8,6 +8,8 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.vibeosys.travelapp.util.NetworkUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
