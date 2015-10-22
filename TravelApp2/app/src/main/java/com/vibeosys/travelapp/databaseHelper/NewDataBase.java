@@ -163,6 +163,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         long id=-1;
         try {
             database = getWritableDatabase();
+
             contentValues = new ContentValues();
             for (int i = 0; i < mListComment.size(); i++) {
                 contentValues.put("commentText", listComment.get(i).getCommentText());
@@ -181,9 +182,30 @@ public class NewDataBase extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return false;
     }
+
+public boolean addDataToSync(String tableName,String UserId,String JsonSync){
+SQLiteDatabase sqLiteDatabase=null;
+ContentValues contentValues=null;
+long id=-1;
+    try{
+sqLiteDatabase=getWritableDatabase();
+contentValues=new ContentValues();
+contentValues.put("UserId",UserId);
+contentValues.put("JsonSync",JsonSync);
+contentValues.put("TableName",tableName);
+id=sqLiteDatabase.insert("Sync",null,contentValues);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+sqLiteDatabase.close();
+    if(id!=-1){
+        Log.d("SyncTable Updated Value",""+id);
+        return true;
+    }
+    else return false;
+}
 
 public int LikeCount(int DestId, String UserId, SQLiteDatabase sqLiteDatabase1){
  int likeCount=0;

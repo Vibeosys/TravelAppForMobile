@@ -41,11 +41,12 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
     List<com.vibeosys.travelapp.data.Question> questionsList = null;
     List<Option> optionsList = null;
 
-    protected void fetchData(final String aServiceUrl, final boolean aShowProgressDlg, int id) {
+    public void fetchData(final String aServiceUrl, final boolean aShowProgressDlg, int id) {
         Log.d("BaseActivity", "IN Base");
         this.id = id;
-        new BackgroundTask(aShowProgressDlg).execute(aServiceUrl);
+        new BackgroundTask(aShowProgressDlg).execute(aServiceUrl, String.valueOf(id));
     }
+
 
     @Override
     public void onSuccess(String aData, int id) {
@@ -160,7 +161,7 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
     class BackgroundTask extends AsyncTask<String, Void, String> {
 
         private boolean mShowProgressDlg;
-        private ProgressDialog mProgressDialog;
+        private ProgressDialog mProgressDialog = new ProgressDialog(BaseActivity.this);
 
         public BackgroundTask(boolean aShowProgressDlg) {
             mShowProgressDlg = aShowProgressDlg;
@@ -186,9 +187,15 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
 
             try {
                 URL url = new URL(params[0]);
+                String id=params[1];
+                 Log.d("Param",id);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                if(id.equals("2")){
+
+                }
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String dataLine = null;
+
                 StringBuffer dataBuffer = new StringBuffer();
                 while ((dataLine = br.readLine()) != null) {
                     dataBuffer.append(dataLine);
@@ -205,7 +212,6 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
         protected void onPreExecute() {
             super.onPreExecute();
             if (mShowProgressDlg) {
-                mProgressDialog = new ProgressDialog(BaseActivity.this);
                 mProgressDialog.show();
             }
         }

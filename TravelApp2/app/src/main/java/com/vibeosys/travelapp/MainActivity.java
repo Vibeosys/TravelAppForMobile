@@ -239,6 +239,7 @@ public class MainActivity extends BaseActivity
             super.fetchData(url + "download" + "?" + "tempid=" + UserId, true, 1);//id 1=>download 2=>upload
 Log.d("Download Calling..","DownloadUrl:-"+url);
         } else {
+
             layoutInflater = getLayoutInflater();
             View view = layoutInflater.inflate(R.layout.cust_toast, null);
             Toast toast = new Toast(this);

@@ -6,7 +6,8 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Download {
-private List<TableDataDTO> data;
+
+    private List<TableDataDTO> data;
 
     public List<TableDataDTO> getData() {
         return data;
@@ -15,4 +16,5 @@ private List<TableDataDTO> data;
     public void setData(List<TableDataDTO> data) {
         this.data = data;
     }
+
 }

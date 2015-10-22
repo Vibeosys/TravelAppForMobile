@@ -1,10 +1,7 @@
 package com.vibeosys.travelapp.data;
-
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * Created by mahesh on 10/20/2015.
  */

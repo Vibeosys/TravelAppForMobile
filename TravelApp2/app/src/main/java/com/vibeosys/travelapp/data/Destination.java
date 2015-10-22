@@ -1,5 +1,7 @@
 package com.vibeosys.travelapp.data;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -56,5 +58,11 @@ double Long;
         }
         return destinationList;
     }
-
+    public static String serializeString(Destination destinationObj){
+        Gson gson = new Gson();
+        Destination destinationObj1=destinationObj;
+        String serializedString = gson.toJson(destinationObj1);
+        Log.d("Destination Serialized ", serializedString);
+        return serializedString;
+    }
 }

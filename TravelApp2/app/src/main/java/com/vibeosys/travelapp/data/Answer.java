@@ -1,9 +1,9 @@
 package com.vibeosys.travelapp.data;
-
+import android.util.Log;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Created by mahesh on 10/20/2015.
@@ -54,6 +54,16 @@ public class Answer {
     public void setOptionId(String OptionId) {
         this.OptionId = OptionId;
     }
+
+public static String serializeString(Answer answer){
+    Gson gson = new Gson();
+    Answer answer1=answer;
+    String serializedString = gson.toJson(answer1);
+    Log.d("Answer Serialized ",serializedString);
+    return serializedString;
+}
+
+
 
    public static List<Answer> deserializeSting(ArrayList<String> serializedStringList) {
         Gson gson = new Gson();

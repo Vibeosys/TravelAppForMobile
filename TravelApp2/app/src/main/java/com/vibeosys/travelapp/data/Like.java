@@ -1,5 +1,7 @@
 package com.vibeosys.travelapp.data;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -38,4 +40,12 @@ public class Like {
         }
         return likeList;
     }
+    public static String serializeString(Like likeObj){
+        Gson gson = new Gson();
+        Like likeObj1=likeObj;
+        String serializedString = gson.toJson(likeObj1);
+        Log.d("Like Serialized ", serializedString);
+        return serializedString;
+    }
+
 }

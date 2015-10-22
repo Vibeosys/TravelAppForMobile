@@ -1,5 +1,7 @@
 package com.vibeosys.travelapp.data;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -48,6 +50,12 @@ public class Comment {
         }
         return commentList;
     }
-
+    public static String serializeString(Comment comment){
+        Gson gson = new Gson();
+        Comment comment1=comment;
+        String serializedString = gson.toJson(comment1);
+        Log.d("Comment Serialized ", serializedString);
+        return serializedString;
+    }
 
 }
