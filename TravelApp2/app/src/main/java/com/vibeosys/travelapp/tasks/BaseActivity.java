@@ -4,7 +4,14 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
@@ -15,6 +22,9 @@ import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -47,6 +57,51 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
         new BackgroundTask(aShowProgressDlg).execute(aServiceUrl, String.valueOf(id));
     }
 
+  public void uploadToServer(final String aServiceUrl,  String uploadData){
+      final ProgressDialog progress = new ProgressDialog(this);
+      progress.setMessage("Sending ...");
+      progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+      progress.setIndeterminate(true);
+      Log.d("In Method","");
+      progress.show();
+      RequestQueue rq = Volley.newRequestQueue(this);
+      JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(Request.Method.POST,
+              aServiceUrl,uploadData ,new Response.Listener<JSONArray>() {
+
+          @Override
+          public void onResponse(JSONArray response) {
+              try {
+                  JSONObject jresponse = response.getJSONObject(0);
+                  String res=jresponse.getString("message");
+                  if(res.equals("Saved")) {
+                      //  JSONObject json = new JSONObject(response);
+                      progress.dismiss();
+                      Toast.makeText(getBaseContext(),
+                              "The Comment Added Successfully", Toast.LENGTH_SHORT)
+                              .show();
+                  }
+              } catch (Exception e) {
+                  Log.d("JSON Exception", e.toString());
+                  Toast.makeText(getBaseContext(),
+                          "Error while loadin data!",
+                          Toast.LENGTH_LONG).show();
+              }
+          }
+
+      }, new Response.ErrorListener() {
+          @Override
+          public void onErrorResponse(VolleyError error) {
+              Log.d("ERROR", "Error [" + error.getMessage() + "]");
+              progress.dismiss();
+              Toast.makeText(getBaseContext(),
+                      "Cannot connect to server", Toast.LENGTH_LONG)
+                      .show();
+          }
+
+      });
+
+      rq.add(jsonArrayRequest);
+  }
 
     @Override
     public void onSuccess(String aData, int id) {
@@ -69,9 +124,7 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
                 else {
                     theTableData.get(theTableName).add(theTableValue);
                 }
-
             }
-
             commentList = new ArrayList<>();
             likeList = new ArrayList<>();
             destinationList = new ArrayList<>();
@@ -190,9 +243,6 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
                 String id=params[1];
                  Log.d("Param",id);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                if(id.equals("2")){
-
-                }
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String dataLine = null;
 

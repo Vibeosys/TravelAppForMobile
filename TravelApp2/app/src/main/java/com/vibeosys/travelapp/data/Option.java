@@ -1,14 +1,25 @@
 package com.vibeosys.travelapp.data;
+
 import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Created by mahesh on 10/20/2015.
  */
 public class Option {
-private int OptionsId;
-private String OptionText;
-private int QuestionId;
+    private int OptionsId;
+    private String OptionText;
+    private int QuestionId;
+
+    Option() {
+
+    }
+
+    public Option(int optionId) {
+        this.OptionsId = optionId;
+    }
 
     public int getOptionId() {
         return OptionsId;
@@ -36,10 +47,10 @@ private int QuestionId;
 
     public static List<Option> deserializeSting(ArrayList<String> serializedStringList) {
         Gson gson = new Gson();
-        ArrayList<Option> optionsList=new ArrayList<>();
+        ArrayList<Option> optionsList = new ArrayList<>();
 
-        for(String serializedString: serializedStringList){
-            Option deserizeedImages= gson.fromJson(serializedString, Option.class);
+        for (String serializedString : serializedStringList) {
+            Option deserizeedImages = gson.fromJson(serializedString, Option.class);
             optionsList.add(deserizeedImages);
         }
         return optionsList;

@@ -11,6 +11,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ScreenSlidePage extends Fragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
+    ArrayList<Option> answers;;
     NewDataBase newDataBase=null;
     List<SendQuestionAnswers> mListQuestions=null;
     List<SendQuestionAnswers> mListOptions=null;
@@ -41,7 +43,6 @@ public class ScreenSlidePage extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         newDataBase=new NewDataBase(getActivity());
-
         mListQuestions=newDataBase.mListQuestions();
         Log.d("Questions", "" + mListQuestions.size());
 
@@ -64,7 +65,6 @@ public class ScreenSlidePage extends Fragment {
 
               mListQuestionsAnswers.put(m,options);
           }
-
       }
 
         mPageNumber = getArguments().getInt(ARG_PAGE);
@@ -76,7 +76,7 @@ public class ScreenSlidePage extends Fragment {
         // Inflate the layout containing a title and body text.
         ViewGroup rootView = (ViewGroup) inflater
                 .inflate(R.layout.userquestionanswers, container, false);
-
+        answers=new ArrayList<>();
         // Set the title view to show the page number.
         TextView textView=(TextView)rootView.findViewById(R.id.questionText);
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));//Questions List
@@ -102,15 +102,20 @@ public class ScreenSlidePage extends Fragment {
         });
 
      radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-    @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-        int id= (int) group.getTag();
-        int lo=   group.getCheckedRadioButtonId();
-        Toast.makeText(getActivity(), "Clicked On"+lo, Toast.LENGTH_SHORT).show();
-    }
-    });
+         @Override
+         public void onCheckedChanged(RadioGroup group, int checkedId) {
+             int id = (int) group.getTag();
+             int lo = group.getCheckedRadioButtonId();
+             Option option=new Option(lo);
+             answers.add(option);
+             Log.d("Answers Log", "" + answers.toString());
+             Toast.makeText(getActivity(), "Clicked On" + lo, Toast.LENGTH_SHORT).show();
+         }
+     });
+        Log.d("Answers", "" + answers.size());
         return rootView;
     }
+
     public int getPageNumber() {
         return mPageNumber;
     }

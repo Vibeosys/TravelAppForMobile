@@ -1,5 +1,6 @@
 package com.vibeosys.travelapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -40,7 +41,7 @@ public class PreviewImage extends FragmentActivity {
     NewDataBase newDataBase = null;
     String imageData = null;
     public static final String MyPREFERENCES = "MyPrefs";
-
+    ProgressDialog progress;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +62,11 @@ public class PreviewImage extends FragmentActivity {
                 ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
                 imageUploadDTO.setImageData(imageData);
                 String path = getIntent().getExtras().getString("Data");
+                progress = new ProgressDialog(getApplicationContext());
+                progress.setMessage("Uploading Image...");
+                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progress.setIndeterminate(true);
+                progress.show();
                 Log.d("Path File ",path);
                 String UserId = sharedPref.getString("UserId", null);
                 int DestId = getIntent().getExtras().getInt("DestId");
@@ -122,33 +128,35 @@ public class PreviewImage extends FragmentActivity {
     public void uploadImage(final String encodedString, final String filename, final int string, final String s) {
 
         RequestQueue rq = Volley.newRequestQueue(this);
-        String url = "http://192.168.1.6/travelwebapp/api/v1/images/upload1";
+        String url = getResources().getString(R.string.URL);
         Log.d("URL", url);
         Log.d("PreviewImage Destid", "" + string);
         Log.d("PreviewImage UserId", "" + s);
-
 
        // final String fileName = filename.replaceAll(" ", "");
 
         Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url, new Response.Listener<String>() {
+                url+"upload1", new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
                 try {
+
                     Log.e("RESPONSE", response);
                     //  JSONObject json = new JSONObject(response);
-
+                    progress.dismiss();
                     Toast.makeText(getBaseContext(),
                             "The image is upload", Toast.LENGTH_SHORT)
                             .show();
+                    finish();
 
                 } catch (Exception e) {
                     Log.d("JSON Exception", e.toString());
                     Toast.makeText(getBaseContext(),
                             "Error while loadin data!",
                             Toast.LENGTH_LONG).show();
+
                 }
 
             }
@@ -157,9 +165,11 @@ public class PreviewImage extends FragmentActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("ERROR", "Error [" + error + "]");
+                progress.dismiss();
                 Toast.makeText(getBaseContext(),
                         "Cannot connect to server", Toast.LENGTH_LONG)
                         .show();
+                finish();
             }
         })
 
@@ -217,6 +227,5 @@ public class PreviewImage extends FragmentActivity {
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
     }
-
 
 }

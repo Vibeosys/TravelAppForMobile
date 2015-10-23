@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Created by mahesh on 10/7/2015.
  */
-public class QuestionsFromOthers extends AppCompatActivity {
+public class QuestionsFromOthers extends BaseActivity {
 
     ExpandableListView questionslistView;
     NewDataBase newDataBase=null;

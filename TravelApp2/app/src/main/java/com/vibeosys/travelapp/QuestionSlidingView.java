@@ -1,6 +1,8 @@
 package com.vibeosys.travelapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -27,6 +29,10 @@ public class QuestionSlidingView extends FragmentActivity{
     private PagerAdapter mPagerAdapter;
     Button mPrevButton,mNextButton;
     NewDataBase newDataBase=null;
+    public static final String MyPREFERENCES = "MyPrefs";
+    String UserId ;
+    int DestId;
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,10 +40,12 @@ public class QuestionSlidingView extends FragmentActivity{
         mViewPager=(ViewPager)findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-      int no;
-       no=getIntent().getExtras().getInt("DestId");
+
+       DestId=getIntent().getExtras().getInt("DestId");
+        sharedPreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        UserId=sharedPreferences.getString("UserId", null);
         newDataBase=new NewDataBase(this);
-     int pages=newDataBase.Questions(no);
+     int pages=newDataBase.Questions(DestId);
         NUM_PAGES=pages;
         // ...but notify us that it happened.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
@@ -56,14 +64,14 @@ public class QuestionSlidingView extends FragmentActivity{
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
+                if((mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1)){
+                    Toast.makeText(getApplicationContext(),"Thank you for feedback",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
 
             }
         });
-        if((mViewPager.getCurrentItem() == mPagerAdapter.getCount() +1)){
-            mNextButton.setText("Finish");
-            finish();
-            Toast.makeText(getApplicationContext(), "Clicked on finish", Toast.LENGTH_SHORT).show();
-        }
+
             mNextButton.setText("Next");
 
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

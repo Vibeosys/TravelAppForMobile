@@ -185,7 +185,6 @@ public class MainActivity extends BaseActivity
     private static final int MEDIA_IMAGE = 1;
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
     List<Destination> mDestList;
-    static final String URL = "http://192.168.1.6/travelwebapp/api/v1/downloadDb";
     protected static String DB_NAME = "TravelApp";
     static final String DB_PATH = "databases";
     HashMap<String, Integer> mDestinationNames = new HashMap<>();
@@ -219,7 +218,6 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         Gson gson = new Gson();
@@ -233,6 +231,7 @@ public class MainActivity extends BaseActivity
             if (!internalfile.exists()) {
                 copyDatabase(internalfile);
             }
+
             String url = getResources().getString(R.string.URL);
             String UserId = sharedPref.getString("UserId", null);
             Log.d("UserId", UserId);
@@ -301,7 +300,6 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
 
 
                 newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
-
 
                 destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
 
@@ -425,9 +423,10 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
                                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
                             }
                         });
-                            view.setLayoutParams(new ViewGroup.LayoutParams(200,200));
+                            view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
                         TextView title = (TextView) view.findViewById(R.id.textView3);
                         title.setText(mark.getTitle());
+
                     }
                     return view;
                 }
@@ -465,10 +464,11 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
                 uuid = UUID.randomUUID();
                 String data = "tempid"
                         + "=" + String.valueOf(uuid);
-                url = new URL(URL + "?" + data);
+                String callurl = getResources().getString(R.string.URL);
+
+                url = new URL(callurl +"downloadDb"+ "?" + data);
                 editor.putString("UserId", String.valueOf(uuid));
                 editor.commit();
-
                 urlConnection = (HttpURLConnection) url.openConnection();
                 Log.d("STATUS", "Request Sended...");
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();

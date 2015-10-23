@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class Download {
 
-    private List<TableDataDTO> data;
+    protected List<TableDataDTO> data;
 
     public List<TableDataDTO> getData() {
         return data;

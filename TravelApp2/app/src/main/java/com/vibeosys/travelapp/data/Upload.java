@@ -5,17 +5,24 @@ import java.util.List;
 /**
  * Created by mahesh on 10/22/2015.
  */
-public class Upload {
+public class Upload extends Download {
+    UploadUser user;
 
-        private List<TableDataDTO> data;
+    public Upload(UploadUser user, List<TableDataDTO> tableDataList) {
+        this.user = user;
+        this.data = tableDataList;
+    }
 
-        public List<TableDataDTO> getData() {
-            return data;
-        }
+    public Upload() {
 
-        public void setData(List<TableDataDTO> data) {
-            this.data = data;
-        }
+    }
 
+    public UploadUser getUser() {
+        return user;
+    }
+
+    public void setUser(UploadUser user) {
+        this.user = user;
+    }
 
 }

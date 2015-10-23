@@ -9,24 +9,33 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class User {
-private String UserId;
-private String UserName;
+private String userId;
+private String userName;
+private String emailId;
 private String PhotoURL;
 
+    public String getEmailId() {
+        return emailId;
+    }
+
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
+
     public String getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(String userId) {
-        this.UserId = userId;
+        this.userId = userId;
     }
 
     public String getUserName() {
-        return UserName;
+        return userName;
     }
 
     public void setUserName(String userName) {
-        this.UserName = userName;
+        this.userName = userName;
     }
 
     public String getPhotoURL() {
