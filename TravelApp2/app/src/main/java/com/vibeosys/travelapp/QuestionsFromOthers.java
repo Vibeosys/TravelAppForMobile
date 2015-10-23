@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
@@ -65,7 +64,7 @@ public class QuestionsFromOthers extends AppCompatActivity {
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(getApplicationContext(), "Clicked On.." + mListOptions.get(groupPosition), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Clicked On.." + mListOptions.get(groupPosition), Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -136,7 +135,7 @@ public class QuestionsFromOthers extends AppCompatActivity {
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
             TextView theView = new TextView(mContext);
             questionslistView.expandGroup(groupPosition);
-            theView.setTextSize(20);
+            theView.setTextSize(15);
             theView.setTypeface(Typeface.DEFAULT_BOLD);
             theView.setText(keyList.get(groupPosition));
             return theView;

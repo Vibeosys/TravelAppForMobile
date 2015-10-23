@@ -30,10 +30,12 @@ import java.util.List;
 public class ShowDestinationCommentsAdaptor extends BaseAdapter {
  Context mContext;
     List<MyImageDB> mUserImagesList = null;
+    int DestId;
     List<CommentsAndLikes> mListDestinationComments=new ArrayList<>();
-    public ShowDestinationCommentsAdaptor(Context destinationComments,List<CommentsAndLikes> mListDestination) {
+    public ShowDestinationCommentsAdaptor(Context destinationComments, List<CommentsAndLikes> mListDestination, int destId) {
     this.mContext=destinationComments;
     this.mListDestinationComments=mListDestination;
+        this.DestId=destId;
     }
 
     @Override

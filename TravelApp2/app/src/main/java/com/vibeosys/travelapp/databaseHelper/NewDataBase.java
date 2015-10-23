@@ -207,6 +207,8 @@ sqLiteDatabase.close();
     else return false;
 }
 
+
+
 public int LikeCount(int DestId, String UserId, SQLiteDatabase sqLiteDatabase1){
  int likeCount=0;
     SQLiteDatabase sqLiteDatabase=sqLiteDatabase1;

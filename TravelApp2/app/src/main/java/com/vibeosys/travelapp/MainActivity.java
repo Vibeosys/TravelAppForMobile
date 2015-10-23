@@ -222,10 +222,10 @@ public class MainActivity extends BaseActivity
 
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedPref.edit();
-
         Gson gson = new Gson();
         newDataBase = new NewDataBase(getApplicationContext());
        //  newDataBase.insertComment(commentList);
+
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
             File directory = ctw.getDir(DB_PATH, Context.MODE_PRIVATE);
@@ -279,6 +279,7 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
             e.printStackTrace();
         }
         text_dest.setAdapter(arrayAdapter);
+
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -396,7 +397,9 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
                 mMap = ((MapFragment) getFragmentManager().
                         findFragmentById(R.id.map)).getMap();
             }
+
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000), 5));
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -410,7 +413,6 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
             mMap.moveCamera(center);
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
-
                 @Override
                 public View getInfoWindow(Marker mark) {
                     if (view == null) {
@@ -423,7 +425,7 @@ Log.d("Download Calling..","DownloadUrl:-"+url);
                                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
                             }
                         });
-                        //    view.setLayoutParams(new ViewGroup.LayoutParams(200,200));
+                            view.setLayoutParams(new ViewGroup.LayoutParams(200,200));
                         TextView title = (TextView) view.findViewById(R.id.textView3);
                         title.setText(mark.getTitle());
                     }

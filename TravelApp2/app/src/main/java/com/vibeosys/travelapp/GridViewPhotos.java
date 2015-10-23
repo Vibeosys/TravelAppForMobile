@@ -49,13 +49,14 @@ public class GridViewPhotos extends AppCompatActivity {
     private Cursor cc = null;
     private Uri imageUri;
     private NewDataBase newDataBase;
+    int DestId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gridviewphotos);
         mGridViewPhotos=(GridView)findViewById(R.id.showgridphotos);
-
+        DestId= getIntent().getExtras().getInt("DestId");
         cc = this.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null,
                 null,
@@ -106,6 +107,8 @@ public class GridViewPhotos extends AppCompatActivity {
 
                     i.putExtra("Data", mUrls[position].getPath());
                     i.putExtra("id", position);
+                    i.putExtra("DestId",DestId);
+                    Log.d("GridViewPhotos DestId",""+DestId);
                     startActivity(i);
                 }
             }

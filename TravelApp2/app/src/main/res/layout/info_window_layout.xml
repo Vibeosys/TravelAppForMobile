@@ -5,11 +5,12 @@
     android:layout_width="200dp"
     android:layout_height="400dp"
     android:background="@drawable/custom_text"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_margin="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:orientation="vertical">
 
         <TextView
@@ -18,19 +19,17 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:textAlignment="center"
-            android:textColor="#000" />
+            android:textColor="#000"
+            android:textSize="14dp"/>
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:background="#000" />
+
 
     <RelativeLayout
         android:id="@+id/userphoto"
@@ -67,17 +66,17 @@
 
         <!-- counter -->
         <TextView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:layout_alignBottom="@+id/item_title"
-
             android:layout_alignParentEnd="true"
             android:layout_marginRight="8dp"
             android:background="@drawable/shape"
             android:gravity="center"
             android:text="8"
+            android:textAlignment="center"
             android:textColor="#000"
-            android:textSize="8sp"
+            android:textSize="12dp"
             android:textStyle="bold" />
     </RelativeLayout>
 
@@ -96,8 +95,8 @@
             android:id="@+id/item_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:src="@drawable/message" />
@@ -113,26 +112,29 @@
             android:textStyle="bold" />
 
         <!-- counter -->
+
         <TextView
             android:id="@+id/item_counter"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_alignParentRight="true"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignParentEnd="true"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:autoText="false"
             android:background="@drawable/shape"
             android:gravity="center"
             android:text="3"
+            android:textAlignment="center"
             android:textColor="#000"
-            android:textSize="8dp"
+            android:textSize="12dp"
             android:textStyle="bold" />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_below="@+id/mymessages">
+        android:layout_below="@+id/mymessages"
+
+        >
 
         <TextView
             android:id="@+id/button2"
@@ -143,6 +145,7 @@
             android:layout_gravity="right"
             android:layout_marginEnd="28dp"
             android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/custom_text"
             android:contextClickable="true"
             android:gravity="center_vertical"
@@ -151,13 +154,15 @@
             android:textSize="8dp"
             android:textStyle="bold" />
 
-        <TextView
+
+         <TextView
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:layout_alignParentStart="true"
             android:layout_alignTop="@+id/button2"
             android:layout_marginRight="10dp"
             android:layout_marginStart="25dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="0.00"
             android:background="@drawable/custom_text"
             android:contextClickable="true"

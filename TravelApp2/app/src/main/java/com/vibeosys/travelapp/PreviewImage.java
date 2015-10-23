@@ -35,23 +35,24 @@ import java.util.Map;
 /**
  * Created by mahesh on 10/13/2015.
  */
-public class PreviewImage extends FragmentActivity{
-SharedPreferences sharedPref;
-NewDataBase newDataBase=null;
-String imageData=null;
+public class PreviewImage extends FragmentActivity {
+    SharedPreferences sharedPref;
+    NewDataBase newDataBase = null;
+    String imageData = null;
     public static final String MyPREFERENCES = "MyPrefs";
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.previewimage);
-        Bitmap bitmap=null;
+        Bitmap bitmap = null;
         // Selected image id
-        newDataBase=new NewDataBase(getApplicationContext());
-        String path=  getIntent().getExtras().getString("Data");
+        newDataBase = new NewDataBase(getApplicationContext());
+        String path = getIntent().getExtras().getString("Data");
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        Log.d("PreviewImage ImagePath",path);
-        Toast.makeText(getApplicationContext(),""+path,Toast.LENGTH_SHORT).show();
-        Button uploadImageButton=(Button)findViewById(R.id.uploadImageBtu);
+        Log.d("PreviewImage ImagePath", path);
+        Toast.makeText(getApplicationContext(), "" + path, Toast.LENGTH_SHORT).show();
+        Button uploadImageButton = (Button) findViewById(R.id.uploadImageBtu);
 
         uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,21 +61,23 @@ String imageData=null;
                 ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
                 imageUploadDTO.setImageData(imageData);
                 String path = getIntent().getExtras().getString("Data");
+                Log.d("Path File ",path);
                 String UserId = sharedPref.getString("UserId", null);
+                int DestId = getIntent().getExtras().getInt("DestId");
                 imageUploadDTO.setImageName(path);
                 String SerializedJsonString = gson.toJson(imageUploadDTO);
                 if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
                     String url = getResources().getString(R.string.URL);
                     Log.d("UserId", UserId);
-                    String filename=path.substring(path.lastIndexOf("/") + 1);
+                    String filename = path.substring(path.lastIndexOf("/") + 1);
                     Bitmap myImg = BitmapFactory.decodeFile(path);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     // Must compress the Image to reduce image size to make upload easy
-                    myImg.compress(Bitmap.CompressFormat.PNG, 10, stream);
+                    myImg.compress(Bitmap.CompressFormat.PNG, 50, stream);
                     byte[] byte_arr = stream.toByteArray();
                     // Encode Image to String
-                  String  encodedString = Base64.encodeToString(byte_arr, 0);
-                    uploadImage(encodedString,filename);
+                    String encodedString = Base64.encodeToString(byte_arr, 0);
+                    uploadImage(encodedString, filename, DestId, UserId);
 
                 } else {
                     try {
@@ -86,7 +89,7 @@ String imageData=null;
                         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                         toast.setView(view);//setting the view of custom toast layout
                         toast.show();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -101,7 +104,7 @@ String imageData=null;
             in = new FileInputStream(path);
             buf = new BufferedInputStream(in);
             bMap = BitmapFactory.decodeStream(buf);
-            imageData=getStringImage(bMap);
+            imageData = getStringImage(bMap);
             imageView.setImageBitmap(bMap);
             if (in != null) {
                 in.close();
@@ -116,11 +119,18 @@ String imageData=null;
         imageView.setImageBitmap(bitmap);*/
     }
 
-    public void uploadImage(final String encodedString ,final String filename) {
+    public void uploadImage(final String encodedString, final String filename, final int string, final String s) {
 
         RequestQueue rq = Volley.newRequestQueue(this);
         String url = "http://192.168.1.6/travelwebapp/api/v1/images/upload1";
         Log.d("URL", url);
+        Log.d("PreviewImage Destid", "" + string);
+        Log.d("PreviewImage UserId", "" + s);
+
+
+       // final String fileName = filename.replaceAll(" ", "");
+
+        Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 url, new Response.Listener<String>() {
 
@@ -128,7 +138,7 @@ String imageData=null;
             public void onResponse(String response) {
                 try {
                     Log.e("RESPONSE", response);
-                  //  JSONObject json = new JSONObject(response);
+                    //  JSONObject json = new JSONObject(response);
 
                     Toast.makeText(getBaseContext(),
                             "The image is upload", Toast.LENGTH_SHORT)
@@ -151,13 +161,17 @@ String imageData=null;
                         "Cannot connect to server", Toast.LENGTH_LONG)
                         .show();
             }
-        }) {
+        })
+
+        {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
 
                 params.put("upload", encodedString);
                 params.put("imagename", filename);
+                params.put("DestId", String.valueOf(string));
+                params.put("UserId",s);
 
                 return params;
 
@@ -169,7 +183,7 @@ String imageData=null;
     }
 
 
-    public Bitmap decodeURI(String filePath){
+    public Bitmap decodeURI(String filePath) {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -178,14 +192,14 @@ String imageData=null;
         // Only scale if we need to
         // (16384 buffer for img processing)
         Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
-        if(options.outHeight * options.outWidth * 2 >= 50000){
+        if (options.outHeight * options.outWidth * 2 >= 50000) {
             // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
             double sampleSize = scaleByHeight
                     ? options.outHeight / 100
                     : options.outWidth / 100;
             options.inSampleSize =
-                    (int)Math.pow(2d, Math.floor(
-                            Math.log(sampleSize)/Math.log(2d)));
+                    (int) Math.pow(2d, Math.floor(
+                            Math.log(sampleSize) / Math.log(2d)));
         }
 
         // Do the actual decoding
@@ -196,7 +210,7 @@ String imageData=null;
         return output;
     }
 
-    public String getStringImage(Bitmap bmp){
+    public String getStringImage(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
