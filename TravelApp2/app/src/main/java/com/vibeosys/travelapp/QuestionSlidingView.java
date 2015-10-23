@@ -10,70 +10,105 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mahesh on 10/14/2015.
  */
-public class QuestionSlidingView extends FragmentActivity{
+public class QuestionSlidingView extends FragmentActivity implements ScreenSlidePage.OnDataPass {
     private static int NUM_PAGES;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
-    Button mPrevButton,mNextButton;
-    NewDataBase newDataBase=null;
+    Button mPrevButton, mNextButton;
+    NewDataBase newDataBase = null;
     public static final String MyPREFERENCES = "MyPrefs";
-    String UserId ;
+    String UserId;
     int DestId;
     SharedPreferences sharedPreferences;
+    List<String> mListOptions;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.questionslidingview);
-        mViewPager=(ViewPager)findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        DestId = getIntent().getExtras().getInt("DestId");
+        mListOptions=new ArrayList<>();
+        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        UserId = sharedPreferences.getString("UserId", null);
+        newDataBase = new NewDataBase(this);
+        int pages = newDataBase.Questions(DestId);
+        NUM_PAGES = pages;
 
-       DestId=getIntent().getExtras().getInt("DestId");
-        sharedPreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        UserId=sharedPreferences.getString("UserId", null);
-        newDataBase=new NewDataBase(this);
-     int pages=newDataBase.Questions(DestId);
-        NUM_PAGES=pages;
         // ...but notify us that it happened.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-        mPrevButton=(Button)findViewById(R.id.prevButton);
-        mNextButton=(Button)findViewById(R.id.nextButton);
+        mPrevButton = (Button) findViewById(R.id.prevButton);
+        mNextButton = (Button) findViewById(R.id.nextButton);
         mPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
             }
         });
+        Log.d("Size ", "" + mListOptions.size());
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
-                if((mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1)){
-                    Toast.makeText(getApplicationContext(),"Thank you for feedback",Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
 
+                if ((mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1)) {
+                    /*Gson gson = new Gson();
+                    Option option = new Option();
+                    ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
+                    for (int i = 0; i > option.getOptionsId().length; i++) {
+                        Option option1 = new Option(option.getOptionsId()[i]);
+                        String SerializedJsonString = gson.toJson(option1);
+                        tableDataList.add(new TableDataDTO("Like", SerializedJsonString));
+                    }
+
+                    String uploadData = gson.toJson(new Upload(new UploadUser(UserId, "abc@ab.com"), tableDataList));
+                    Log.d("Like Data to Uplaod", uploadData);
+
+                    if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
+                        String url = getResources().getString(R.string.URL);
+                        BaseActivity baseActivity = new BaseActivity();
+                        baseActivity.uploadToServer(url + "upload", uploadData);//id 1=>download 2=>upload
+                        Log.d("Download Calling..", "DownloadUrl:-" + url);
+
+                    } else {
+                        newDataBase.addDataToSync("answer", UserId, uploadData);
+                        LayoutInflater
+                                layoutInflater = getLayoutInflater();
+                        View view = layoutInflater.inflate(R.layout.cust_toast, null);
+                        Toast toast = new Toast(getApplicationContext());
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        toast.setView(view);//setting the view of custom toast layout
+                        toast.show();
+
+                    }*/
+                    finish();
+
+                }
             }
         });
 
-            mNextButton.setText("Next");
-
+        mNextButton.setText("Next");
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -85,6 +120,7 @@ public class QuestionSlidingView extends FragmentActivity{
             }
         });
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // If we've received a touch notification that the user has touched
@@ -97,6 +133,7 @@ public class QuestionSlidingView extends FragmentActivity{
         // Delegate everything else to Activity.
         return super.onTouchEvent(event);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -138,6 +175,13 @@ public class QuestionSlidingView extends FragmentActivity{
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onDataPass(String data) {
+        mListOptions.add(data);
+        Log.d("Data From Fragment",data);
+    }
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
         public ScreenSlidePagerAdapter(FragmentManager supportFragmentManager) {

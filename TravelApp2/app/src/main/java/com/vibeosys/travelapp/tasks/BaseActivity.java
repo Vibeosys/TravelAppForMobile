@@ -77,7 +77,7 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
                       //  JSONObject json = new JSONObject(response);
                       progress.dismiss();
                       Toast.makeText(getBaseContext(),
-                              "The Comment Added Successfully", Toast.LENGTH_SHORT)
+                              "Updated Successfully", Toast.LENGTH_SHORT)
                               .show();
                   }
               } catch (Exception e) {

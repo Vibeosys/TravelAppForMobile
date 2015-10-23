@@ -54,7 +54,6 @@ public class PreviewImage extends FragmentActivity {
         Log.d("PreviewImage ImagePath", path);
         Toast.makeText(getApplicationContext(), "" + path, Toast.LENGTH_SHORT).show();
         Button uploadImageButton = (Button) findViewById(R.id.uploadImageBtu);
-
         uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -82,13 +82,17 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         comment1.setDestId(destinatinid);
         comment1.setUserId(userId);
         Gson gson = new Gson();
+
         String SerializedJsonString = gson.toJson(comment1);
 
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
 
         tableDataList.add(new TableDataDTO("Comment", SerializedJsonString));
+
         String uploadData=gson.toJson(new Upload(new UploadUser(userId, "abc@ab.com"), tableDataList));
+
         Log.d("Uploading",uploadData.toString());
+
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             String url = getResources().getString(R.string.URL);
             super.uploadToServer(url + "upload",uploadData );//id 1=>download 2=>upload

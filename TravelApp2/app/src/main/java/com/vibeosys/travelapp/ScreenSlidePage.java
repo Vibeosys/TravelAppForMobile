@@ -1,5 +1,6 @@
 package com.vibeosys.travelapp;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -25,11 +26,12 @@ import java.util.List;
 public class ScreenSlidePage extends Fragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
-    ArrayList<Option> answers;;
+    ArrayList<Option> answers;
     NewDataBase newDataBase=null;
     List<SendQuestionAnswers> mListQuestions=null;
     List<SendQuestionAnswers> mListOptions=null;
     HashMap<String,Options> mListQuestionsAnswers=null;
+    OnDataPass onDataPass;
     public static ScreenSlidePage create(int pageNumber) {
         ScreenSlidePage fragment = new ScreenSlidePage();
         Bundle args = new Bundle();
@@ -38,6 +40,18 @@ public class ScreenSlidePage extends Fragment {
         return fragment;
     }
     public ScreenSlidePage() {
+    }
+    public interface OnDataPass {
+        public void onDataPass(String data);
+    }
+
+    @Override
+    public void onAttach(Activity a) {
+        super.onAttach(a);
+        onDataPass = (OnDataPass) a;
+    }
+    public void passData(String data) {
+        onDataPass.onDataPass(data);
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,14 +119,15 @@ public class ScreenSlidePage extends Fragment {
          @Override
          public void onCheckedChanged(RadioGroup group, int checkedId) {
              int id = (int) group.getTag();
+
              int lo = group.getCheckedRadioButtonId();
-             Option option=new Option(lo);
-             answers.add(option);
-             Log.d("Answers Log", "" + answers.toString());
+             onDataPass.onDataPass(String.valueOf(lo));
              Toast.makeText(getActivity(), "Clicked On" + lo, Toast.LENGTH_SHORT).show();
          }
      });
+
         Log.d("Answers", "" + answers.size());
+
         return rootView;
     }
 

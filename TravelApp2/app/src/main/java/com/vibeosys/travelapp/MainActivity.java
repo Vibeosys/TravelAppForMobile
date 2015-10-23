@@ -236,7 +236,7 @@ public class MainActivity extends BaseActivity
             String UserId = sharedPref.getString("UserId", null);
             Log.d("UserId", UserId);
             super.fetchData(url + "download" + "?" + "tempid=" + UserId, true, 1);//id 1=>download 2=>upload
-Log.d("Download Calling..","DownloadUrl:-"+url);
+Log.d("Download Calling..","DownloadUrl:-"+url+"download");
         } else {
 
             layoutInflater = getLayoutInflater();

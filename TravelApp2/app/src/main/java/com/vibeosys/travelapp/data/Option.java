@@ -9,24 +9,34 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Option {
-    private int OptionsId;
+    private int OptionId;
     private String OptionText;
     private int QuestionId;
 
-    Option() {
+    public int[] getOptionsId() {
+        return OptionsId;
+    }
+
+    public void setOptionsId(int[] optionsId) {
+        OptionsId = optionsId;
+    }
+
+    private int []OptionsId;
+
+    public Option() {
 
     }
 
     public Option(int optionId) {
-        this.OptionsId = optionId;
+        this.OptionId = optionId;
     }
 
     public int getOptionId() {
-        return OptionsId;
+        return OptionId;
     }
 
-    public void setOptionsId(int optionsId) {
-        this.OptionsId = optionsId;
+    public void setOptionId(int optionId) {
+        this.OptionId = optionId;
     }
 
     public String getOptionText() {

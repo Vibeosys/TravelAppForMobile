@@ -15,6 +15,12 @@ public class Answer {
     String OptionId;
     String CreatedDate;
 
+    public Answer(){
+
+    }
+    public Answer(String optionId){
+        this.OptionId=optionId;
+    }
     public String getCreatedDate() {
         return CreatedDate;
     }
