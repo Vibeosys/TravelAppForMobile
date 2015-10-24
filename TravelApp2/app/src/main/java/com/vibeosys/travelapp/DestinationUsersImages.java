@@ -14,10 +14,16 @@ public class DestinationUsersImages extends FragmentActivity{
     private static final String TAG = "ImageGridActivity";
 
     @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle("User Photos");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (BuildConfig.DEBUG) {
             Utils.enableStrictMode();
         }
+
         super.onCreate(savedInstanceState);
 
         if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {

@@ -20,9 +20,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+
 /**
  * Created by mahesh on 10/14/2015.
  */
+
+
 public class ScreenSlidePage extends Fragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
@@ -32,6 +35,7 @@ public class ScreenSlidePage extends Fragment {
     List<SendQuestionAnswers> mListOptions=null;
     HashMap<String,Options> mListQuestionsAnswers=null;
     OnDataPass onDataPass;
+
     public static ScreenSlidePage create(int pageNumber) {
         ScreenSlidePage fragment = new ScreenSlidePage();
         Bundle args = new Bundle();
@@ -50,9 +54,7 @@ public class ScreenSlidePage extends Fragment {
         super.onAttach(a);
         onDataPass = (OnDataPass) a;
     }
-    public void passData(String data) {
-        onDataPass.onDataPass(data);
-    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +121,6 @@ public class ScreenSlidePage extends Fragment {
          @Override
          public void onCheckedChanged(RadioGroup group, int checkedId) {
              int id = (int) group.getTag();
-
              int lo = group.getCheckedRadioButtonId();
              onDataPass.onDataPass(String.valueOf(lo));
              Toast.makeText(getActivity(), "Clicked On" + lo, Toast.LENGTH_SHORT).show();
@@ -127,7 +128,6 @@ public class ScreenSlidePage extends Fragment {
      });
 
         Log.d("Answers", "" + answers.size());
-
         return rootView;
     }
 

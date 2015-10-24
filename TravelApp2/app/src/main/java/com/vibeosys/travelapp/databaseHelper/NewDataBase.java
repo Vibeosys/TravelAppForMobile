@@ -155,6 +155,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
+
     public boolean insertComment(List<Comment> listComment) {
         List<Comment> mListComment =null;
         SQLiteDatabase database = null;
@@ -184,6 +185,29 @@ public class NewDataBase extends SQLiteOpenHelper {
         }
         return false;
     }
+
+/*
+public List<Sync> dataFromSync(){
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    List<Sync> listSyncData;
+    try {
+    sqLiteDatabase=getReadableDatabase();
+    cursor=sqLiteDatabase.rawQuery("select * from Sync",null);
+    if(cursor!=null){
+        if(cursor.getCount()>0){
+
+
+        }
+    }
+    }
+    catch (Exception e){
+        e.printStackTrace();
+    }
+
+return listSyncData;
+
+}*/
 
 public boolean addDataToSync(String tableName,String UserId,String JsonSync){
 SQLiteDatabase sqLiteDatabase=null;
@@ -251,7 +275,7 @@ return likeCount+1;
                 Log.d("Updated Databse", String.valueOf(id));
                 contentValues.clear();
             }
-            Log.d("Like_and_Comments Table","Inserted in Like Table"+id);
+            Log.d("Like_and_Comments Table", "Inserted in Like Table" + id);
             if(id!=-1) {
                 return true;
             }
@@ -288,7 +312,7 @@ sqLiteDatabase.close();
     }catch (Exception e){
         e.printStackTrace();
     }
-    Log.d("Destination Table","Inserted in Destination"+count);
+    Log.d("Destination Table", "Inserted in Destination" + count);
     return false;
 }
 
@@ -437,7 +461,7 @@ Log.d("Qptions Table ","Inserted in Option Table"+count);
         try {
             sqLiteDatabase = getReadableDatabase();
                     /*cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});*/
-            cursor = sqLiteDatabase.rawQuery("select * from Images", null);
+            cursor = sqLiteDatabase.rawQuery("select * from Images natural join user where user.userid=images.userid", null);
 
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
@@ -510,6 +534,46 @@ Log.d("Qptions Table ","Inserted in Option Table"+count);
         return noOfQuestions;
     }
 
+public boolean updateUser(String UserName,String EmailAddress,String UserId){
+      SQLiteDatabase sqLiteDatabase=null;
+      ContentValues contentValues=null;
+    int rowsid=0;
+    try{
+    sqLiteDatabase=getWritableDatabase();
+    contentValues=new ContentValues();
+    contentValues.put("UserName",UserName);
+    contentValues.put("UserEmail",EmailAddress);
+    rowsid=sqLiteDatabase.update("MyUser", contentValues, "UserId=?", new String[]{UserId});
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    contentValues.clear();
+    sqLiteDatabase.close();
+if(rowsid>0){
+    return true;
+}
+    else return false;
+}
+
+  public boolean updateUserInfo(String userId){
+      SQLiteDatabase sqLiteDatabase=null;
+      ContentValues contentValues=null;
+      long count=-1;
+      try{
+          sqLiteDatabase=getWritableDatabase();
+          contentValues=new ContentValues();
+          contentValues.put("UserId",userId);
+          sqLiteDatabase.insert("MyUser",null,contentValues);
+      }catch (Exception e){
+          e.printStackTrace();
+      }
+
+      contentValues.clear();
+      sqLiteDatabase.close();
+      if(count==-1)return false;
+      else return true;
+
+  }
 
     public int MsgCount(int cDestId) {
         int count = 0;
@@ -608,6 +672,8 @@ Log.d("Qptions Table ","Inserted in Option Table"+count);
         }
         return null;
     }
+
+
 
 
     public List<TempData> GetLatLong(int cDestId) {

@@ -29,7 +29,7 @@ public class CommentsAndLikes extends UserDetails {
         this.UserName=username;
     }
 
-    CommentsAndLikes() {
+    public CommentsAndLikes() {
 
     }
 

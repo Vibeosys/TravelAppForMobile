@@ -87,90 +87,6 @@ public class MainActivity extends BaseActivity
     @Override
     public void onSuccess(String aData, int id) {
         super.onSuccess(aData, id);
-        if (id == 1) {//Download
-
-            /*    jsonObject1 = new JSONObject(aData);
-                JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                if (jsonArray.length() > 0) {
-                    mListDownload = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        if (jsonObject.has("Comment")) {
-                            Download download = new Download();
-                            download.setmKey("Comment");
-                            download.setmValue(new String[]{jsonObject.getString("Comment")});
-                            mListDownload.add(download);
-                            Log.d("Comments Value", "" + jsonObject.getString("Comment"));
-                        }
-
-                        if (jsonObject.has("Like")) {
-                            Download download = new Download();
-                            download.setmKey("Like");
-                            download.setmValue(new String[]{jsonObject.getString("Like")});
-                            mListDownload.add(download);
-                            Log.d("Likes Values", "" + jsonObject.getString("Like"));
-                        }
-
-                        if (jsonObject.has("Destination")) {
-                            Download download = new Download();
-                            download.setmKey("Destination");
-                            download.setmValue(new String[]{jsonObject.getString("Destination")});
-                            mListDownload.add(download);
-                            Log.d("Destination Values", "" + jsonObject.getString("Destination"));
-                        }
-
-                        if (jsonObject.has("Answer")) {
-                            Download download = new Download();
-                            download.setmKey("Answer");
-                            download.setmValue(new String[]{jsonObject.getString("Answer")});
-                            mListDownload.add(download);
-                            Log.d("Answer Values", "" + jsonObject.getString("Answer"));
-                        }
-
-                        if (jsonObject.has("Options")) {
-                            Download download = new Download();
-                            download.setmKey("Options");
-                            download.setmValue(new String[]{jsonObject.getString("Options")});
-                            mListDownload.add(download);
-                            Log.d("Options Values", "" + jsonObject.getString("Options"));
-                        }
-
-                        if (jsonObject.has("Question")) {
-                            Download download = new Download();
-                            download.setmKey("Question");
-                            download.setmValue(new String[]{jsonObject.getString("Question")});
-                            mListDownload.add(download);
-                            Log.d("Questions Values", "" + jsonObject.getString("Question"));
-                        }
-                        if (jsonObject.has("Images")) {
-                            Download download = new Download();
-                            download.setmKey("Images");
-                            download.setmValue(new String[]{jsonObject.getString("Images")});
-                            mListDownload.add(download);
-                            Log.d("Images Values", "" + jsonObject.getString("Images"));
-                        }
-
-                        if (jsonObject.has("User")) {
-                            Download download = new Download();
-                            download.setmKey("User");
-                            download.setmValue(new String[]{jsonObject.getString("User")});
-                            mListDownload.add(download);
-                            Log.d("User Values", "" + jsonObject.getString("User"));
-                        }
-
-                    }
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
-            //         Log.d("Loaded Data", "Data" + mListDownload.size());
-        }
-        if (id == 2) {//Upload
-
-        }
 
     }
 
@@ -222,7 +138,7 @@ public class MainActivity extends BaseActivity
         editor = sharedPref.edit();
         Gson gson = new Gson();
         newDataBase = new NewDataBase(getApplicationContext());
-       //  newDataBase.insertComment(commentList);
+        //  newDataBase.insertComment(commentList);
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
@@ -235,8 +151,9 @@ public class MainActivity extends BaseActivity
             String url = getResources().getString(R.string.URL);
             String UserId = sharedPref.getString("UserId", null);
             Log.d("UserId", UserId);
-            super.fetchData(url + "download" + "?" + "tempid=" + UserId, true, 1);//id 1=>download 2=>upload
-Log.d("Download Calling..","DownloadUrl:-"+url+"download");
+            super.fetchData(url + "download?userid=" + UserId, true, 1);//id 1=>download 2=>upload
+            Log.d("Download Calling..", "DownloadUrl:-" + url + "download");
+
         } else {
 
             layoutInflater = getLayoutInflater();
@@ -247,6 +164,7 @@ Log.d("Download Calling..","DownloadUrl:-"+url+"download");
             toast.setView(view);//setting the view of custom toast layout
             toast.show();
         }
+
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -297,12 +215,8 @@ Log.d("Download Calling..","DownloadUrl:-"+url+"download");
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
                 Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
-
-
                 newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
-
                 destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
-
                 CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
                 mMap.moveCamera(center);
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
@@ -405,25 +319,33 @@ Log.d("Download Calling..","DownloadUrl:-"+url+"download");
             toggle.syncState();
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
-            CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(21.0000, 78.0000));
+            final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(21.0000, 78.0000));
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
             mMap.animateCamera(zoom);
             mMap.moveCamera(center);
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
+
                 @Override
                 public View getInfoWindow(Marker mark) {
                     if (view == null) {
                         view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
                         view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
                         View phtotosView = view.findViewById(R.id.item_title);
+                        int mDestId = mDestinationNames.get(mark.getTitle());
+                        TextView countimages = (TextView) view.findViewById(R.id.item_counter);
+                        TextView countmsgs = (TextView) view.findViewById(R.id.countmsgs);
+                        int count = newDataBase.ImageCount(mDestId);
+                        int count1 = newDataBase.MsgCount(mDestId);
+                        countimages.setText(String.valueOf(count1));
+                        countmsgs.setText(String.valueOf(count));
                         phtotosView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
                             }
                         });
-                            view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
+                        view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
                         TextView title = (TextView) view.findViewById(R.id.textView3);
                         title.setText(mark.getTitle());
 
@@ -451,6 +373,8 @@ Log.d("Download Calling..","DownloadUrl:-"+url+"download");
         }
     }
 
+
+
     private void copyDatabase(File internalfile) {
         NetworkUtils n = new NetworkUtils();
         java.net.URL url = null;
@@ -462,12 +386,17 @@ Log.d("Download Calling..","DownloadUrl:-"+url+"download");
         try {
             if (n.isActiveNetworkAvailable(getApplicationContext())) {
                 uuid = UUID.randomUUID();
-                String data = "tempid"
+                String data = "userid"
                         + "=" + String.valueOf(uuid);
                 String callurl = getResources().getString(R.string.URL);
 
-                url = new URL(callurl +"downloadDb"+ "?" + data);
+                url = new URL(callurl + "downloadDb" + "?" + data);
                 editor.putString("UserId", String.valueOf(uuid));
+
+                newDataBase.updateUserInfo(String.valueOf(uuid));
+                newDataBase.updateUser("abc", "abc@abc.com", String.valueOf(uuid));
+                editor.putString("UserName", "abc");
+                editor.putString("EmailId", "abc@abc.com");
                 editor.commit();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 Log.d("STATUS", "Request Sended...");
@@ -478,7 +407,6 @@ Log.d("Download Calling..","DownloadUrl:-"+url+"download");
                 urlConnection.setConnectTimeout(20000);
                 urlConnection.setReadTimeout(10000);
                 urlConnection.connect();
-
                /* OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
                 wr.write(data);
                 wr.flush();

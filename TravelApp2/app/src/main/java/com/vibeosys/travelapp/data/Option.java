@@ -9,7 +9,7 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Option {
-    private int OptionId;
+    private String OptionId;
     private String OptionText;
     private int QuestionId;
 
@@ -27,15 +27,15 @@ public class Option {
 
     }
 
-    public Option(int optionId) {
+    public Option(String optionId) {
         this.OptionId = optionId;
     }
 
-    public int getOptionId() {
+    public String getOptionId() {
         return OptionId;
     }
 
-    public void setOptionId(int optionId) {
+    public void setOptionId(String optionId) {
         this.OptionId = optionId;
     }
 

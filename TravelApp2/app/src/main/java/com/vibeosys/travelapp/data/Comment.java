@@ -11,32 +11,34 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Comment {
-    private String UserId;
-    private int DestId;
-    private String CommentText;
+    private String userId;
+    private int destId;
+    private String commentText;
+public Comment(){
 
+}
     public String getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(String userId) {
-        this.UserId = userId;
+        this.userId = userId;
     }
 
     public int getDestId() {
-        return DestId;
+        return destId;
     }
 
     public void setDestId(int destId) {
-        this.DestId = destId;
+        this.destId = destId;
     }
 
     public String getCommentText() {
-        return CommentText;
+        return commentText;
     }
 
     public void setCommentText(String commentText) {
-        this.CommentText = commentText;
+        this.commentText = commentText;
     }
 
 

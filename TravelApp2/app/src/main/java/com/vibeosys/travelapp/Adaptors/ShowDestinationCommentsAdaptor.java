@@ -1,6 +1,7 @@
 package com.vibeosys.travelapp.Adaptors;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,24 +30,34 @@ import java.util.List;
  * Created by mahesh on 10/15/2015.
  */
 public class ShowDestinationCommentsAdaptor extends BaseAdapter {
- Context mContext;
+    Context mContext;
     List<MyImageDB> mUserImagesList = null;
     int DestId;
-    List<CommentsAndLikes> mListDestinationComments=new ArrayList<>();
+    List<CommentsAndLikes> mListDestinationComments = new ArrayList<>();
+    SharedPreferences sharedPref;
+    public static final String MyPREFERENCES = "MyPrefs";
+    String UserId;
+    String UserName;
     public ShowDestinationCommentsAdaptor(Context destinationComments, List<CommentsAndLikes> mListDestination, int destId) {
-    this.mContext=destinationComments;
-    this.mListDestinationComments=mListDestination;
-        this.DestId=destId;
+        this.mContext = destinationComments;
+        this.mListDestinationComments = mListDestination;
+        this.DestId = destId;
+        sharedPref =  mContext.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        UserId = sharedPref.getString("UserId", null);
+        UserName=sharedPref.getString("UserName",null);
     }
+
 
     @Override
     public boolean areAllItemsEnabled() {
         return true;
     }
+
     @Override
     public boolean isEnabled(int position) {
         return true;
     }
+
     @Override
     public void registerDataSetObserver(DataSetObserver observer) {
     }
@@ -57,7 +69,7 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
 
     @Override
     public int getCount() {
-  if(mListDestinationComments!=null)  return mListDestinationComments.size();
+        if (mListDestinationComments != null) return mListDestinationComments.size();
         else return 0;
     }
 
@@ -78,22 +90,32 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View viewrow=convertView;
+        View viewrow = convertView;
         ViewHolder viewHolder = null;
-        if(viewrow==null) {
-            LayoutInflater layoutInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            viewrow=layoutInflater.inflate(R.layout.destination_comment,null);
-            viewHolder=new ViewHolder();
-            viewHolder.textView=(TextView)viewrow.findViewById(R.id.userNametext1);
-            viewHolder.textView1=(TextView)viewrow.findViewById(R.id.userNameComment2);
-            viewHolder.imageView=(ImageView)viewrow.findViewById(R.id.userimagedest);
+        if (viewrow == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            viewrow = layoutInflater.inflate(R.layout.destination_comment, null);
+            viewHolder = new ViewHolder();
+            viewHolder.textView = (TextView) viewrow.findViewById(R.id.userNametext1);
+            viewHolder.textView1 = (TextView) viewrow.findViewById(R.id.userNameComment2);
+            viewHolder.imageView = (ImageView) viewrow.findViewById(R.id.userimagedest);
             viewrow.setTag(viewHolder);
-        }
-        else viewHolder=(ViewHolder)viewrow.getTag();
+        } else viewHolder = (ViewHolder) viewrow.getTag();
+        if(mListDestinationComments.get(position).getUserId().equals(UserId)){
+            Log.d("UserId",""+UserId);
+            viewHolder.textView.setText(UserName);
+            viewHolder.textView1.setText(mListDestinationComments.get(position).getmCommentText());
+        } else {
+            Log.d("UserId", "" + UserId);
             viewHolder.textView1.setText(mListDestinationComments.get(position).getmCommentText());
             viewHolder.textView.setText(mListDestinationComments.get(position).getUserName());
+        }
+        return viewrow;
+    }
 
-            return viewrow;
+    @Override
+    public void notifyDataSetInvalidated() {
+        super.notifyDataSetInvalidated();
     }
 
     @Override
@@ -111,11 +133,13 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
     public boolean isEmpty() {
         return false;
     }
+
     private static class ViewHolder {
         ImageView imageView;
         TextView textView;
         TextView textView1;
     }
+
     public Bitmap roundCornerImage(Bitmap raw, float round) {
         int width = raw.getWidth();
         int height = raw.getHeight();

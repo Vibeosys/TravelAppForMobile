@@ -4,28 +4,45 @@ package com.vibeosys.travelapp.data;
  * Created by mahesh on 10/23/2015.
  */
 public class UploadUser {
-    private String UserId;
-    private String EmailId;
-public UploadUser(){
+    private String userId;
+    private String emailId;
+    String userName;
 
-}
-    public UploadUser(String userId,String emailId){
-        this.UserId =userId;
-        this.EmailId =emailId;
+    public UploadUser() {
+
     }
+
+    public UploadUser(String userId, String emailId) {
+        this.userId = userId;
+        this.emailId = emailId;
+    }
+    public UploadUser(String userId, String emailId,String userName) {
+        this.userId = userId;
+        this.emailId = emailId;
+        this.userName=userName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public String getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(String userId) {
-        this.UserId = userId;
+        this.userId = userId;
     }
 
     public String getEmailId() {
-        return EmailId;
+        return emailId;
     }
 
     public void setEmailId(String emailId) {
-        this.EmailId = emailId;
+        this.emailId = emailId;
     }
 }

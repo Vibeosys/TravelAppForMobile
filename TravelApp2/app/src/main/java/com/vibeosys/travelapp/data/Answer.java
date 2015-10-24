@@ -9,56 +9,61 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Answer {
-    String AnswerId;
-    String UserId;
-    String DestId;
-    String OptionId;
-    String CreatedDate;
+    String answerId;
+    String userId;
+    String destId;
+    String optionId;
+    String createdDate;
 
     public Answer(){
 
     }
     public Answer(String optionId){
-        this.OptionId=optionId;
+        this.optionId =optionId;
+    }
+    public Answer(String optionId,String DestId,String userId){
+        this.optionId =optionId;
+        this.destId =DestId;
+        this.userId=userId;
     }
     public String getCreatedDate() {
-        return CreatedDate;
+        return createdDate;
     }
 
     public void setCreatedDate(String createdDate) {
-        CreatedDate = createdDate;
+        this.createdDate = createdDate;
     }
 
     public String getAnswerId() {
-        return AnswerId;
+        return answerId;
     }
 
     public void setAnswerId(String AnswerId) {
-        this.AnswerId = AnswerId;
+        this.answerId = AnswerId;
     }
 
     public String getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(String UserId) {
-        this.UserId = UserId;
+        this.userId = UserId;
     }
 
     public String getDestId() {
-        return DestId;
+        return destId;
     }
 
     public void setDestId(String DestId) {
-        this.DestId = DestId;
+        this.destId = DestId;
     }
 
     public String getOptionId() {
-        return OptionId;
+        return optionId;
     }
 
     public void setOptionId(String OptionId) {
-        this.OptionId = OptionId;
+        this.optionId = OptionId;
     }
 
 public static String serializeString(Answer answer){

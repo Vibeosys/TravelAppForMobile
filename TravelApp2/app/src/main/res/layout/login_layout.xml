@@ -3,23 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<ImageView
-    android:layout_width="100dp"
-    android:layout_height="100dp"
-    android:src="@drawable/company"
-    android:layout_gravity="center"
-    android:layout_marginTop="50dp"
-    android:layout_alignParentTop="true"
-    android:layout_centerHorizontal="true"
-    android:id="@+id/imageView3"
-    />
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dip"
-        android:layout_below="@id/imageView3">
+        android:padding="10dip">
         <!--  Email Label -->
         <TextView android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -28,6 +17,7 @@
         <EditText android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dip"
+            android:id="@+id/username"
             android:hint="Enter Name"
             android:layout_marginBottom="20dip"
             android:singleLine="true"/>
@@ -35,13 +25,13 @@
         <TextView android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textColor="#372c24"
-            android:text="Mobile No"/>
+            android:text="EmailId"/>
         <EditText android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dip"
-            android:singleLine="true"
-            android:password="true"
-            android:hint="Mobile Number"/>
+            android:id="@+id/emailid"
+            android:inputType="textEmailAddress"
+            android:hint="Enter Email Address"/>
         <!-- Login button -->
         <Button android:id="@+id/btnLogin"
             android:layout_width="174dp"

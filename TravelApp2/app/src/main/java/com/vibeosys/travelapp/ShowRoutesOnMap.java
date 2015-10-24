@@ -44,7 +44,7 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
     NewDataBase newDataBase;
     List<Routes> mRouteList;
     HashMap<Integer, DestLatLong> mHashMapRoutes;
-
+    HashMap<String, Integer> mDestinationNames = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +52,10 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         newDataBase = new NewDataBase(ShowRoutesOnMap.this);
         mRouteList = newDataBase.getRouteList();
         Intent mIntent = getIntent();
+        mDestinationNames = newDataBase.getDestNames();
+       setTitle("My Routes");
         String mRouteName = mIntent.getStringExtra("theRouteName");
+
         mHashMapRoutes = new HashMap<>();
         for (int i = 0; i < mRouteList.size(); i++) {
             if (mRouteName.equals(mRouteList.get(i).getmRouteName())) {
@@ -79,12 +82,14 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
                 }
             }
         }
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapNameText);
         mapFragment.getMapAsync(this);
+
     }
 
-    void CustDialog(String title) {
+    void CustDialog(String title, final int cDestId) {
         // Create custom dialog object
         final Dialog dialog = new Dialog(this);
         // Include dialog.xml file
@@ -93,17 +98,20 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         dialog.setTitle(title);
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
-
-        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
-
+        int count = newDataBase.ImageCount(cDestId);
+        int count1 = newDataBase.MsgCount(cDestId);
         dialog.show();
+        Log.d("INDialog", "" + cDestId);
+        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
+        mCountPhotos.setText(String.valueOf(count));
+        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
+        mCountMsgs.setText(String.valueOf(count1));
         RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
-
+                Intent intent = new Intent(ShowRoutesOnMap.this, DestinationUsersImages.class);
+                intent.putExtra("DestId", cDestId);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }
@@ -112,8 +120,8 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         relativeLayout1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
-
+                Intent intentphoto = new Intent(ShowRoutesOnMap.this, QuestionsFromOthers.class);
+                intentphoto.putExtra("DestId", cDestId);
                 startActivity(intentphoto);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -124,16 +132,16 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         usercomments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
-
+                Intent theIntent = new Intent(ShowRoutesOnMap.this, DestinationComments.class);
+                theIntent.putExtra("DestId", cDestId);
                 startActivity(theIntent);
             }
         });
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
-
+                Intent theIntent = new Intent(ShowRoutesOnMap.this, QuestionSlidingView.class);
+                theIntent.putExtra("DestId", cDestId);
                 startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -141,13 +149,12 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         sendphoto_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GridViewPhotos.class);
-
+                Intent intent = new Intent(ShowRoutesOnMap.this, GridViewPhotos.class);
+                intent.putExtra("DestId", cDestId);
                 startActivity(intent);
             }
         });
     }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         List<LatLong> theLatLongList = new ArrayList<>();
@@ -165,7 +172,6 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
             theLatLongList.add(theLatLong);
             googleMap.addMarker(new MarkerOptions().position(theCurrentLatLong).title(theDestLatLong.getmDestName()));
 
-
         }
         for (int i = 0; i < theLatLongList.size() - 1; i++) {
             googleMap.addPolyline(new PolylineOptions().geodesic(true)
@@ -179,8 +185,10 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-
-                CustDialog(marker.getTitle().toString());
+                int mDestId = mDestinationNames.get(marker.getTitle());
+                Log.d("MainActivityMarker", "" + mDestId);
+                mDestId = mDestinationNames.get(marker.getTitle());
+                CustDialog(marker.getTitle(), mDestId);
                 return true;
             }
         });

@@ -1,5 +1,6 @@
 package com.vibeosys.travelapp.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +8,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -38,9 +41,10 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
     EditText editTextCommentByUser;
     Button submitBtn;
     SharedPreferences sharedPref;
-
+    List<Comment> listComment;
     int DestId;
-
+    String UserId;
+    String  UserName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,26 +59,54 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         editTextCommentByUser = (EditText) findViewById(R.id.commnetbyUser);
         newDataBase = new NewDataBase(this);
         mListDestination = new ArrayList<>();
+        listComment = new ArrayList<>();
         mListDestination = newDataBase.DestinationComments(DestId);
         Log.d("DestinationComment", String.valueOf(mListDestination.size()));
+        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+         UserId = sharedPref.getString("UserId", null);
+         UserName=sharedPref.getString("UserName",null);
         mDestinationCommentListView.setAdapter(new ShowDestinationCommentsAdaptor(getApplicationContext(), mListDestination, DestId));
+
     }
 
     @Override
     public void onClick(View v) {
         int Destinatinid = DestId;
-        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        String UserId = sharedPref.getString("UserId", null);
         if (editTextCommentByUser.getText().toString().length() > 0 && editTextCommentByUser.getText().toString() != null) {
             String comment = editTextCommentByUser.getText().toString();
             UploadComment(Destinatinid, UserId, comment);
-            finish();
-           // Toast.makeText(getApplicationContext(), "Enterted comement" + editTextCommentByUser.getText().toString(), Toast.LENGTH_SHORT).show();
+            Comment comment1 = new Comment();
+            comment1.setUserId(UserId);
+            comment1.setCommentText(comment);
+            comment1.setDestId(DestId);
+            listComment.add(comment1);
+            newDataBase.insertComment(listComment);
+            mDestinationCommentListView.invalidate();
+            // Toast.makeText(getApplicationContext(), "Enterted comement" + editTextCommentByUser.getText().toString(), Toast.LENGTH_SHORT).show();
         } else {
             editTextCommentByUser.setError("Please Enter some Text");
         }
 
     }
+
+    public void LoginDialog() {
+        final Dialog dialog = new Dialog(this);
+        // Include dialog.xml file
+        EditText userNameEditText;
+        EditText emailidEditText;
+        Button loginButton;
+        dialog.setContentView(R.layout.login_layout);
+        // Set dialog title
+        dialog.setTitle("Login");
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
+        userNameEditText = (EditText) dialog.findViewById(R.id.username);
+        emailidEditText = (EditText) dialog.findViewById(R.id.emailid);
+        loginButton = (Button) dialog.findViewById(R.id.btnLogin);
+        loginButton.setOnClickListener(DestinationComments.this);
+    }
+
 
     private void UploadComment(int destinatinid, String userId, String comment) {
         Comment comment1 = new Comment();
@@ -88,15 +120,18 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
 
         tableDataList.add(new TableDataDTO("Comment", SerializedJsonString));
+        String EmailId = sharedPref.getString("EmailId", null);
+        Log.d("EmailId", "" + EmailId);
+        String uploadData = gson.toJson(new Upload(new UploadUser(userId, EmailId), tableDataList));
 
-        String uploadData=gson.toJson(new Upload(new UploadUser(userId, "abc@ab.com"), tableDataList));
-
-        Log.d("Uploading",uploadData.toString());
+        Log.d("Uploading", uploadData.toString());
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
+            super.UploadUserDetails();
             String url = getResources().getString(R.string.URL);
-            super.uploadToServer(url + "upload",uploadData );//id 1=>download 2=>upload
+            super.uploadToServer(url + "upload", uploadData, DestinationComments.this);//id 1=>download 2=>upload
             Log.d("Download Calling..", "DownloadUrl:-" + url);
+
         } else {
             newDataBase.addDataToSync("Comment_and_like", userId, SerializedJsonString);
             LayoutInflater

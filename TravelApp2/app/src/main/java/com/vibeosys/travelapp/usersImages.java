@@ -6,12 +6,13 @@ package com.vibeosys.travelapp;
 public class usersImages extends UserDetails {
     String mImageId;
     String mImagePaths;
- public usersImages(String cImageId, String cImagePath, int cDestId, String cUserId){
+    String userName;
+ public usersImages(String cImageId, String cImagePath, int cDestId, String cUserId,String userName){
     this.mImageId= cImageId;
     this.mImagePaths=cImagePath;
     this.UserId=cUserId;
     this.DestId=cDestId;
-
+    this.userName=userName;
  }
 
     public String getmImageId() {

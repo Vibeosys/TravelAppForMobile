@@ -32,7 +32,6 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -40,8 +39,8 @@ import android.widget.Toast;
 
 import com.vibeosys.travelapp.BuildConfig;
 import com.vibeosys.travelapp.ImageDetailActivity;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.usersImages;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
@@ -283,19 +282,19 @@ int id=v.getId();
             // Now handle the main ImageView thumbnails
             View view;
             ImageView imageView;
-            Button likeBtn;
+            ImageView likeBtn;
 
                 layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = layoutInflater.inflate(R.layout.showdestinationimages, null);
                 imageView = (ImageView) view.findViewById(R.id.userimages);
-                likeBtn = (Button) view.findViewById(R.id.likebutton);
+                likeBtn = (ImageView) view.findViewById(R.id.likebutton);
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                // imageView.setLayoutParams(mImageViewLayoutParams);
 
             likeBtn.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-        Button btn=(Button)v.findViewById(R.id.likebutton);
+
         int id=v.getId();
         Toast.makeText(getActivity(),""+ id,Toast.LENGTH_SHORT).show();
     }

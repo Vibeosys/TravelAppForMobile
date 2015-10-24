@@ -1,6 +1,8 @@
 package com.vibeosys.travelapp.tasks;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -10,20 +12,14 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.vibeosys.travelapp.data.Answer;
-import com.vibeosys.travelapp.data.Comment;
-import com.vibeosys.travelapp.data.Destination;
-import com.vibeosys.travelapp.data.Download;
-import com.vibeosys.travelapp.data.Images;
-import com.vibeosys.travelapp.data.Like;
-import com.vibeosys.travelapp.data.Option;
-import com.vibeosys.travelapp.data.User;
+import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.data.*;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
-import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -39,7 +35,7 @@ import java.util.Map;
 /**
  * Base Activity will give the basic implementation with async task support and other things
  */
-public class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback {
+public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback {
     int id;
     NewDataBase newDataBase = null;
     List<Comment> commentList = null;
@@ -50,6 +46,73 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
     List<Images> imagesList = null;
     List<com.vibeosys.travelapp.data.Question> questionsList = null;
     List<Option> optionsList = null;
+    SharedPreferences sharedPref;
+    public static final String MyPREFERENCES = "MyPrefs";
+
+
+    public void UploadUserDetails() {
+        Gson gson = new Gson();
+        sharedPref=getSharedPreferences(MyPREFERENCES,MODE_PRIVATE);
+        String EmailId = sharedPref.getString("EmailId", null);
+        String UserId = sharedPref.getString("UserId", null);
+        String UserName = sharedPref.getString("UserName", null);
+        UploadUser uploadUser = new UploadUser(UserId, EmailId, UserName);
+        final String encodedString = gson.toJson(uploadUser);
+        RequestQueue rq = Volley.newRequestQueue(this);
+        final String url = getResources().getString(R.string.URL);
+        Log.d("Encoded String", encodedString);
+        rq = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
+                url+"updateuser", encodedString, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject jresponse = response;//.getJSONObject(0);
+                    Log.d("UploadUserDetails", jresponse+"");
+                    String res = jresponse.getString("message");
+                    String code = jresponse.getString("errorCode");
+                    if (code.equals("0")) {
+                        //  JSONObject json = new JSONObject(response);
+                        Toast.makeText(getBaseContext(),
+                                "Updated Successfully", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+
+                    if (code.equals("100")) {
+                        Log.e("Error", "User Not Authenticated..");
+                    }
+                    if (code.equals("101")) {
+                        Log.e("Error", "User Id is Blanck");
+                    }
+                    if (code.equals("102")) {
+                        Log.e("Error", "Unknown Error");
+                    }
+
+
+                } catch (JSONException e) {
+                    Log.d("JSON Exception", e.toString());
+                    Toast.makeText(getBaseContext(),
+                            "Error while loadin data!",
+                            Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", "Error [" + error.getMessage() + "]");
+                Toast.makeText(getBaseContext(),
+                        "Cannot connect to server", Toast.LENGTH_LONG)
+                        .show();
+            }
+
+        });
+
+        rq.add(jsonArrayRequest);
+    }
+
 
     public void fetchData(final String aServiceUrl, final boolean aShowProgressDlg, int id) {
         Log.d("BaseActivity", "IN Base");
@@ -57,35 +120,39 @@ public class BaseActivity extends AppCompatActivity implements BackgroundTaskCal
         new BackgroundTask(aShowProgressDlg).execute(aServiceUrl, String.valueOf(id));
     }
 
-  public void uploadToServer(final String aServiceUrl,  String uploadData){
-      final ProgressDialog progress = new ProgressDialog(this);
-      progress.setMessage("Sending ...");
+  public void uploadToServer(final String aServiceUrl,  String uploadData,Context context){
+      final ProgressDialog progress = new ProgressDialog(context);
+      progress.setMessage("Please Wait ...");
       progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
       progress.setIndeterminate(true);
-      Log.d("In Method","");
+      Log.d("Upload To Server", "");
       progress.show();
       RequestQueue rq = Volley.newRequestQueue(this);
-      JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(Request.Method.POST,
-              aServiceUrl,uploadData ,new Response.Listener<JSONArray>() {
+
+      JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
+              aServiceUrl, uploadData, new Response.Listener<JSONObject>() {
 
           @Override
-          public void onResponse(JSONArray response) {
+          public void onResponse(JSONObject response) {
               try {
-                  JSONObject jresponse = response.getJSONObject(0);
-                  String res=jresponse.getString("message");
-                  if(res.equals("Saved")) {
-                      //  JSONObject json = new JSONObject(response);
-                      progress.dismiss();
-                      Toast.makeText(getBaseContext(),
-                              "Updated Successfully", Toast.LENGTH_SHORT)
-                              .show();
+                  //com.vibeosys.travelapp.data.Error vbError = new Gson().fromJson(response.toString(), com.vibeosys.travelapp.data.Error.class);
+                 Log.d("Upload Response",""+response.toString());
+                  if(response.getString("errorCode").equals("o")){
+                      Toast.makeText(getApplicationContext(),"Data Updated Successfully",Toast.LENGTH_SHORT).show();
                   }
+                  else {
+                      Toast.makeText(getApplicationContext(),"Error Occoured Please try again",Toast.LENGTH_SHORT).show();
+                  }
+                  progress.dismiss();
+
+
               } catch (Exception e) {
                   Log.d("JSON Exception", e.toString());
                   Toast.makeText(getBaseContext(),
                           "Error while loadin data!",
                           Toast.LENGTH_LONG).show();
               }
+
           }
 
       }, new Response.ErrorListener() {

@@ -4,21 +4,30 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.vibeosys.travelapp.data.Answer;
+import com.vibeosys.travelapp.data.TableDataDTO;
+import com.vibeosys.travelapp.data.Upload;
+import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseActivity;
+import com.vibeosys.travelapp.util.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +35,7 @@ import java.util.List;
 /**
  * Created by mahesh on 10/14/2015.
  */
-public class QuestionSlidingView extends FragmentActivity implements ScreenSlidePage.OnDataPass {
+public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage.OnDataPass {
     private static int NUM_PAGES;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
@@ -35,6 +44,7 @@ public class QuestionSlidingView extends FragmentActivity implements ScreenSlide
     public static final String MyPREFERENCES = "MyPrefs";
     String UserId;
     int DestId;
+   String EmailId;
     SharedPreferences sharedPreferences;
     List<String> mListOptions;
 
@@ -44,11 +54,13 @@ public class QuestionSlidingView extends FragmentActivity implements ScreenSlide
         setContentView(R.layout.questionslidingview);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+      //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         DestId = getIntent().getExtras().getInt("DestId");
-        mListOptions=new ArrayList<>();
+        mListOptions = new ArrayList<>();
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         UserId = sharedPreferences.getString("UserId", null);
+        EmailId=sharedPreferences.getString("EmailId",null);
         newDataBase = new NewDataBase(this);
         int pages = newDataBase.Questions(DestId);
         NUM_PAGES = pages;
@@ -65,45 +77,51 @@ public class QuestionSlidingView extends FragmentActivity implements ScreenSlide
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
             }
         });
+
         Log.d("Size ", "" + mListOptions.size());
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
 
-                if ((mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1)) {
-                    /*Gson gson = new Gson();
-                    Option option = new Option();
-                    ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
-                    for (int i = 0; i > option.getOptionsId().length; i++) {
-                        Option option1 = new Option(option.getOptionsId()[i]);
-                        String SerializedJsonString = gson.toJson(option1);
-                        tableDataList.add(new TableDataDTO("Like", SerializedJsonString));
+                if((mViewPager.getCurrentItem()+1 == mPagerAdapter.getCount())){
+                    Log.d("Calling Finish","");
+                }
+                String uploadData;
+                if ((mViewPager.getCurrentItem() == mPagerAdapter.getCount()-1)) {
+                    if (mListOptions.size() > 0) {
+                        Gson gson = new Gson();
+                        ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
+                        for (int i = 0; i < mListOptions.size(); i++) {
+                            Answer answer = new Answer(mListOptions.get(i),String.valueOf(DestId),UserId);
+                            String SerializedJsonString = gson.toJson(answer);
+                            Log.d("Option Data",SerializedJsonString);
+                            tableDataList.add(new TableDataDTO("answer", SerializedJsonString));
+                        }
+
+                         uploadData = gson.toJson(new Upload(new UploadUser(UserId, EmailId), tableDataList));
+                        Log.d("Like Data to Uplaod", uploadData);
+
+                        if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
+                            String url = getResources().getString(R.string.URL);
+
+                            Upload(url,uploadData);
+                            Log.d("Download Calling..", "DownloadUrl:-" + url);
+
+                        } else {
+                            newDataBase.addDataToSync("answer", UserId, uploadData);
+                            LayoutInflater
+                                    layoutInflater = getLayoutInflater();
+                            View view = layoutInflater.inflate(R.layout.cust_toast, null);
+                            Toast toast = new Toast(getApplicationContext());
+                            toast.setDuration(Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                            toast.setView(view);//setting the view of custom toast layout
+                            toast.show();
+
+                        }
+                        finish();
                     }
-
-                    String uploadData = gson.toJson(new Upload(new UploadUser(UserId, "abc@ab.com"), tableDataList));
-                    Log.d("Like Data to Uplaod", uploadData);
-
-                    if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
-                        String url = getResources().getString(R.string.URL);
-                        BaseActivity baseActivity = new BaseActivity();
-                        baseActivity.uploadToServer(url + "upload", uploadData);//id 1=>download 2=>upload
-                        Log.d("Download Calling..", "DownloadUrl:-" + url);
-
-                    } else {
-                        newDataBase.addDataToSync("answer", UserId, uploadData);
-                        LayoutInflater
-                                layoutInflater = getLayoutInflater();
-                        View view = layoutInflater.inflate(R.layout.cust_toast, null);
-                        Toast toast = new Toast(getApplicationContext());
-                        toast.setDuration(Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                        toast.setView(view);//setting the view of custom toast layout
-                        toast.show();
-
-                    }*/
-                    finish();
-
                 }
             }
         });
@@ -119,6 +137,11 @@ public class QuestionSlidingView extends FragmentActivity implements ScreenSlide
                 invalidateOptionsMenu();
             }
         });
+    }
+
+    void Upload(String url,String uploadData){
+        super.UploadUserDetails();
+        super.uploadToServer(url + "upload", uploadData,QuestionSlidingView.this);//id 1=>download 2=>upload
     }
 
     @Override
@@ -179,7 +202,8 @@ public class QuestionSlidingView extends FragmentActivity implements ScreenSlide
     @Override
     public void onDataPass(String data) {
         mListOptions.add(data);
-        Log.d("Data From Fragment",data);
+        Log.d("Data From Fragment", data);
+        Log.d("Size of List", "" + mListOptions.size());
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

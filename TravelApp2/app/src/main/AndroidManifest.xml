@@ -96,7 +96,7 @@
             android:theme="@android:style/Theme.Light" />
         <activity
             android:name=".QuestionSlidingView"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:uiOptions="splitActionBarWhenNarrow">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
