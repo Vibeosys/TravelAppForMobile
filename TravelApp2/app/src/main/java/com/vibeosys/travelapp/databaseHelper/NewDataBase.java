@@ -1004,6 +1004,30 @@ return listSyncData;
         return mRouteLists;
     }
 
+    public Routes getRoute(String routeName) {
+        Routes mRoutes = new Routes();
+        try {
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery("select * from MyMap where RouteName='"+ routeName + "'", null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    mRoutes.setmRouteName(cursor.getString(cursor.getColumnIndex("RouteName")));
+                    mRoutes.setmRoutetripsNames(cursor.getString(cursor.getColumnIndex("RouteJson")));
+                    mRoutes.setmRouteDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    //mRouteLists.add(mRoutes);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mRoutes;
+    }
+
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP DATABASE IF EXISTS Answer");

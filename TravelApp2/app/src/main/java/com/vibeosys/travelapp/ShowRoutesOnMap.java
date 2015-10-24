@@ -35,7 +35,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by mahesh on 10/12/2015.
@@ -43,45 +42,49 @@ import java.util.Map;
 public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallback {
     NewDataBase newDataBase;
     List<Routes> mRouteList;
-    HashMap<Integer, DestLatLong> mHashMapRoutes;
+    //HashMap<Integer, DestLatLong> mHashMapRoutes;
+    ArrayList<DestLatLong> mDestinationLatLongs;
     HashMap<String, Integer> mDestinationNames = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.showroutes);
         newDataBase = new NewDataBase(ShowRoutesOnMap.this);
-        mRouteList = newDataBase.getRouteList();
         Intent mIntent = getIntent();
         mDestinationNames = newDataBase.getDestNames();
-       setTitle("My Routes");
+        setTitle("My Routes");
         String mRouteName = mIntent.getStringExtra("theRouteName");
+        Routes mRoute = newDataBase.getRoute(mRouteName);
 
-        mHashMapRoutes = new HashMap<>();
-        for (int i = 0; i < mRouteList.size(); i++) {
-            if (mRouteName.equals(mRouteList.get(i).getmRouteName())) {
-                JSONArray theJsonArray;
-                JSONObject jsonObject;
-                DestLatLong mDestLatLong;
-                try {
-                    theJsonArray = new JSONArray(mRouteList.get(i).getmRoutetripsNames());
-                    Log.d("SHOWROUTELIST :- JSON", theJsonArray.toString());
-                    for (int j = 0; j < theJsonArray.length(); j++) {
-                        jsonObject = theJsonArray.getJSONObject(j);
-                        mDestLatLong = new DestLatLong();
-                        mDestLatLong.setLatitude(jsonObject.getDouble("Lat"));
-                        mDestLatLong.setLongitude(jsonObject.getDouble("Long"));
-                        mDestLatLong.setmDestName(jsonObject.getString("DestName"));
-                        int id = jsonObject.getInt("Id");
-                        mHashMapRoutes.put(id, mDestLatLong);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException er) {
-                    er.printStackTrace();
+        //mHashMapRoutes = new HashMap<>();
+        mDestinationLatLongs = new ArrayList<>();
+        //for (int i = 0; i < mRouteList.size(); i++) {
+        //if (mRouteName.equals(mRouteList.get(i).getmRouteName())) {
+            JSONArray theJsonArray;
+            JSONObject jsonObject;
+            DestLatLong mDestLatLong;
+            try {
+                theJsonArray = new JSONArray(mRoute.getmRoutetripsNames());
+                Log.d("SHOWROUTELIST :- JSON", theJsonArray.toString());
+                for (int j = 0; j < theJsonArray.length(); j++) {
+                    jsonObject = theJsonArray.getJSONObject(j);
+                    mDestLatLong = new DestLatLong();
+                    mDestLatLong.setLatitude(jsonObject.getDouble("Lat"));
+                    mDestLatLong.setLongitude(jsonObject.getDouble("Long"));
+                    mDestLatLong.setmDestName(jsonObject.getString("DestName"));
+                    int id = jsonObject.getInt("Id");
+                    //mHashMapRoutes.put(id, mDestLatLong);
+                    mDestinationLatLongs.add(mDestLatLong);
                 }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (NullPointerException er) {
+                er.printStackTrace();
             }
-        }
+            //}
+        //}
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapNameText);
@@ -155,13 +158,25 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
             }
         });
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         List<LatLong> theLatLongList = new ArrayList<>();
         LatLong theLatLong;
         LatLng theCurrentLatLong = null;
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000),5));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000), 5));
 
+        for(DestLatLong theDestLatLong : mDestinationLatLongs)
+        {
+            theLatLong = new LatLong();
+            //DestLatLong theDestLatLong = entry.getValue();
+            theLatLong.setmLat(theDestLatLong.getLatitude());
+            theLatLong.setmLong(theDestLatLong.getLongitude());
+            theCurrentLatLong = new LatLng(theDestLatLong.getLatitude(), theDestLatLong.getLongitude());
+            theLatLongList.add(theLatLong);
+            googleMap.addMarker(new MarkerOptions().position(theCurrentLatLong).title(theDestLatLong.getmDestName()));
+        }
+/*
         for (Map.Entry<Integer, DestLatLong> entry : mHashMapRoutes.entrySet()) {
             int theId = entry.getKey();
             theLatLong = new LatLong();
@@ -173,6 +188,7 @@ public class ShowRoutesOnMap extends FragmentActivity implements OnMapReadyCallb
             googleMap.addMarker(new MarkerOptions().position(theCurrentLatLong).title(theDestLatLong.getmDestName()));
 
         }
+*/
         for (int i = 0; i < theLatLongList.size() - 1; i++) {
             googleMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(theLatLongList.get(i).getmLat(), theLatLongList.get(i).getmLong()))
