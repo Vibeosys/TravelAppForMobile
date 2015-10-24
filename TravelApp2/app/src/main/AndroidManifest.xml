@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vibeosys.travelapp">
+    package="com.vibeosys.travelapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,20 +18,18 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<!--
-     android:name="com.vibeosys.travelapp.MyApp"
-    -->
+
+<!--          android:name="com.vibeosys.travelapp.MyApp" -->
     <application
-        android:largeHeap="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:parentActivityName=".MainActivity"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -40,19 +38,18 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.vibeosys.travelapp.LoginActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.ConformOTPActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.vibeosys.travelapp.MainActivity"
+            android:name=".MainActivity"
+            android:alwaysRetainTaskState="true"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" android:alwaysRetainTaskState="true">
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,77 +57,76 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.vibeosys.travelapp.QuestionsFromOthers"
-            android:parentActivityName="com.vibeosys.travelapp.MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog">
+            android:name=".QuestionsFromOthers"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
         <activity
-            android:name="com.vibeosys.travelapp.ShowRouteList"
+            android:name=".ShowRouteList"
             android:label="@string/app_name"
-            android:parentActivityName="com.vibeosys.travelapp.MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
         <activity
-            android:name="com.vibeosys.travelapp.ShowMyPhotos"
+            android:name=".ShowMyPhotos"
             android:label="@string/app_name"
-            android:parentActivityName="com.vibeosys.travelapp.MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
         <activity
             android:name=".ShowRoutesOnMap"
-            android:parentActivityName="com.vibeosys.travelapp.MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
-        <activity android:name=".GridViewPhotos" />
+        <activity
+            android:name=".GridViewPhotos"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PreviewImage"
-            android:theme="@android:style/Theme.Light" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".QuestionSlidingView"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:uiOptions="splitActionBarWhenNarrow">
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:uiOptions="splitActionBarWhenNarrow" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vibeosys.travelapp.MainActivity" />
+        </activity>
+        <activity android:name=".activities.DestinationComments" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vibeosys.travelapp.MainActivity" />
+        </activity>
+        <activity android:name=".UserLikes" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.DestinationComments"
-
-            >
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.vibeosys.travelapp.MainActivity" />
-</activity>
-        <activity android:name=".UserLikes">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vibeosys.travelapp.MainActivity" />
-        </activity>
-
-        <activity android:name=".DestinationUsersImages"
+            android:name=".DestinationUsersImages"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
-
         <activity
             android:name=".ImageDetailActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
-               </activity>
-
+        </activity>
+        <activity android:name=".activities.LocationDetailsActivity" >
+        </activity>
     </application>
 
 </manifest>

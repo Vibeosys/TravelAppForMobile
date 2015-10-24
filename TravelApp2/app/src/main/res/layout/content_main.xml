@@ -26,18 +26,18 @@
             android:id="@+id/dest_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="3"
             android:hint=" Search Destination"
-            android:textSize="14dp"
             android:inputType="textAutoComplete"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="3dp"/>
+            android:textSize="14dp" />
 
         <Button
             android:layout_width="30dp"
             android:layout_height="35dp"
 
-            android:background="@drawable/searchicon" />
+            android:background="@drawable/search" />
     </LinearLayout>
 
     <include

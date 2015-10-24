@@ -87,6 +87,90 @@ public class MainActivity extends BaseActivity
     @Override
     public void onSuccess(String aData, int id) {
         super.onSuccess(aData, id);
+        if (id == 1) {//Download
+
+            /*    jsonObject1 = new JSONObject(aData);
+                JSONArray jsonArray = jsonObject1.getJSONArray("data");
+                if (jsonArray.length() > 0) {
+                    mListDownload = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        if (jsonObject.has("Comment")) {
+                            Download download = new Download();
+                            download.setmKey("Comment");
+                            download.setmValue(new String[]{jsonObject.getString("Comment")});
+                            mListDownload.add(download);
+                            Log.d("Comments Value", "" + jsonObject.getString("Comment"));
+                        }
+
+                        if (jsonObject.has("Like")) {
+                            Download download = new Download();
+                            download.setmKey("Like");
+                            download.setmValue(new String[]{jsonObject.getString("Like")});
+                            mListDownload.add(download);
+                            Log.d("Likes Values", "" + jsonObject.getString("Like"));
+                        }
+
+                        if (jsonObject.has("Destination")) {
+                            Download download = new Download();
+                            download.setmKey("Destination");
+                            download.setmValue(new String[]{jsonObject.getString("Destination")});
+                            mListDownload.add(download);
+                            Log.d("Destination Values", "" + jsonObject.getString("Destination"));
+                        }
+
+                        if (jsonObject.has("Answer")) {
+                            Download download = new Download();
+                            download.setmKey("Answer");
+                            download.setmValue(new String[]{jsonObject.getString("Answer")});
+                            mListDownload.add(download);
+                            Log.d("Answer Values", "" + jsonObject.getString("Answer"));
+                        }
+
+                        if (jsonObject.has("Options")) {
+                            Download download = new Download();
+                            download.setmKey("Options");
+                            download.setmValue(new String[]{jsonObject.getString("Options")});
+                            mListDownload.add(download);
+                            Log.d("Options Values", "" + jsonObject.getString("Options"));
+                        }
+
+                        if (jsonObject.has("Question")) {
+                            Download download = new Download();
+                            download.setmKey("Question");
+                            download.setmValue(new String[]{jsonObject.getString("Question")});
+                            mListDownload.add(download);
+                            Log.d("Questions Values", "" + jsonObject.getString("Question"));
+                        }
+                        if (jsonObject.has("Images")) {
+                            Download download = new Download();
+                            download.setmKey("Images");
+                            download.setmValue(new String[]{jsonObject.getString("Images")});
+                            mListDownload.add(download);
+                            Log.d("Images Values", "" + jsonObject.getString("Images"));
+                        }
+
+                        if (jsonObject.has("User")) {
+                            Download download = new Download();
+                            download.setmKey("User");
+                            download.setmValue(new String[]{jsonObject.getString("User")});
+                            mListDownload.add(download);
+                            Log.d("User Values", "" + jsonObject.getString("User"));
+                        }
+
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+            //         Log.d("Loaded Data", "Data" + mListDownload.size());
+        }
+        if (id == 2) {//Upload
+
+        }
 
     }
 
@@ -138,7 +222,7 @@ public class MainActivity extends BaseActivity
         editor = sharedPref.edit();
         Gson gson = new Gson();
         newDataBase = new NewDataBase(getApplicationContext());
-        //  newDataBase.insertComment(commentList);
+       //  newDataBase.insertComment(commentList);
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
@@ -153,7 +237,6 @@ public class MainActivity extends BaseActivity
             Log.d("UserId", UserId);
             super.fetchData(url + "download?userid=" + UserId, true, 1);//id 1=>download 2=>upload
             Log.d("Download Calling..", "DownloadUrl:-" + url + "download");
-
         } else {
 
             layoutInflater = getLayoutInflater();
@@ -164,7 +247,6 @@ public class MainActivity extends BaseActivity
             toast.setView(view);//setting the view of custom toast layout
             toast.show();
         }
-
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -215,9 +297,13 @@ public class MainActivity extends BaseActivity
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
                 Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
+
+
                 newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
+
                 destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
-                CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
+
+                final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
                 mMap.moveCamera(center);
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
                 mMap.animateCamera(zoom);
@@ -319,13 +405,22 @@ public class MainActivity extends BaseActivity
             toggle.syncState();
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
-            final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(21.0000, 78.0000));
+            CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(21.0000, 78.0000));
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
             mMap.animateCamera(zoom);
             mMap.moveCamera(center);
+            /*
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    Intent theIntent = new Intent(MainActivity.this, LocationDetailsActivity.class);
+                    startActivity(theIntent);
+                    return false;
+                }
+            });
+            */
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
-
                 @Override
                 public View getInfoWindow(Marker mark) {
                     if (view == null) {
@@ -345,7 +440,7 @@ public class MainActivity extends BaseActivity
                                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
                             }
                         });
-                        view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
+                            view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
                         TextView title = (TextView) view.findViewById(R.id.textView3);
                         title.setText(mark.getTitle());
 
@@ -358,6 +453,7 @@ public class MainActivity extends BaseActivity
                     return null;
                 }
             });
+
             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
                 public void onInfoWindowClick(Marker mark) {
@@ -372,8 +468,6 @@ public class MainActivity extends BaseActivity
             e.printStackTrace();
         }
     }
-
-
 
     private void copyDatabase(File internalfile) {
         NetworkUtils n = new NetworkUtils();
@@ -390,13 +484,13 @@ public class MainActivity extends BaseActivity
                         + "=" + String.valueOf(uuid);
                 String callurl = getResources().getString(R.string.URL);
 
-                url = new URL(callurl + "downloadDb" + "?" + data);
+                url = new URL(callurl +"downloadDb"+ "?" + data);
                 editor.putString("UserId", String.valueOf(uuid));
-
                 newDataBase.updateUserInfo(String.valueOf(uuid));
                 newDataBase.updateUser("abc", "abc@abc.com", String.valueOf(uuid));
                 editor.putString("UserName", "abc");
                 editor.putString("EmailId", "abc@abc.com");
+
                 editor.commit();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 Log.d("STATUS", "Request Sended...");
@@ -407,6 +501,7 @@ public class MainActivity extends BaseActivity
                 urlConnection.setConnectTimeout(20000);
                 urlConnection.setReadTimeout(10000);
                 urlConnection.connect();
+
                /* OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
                 wr.write(data);
                 wr.flush();

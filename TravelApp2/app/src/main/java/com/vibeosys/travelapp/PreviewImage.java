@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -36,23 +36,25 @@ import java.util.Map;
 /**
  * Created by mahesh on 10/13/2015.
  */
-public class PreviewImage extends FragmentActivity {
-    SharedPreferences sharedPref;
-    NewDataBase newDataBase = null;
-    String imageData = null;
+public class PreviewImage extends AppCompatActivity {
+
+    private SharedPreferences sharedPref;
+    private NewDataBase newDataBase = null;
+    private String imageData = null;
     public static final String MyPREFERENCES = "MyPrefs";
-    ProgressDialog progress;
+    private ProgressDialog progress;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.previewimage);
-        Bitmap bitmap = null;
+        setTitle("Preview Image");
         // Selected image id
         newDataBase = new NewDataBase(getApplicationContext());
-        String path = getIntent().getExtras().getString("Data");
+        final String path = getIntent().getExtras().getString("Data");
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         Log.d("PreviewImage ImagePath", path);
-        Toast.makeText(getApplicationContext(), "" + path, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "" + path, Toast.LENGTH_SHORT).show();
         Button uploadImageButton = (Button) findViewById(R.id.uploadImageBtu);
         uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +68,7 @@ public class PreviewImage extends FragmentActivity {
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progress.setIndeterminate(true);
                 progress.show();
-                Log.d("Path File ",path);
+                Log.d("Path File ", path);
                 String UserId = sharedPref.getString("UserId", null);
                 int DestId = getIntent().getExtras().getInt("DestId");
                 imageUploadDTO.setImageName(path);
@@ -101,25 +103,33 @@ public class PreviewImage extends FragmentActivity {
             }
         });
 
-        ImageView imageView = (ImageView) findViewById(R.id.previewmyimage);
-        FileInputStream in;
-        BufferedInputStream buf;
-        Bitmap bMap;
-        try {
-            in = new FileInputStream(path);
-            buf = new BufferedInputStream(in);
-            bMap = BitmapFactory.decodeStream(buf);
-            imageData = getStringImage(bMap);
-            imageView.setImageBitmap(bMap);
-            if (in != null) {
-                in.close();
+        final ImageView imageView = (ImageView) findViewById(R.id.previewmyimage);
+
+        imageView.post(new Runnable() {
+            @Override
+            public void run() {
+
+                FileInputStream in;
+                BufferedInputStream buf;
+                Bitmap bMap;
+                try {
+                    in = new FileInputStream(path);
+                    buf = new BufferedInputStream(in);
+                    bMap = BitmapFactory.decodeStream(buf);
+                    imageData = getStringImage(bMap);
+                    imageView.setImageBitmap(bMap);
+                    if (in != null) {
+                        in.close();
+                    }
+                    if (buf != null) {
+                        buf.close();
+                    }
+                } catch (Exception e) {
+                    Log.e("Error reading file", e.toString());
+                }
+
             }
-            if (buf != null) {
-                buf.close();
-            }
-        } catch (Exception e) {
-            Log.e("Error reading file", e.toString());
-        }
+        });
         /*bitmap = decodeURI(path);
         imageView.setImageBitmap(bitmap);*/
     }
@@ -132,11 +142,11 @@ public class PreviewImage extends FragmentActivity {
         Log.d("PreviewImage Destid", "" + string);
         Log.d("PreviewImage UserId", "" + s);
 
-       // final String fileName = filename.replaceAll(" ", "");
+        // final String fileName = filename.replaceAll(" ", "");
 
         Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url+"images/upload1", new Response.Listener<String>() {
+                url + "images/upload1", new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -164,7 +174,7 @@ public class PreviewImage extends FragmentActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("ERROR", "Error [" + error + "]");
-                Log.e("URL Called",url);
+                Log.e("URL Called", url);
 
                 progress.dismiss();
                 Toast.makeText(getBaseContext(),
@@ -182,7 +192,7 @@ public class PreviewImage extends FragmentActivity {
                 params.put("upload", encodedString);
                 params.put("imagename", filename);
                 params.put("DestId", String.valueOf(string));
-                params.put("UserId",s);
+                params.put("UserId", s);
 
                 return params;
 

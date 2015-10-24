@@ -13,16 +13,18 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.view.LoaderImageView;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -35,6 +37,7 @@ import java.util.Locale;
  * Created by mahesh on 10/12/2015.
  */
 public class GridViewPhotos extends AppCompatActivity {
+
     GridView mGridViewPhotos;
     List<String> mImages;
     private static final int IMAGE_CAPTURE_CODE = 100;
@@ -55,15 +58,18 @@ public class GridViewPhotos extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gridviewphotos);
-        mGridViewPhotos=(GridView)findViewById(R.id.showgridphotos);
-        DestId= getIntent().getExtras().getInt("DestId");
-        cc = this.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        setTitle("Choose Photos");
+        mGridViewPhotos = (GridView) findViewById(R.id.showgridphotos);
+        DestId = getIntent().getExtras().getInt("DestId");
+        //String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+        cc = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null,
                 null,
                 null,
                 null);
 
-        if(cc!=null) {
+        if (cc != null) {
+
             if (cc.moveToFirst()) {
                 ProgressDialog = new ProgressDialog(GridViewPhotos.this);
                 ProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -93,30 +99,50 @@ public class GridViewPhotos extends AppCompatActivity {
 
             }
 
+            /*GalleryAdapter theAdapter = new GalleryAdapter(this, cc);
+            mGridViewPhotos.setAdapter(theAdapter);
+            mGridViewPhotos.setOnItemClickListener(theAdapter);
+            */
+
+            mGridViewPhotos.invalidate();
+
         }
+
         mGridViewPhotos.setAdapter(new ShowImages(this));
         mGridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bitmap bitmap;
-                if (position == 0) {
-                    captureiMAGE();
-                } else {
-                    Intent i = new Intent(getApplicationContext(), PreviewImage.class);
-                    // passing array index
 
-                    i.putExtra("Data", mUrls[position].getPath());
-                    i.putExtra("id", position);
-                    i.putExtra("DestId",DestId);
-                    Log.d("GridViewPhotos DestId",""+DestId);
-                    startActivity(i);
-                }
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long aId) {
+
+                Intent theIntent = new Intent(getApplicationContext(), PreviewImage.class);
+                theIntent.putExtra("Data", mUrls[position].getPath());
+                theIntent.putExtra("id", position);
+                theIntent.putExtra("DestId", DestId);
+                Log.d("GridViewPhotos DestId", "" + DestId);
+                startActivity(theIntent);
+
             }
         });
-        mGridViewPhotos.invalidate();
+
     }
 
-    private void captureiMAGE() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.photos, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.get_photo) {
+            captureImage();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void captureImage() {
         Intent takephoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
 
@@ -156,11 +182,11 @@ public class GridViewPhotos extends AppCompatActivity {
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 String date = DateFormat.getDateTimeInstance().format(new Date());
-                newDataBase=new NewDataBase(getApplicationContext());
-                newDataBase.mSaveMyImages(imageUri.getPath(),date);
-                    Toast.makeText(getApplicationContext(),
-                            "User image capture"+imageUri.getPath(), Toast.LENGTH_SHORT)
-                            .show();
+                newDataBase = new NewDataBase(getApplicationContext());
+                newDataBase.mSaveMyImages(imageUri.getPath(), date);
+                Toast.makeText(getApplicationContext(),
+                        "User image capture" + imageUri.getPath(), Toast.LENGTH_SHORT)
+                        .show();
 
             } else if (resultCode == RESULT_CANCELED) {
                 // user cancelled Image capture
@@ -176,22 +202,20 @@ public class GridViewPhotos extends AppCompatActivity {
         }
     }
 
-    public Bitmap decodeURI(String filePath){
+    public Bitmap decodeURI(String filePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(filePath, options);
-
         // Only scale if we need to
         // (16384 buffer for img processing)
         Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
-        if(options.outHeight * options.outWidth * 2 >= 16384){
+        if (options.outHeight * options.outWidth * 2 >= 16384) {
             // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
             double sampleSize = scaleByHeight
                     ? options.outHeight / 100
                     : options.outWidth / 100;
             options.inSampleSize =
-                    (int)Math.pow(2d, Math.floor(
-                            Math.log(sampleSize)/Math.log(2d)));
+                    (int) Math.pow(2d, Math.floor(
+                            Math.log(sampleSize) / Math.log(2d)));
         }
 
         // Do the actual decoding
@@ -201,6 +225,7 @@ public class GridViewPhotos extends AppCompatActivity {
 
         return output;
     }
+
     /**
      * Matches code in MediaProvider.computeBucketValues. Should be a common
      * function.
@@ -213,11 +238,73 @@ public class GridViewPhotos extends AppCompatActivity {
         }
     }*/
 
-    private class ShowImages extends BaseAdapter {
-        Context theContext;
-        public ShowImages(Context context) {
-            theContext=context;
+    /*
+    private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener{
+
+        public GalleryAdapter(Context context, Cursor aCur) {
+            super(context, aCur, true);
         }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+
+            Cursor cc = getCursor();
+            cc.moveToPosition(position);
+            Uri theUrl = Uri.parse(cc.getString(1));
+            //String theName = cc.getString(3);
+            View row = convertView;
+            if (row == null) {
+                LayoutInflater theLayoutInflator = getLayoutInflater();
+                row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
+            }
+
+            LoaderImageView image = (LoaderImageView) row.findViewById(R.id.viewImage);
+            image.loadImageFromFile(theUrl.getPath());
+            return row;
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View row = null;
+            LayoutInflater theLayoutInflator = getLayoutInflater();
+            row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
+            //ViewHolder viewHolder = new ViewHolder();
+            //row.setTag(viewHolder);
+            return row;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long aId) {
+
+            Intent theIntent = new Intent(getApplicationContext(), PreviewImage.class);
+            Cursor theCur = getCursor();
+            theCur.moveToPosition(position);
+            Uri theUri = Uri.parse(theCur.getString(1));
+            theIntent.putExtra("Data", theUri.getPath());
+            theIntent.putExtra("id", position);
+            theIntent.putExtra("DestId", DestId);
+            Log.d("GridViewPhotos DestId", "" + DestId);
+            startActivity(theIntent);
+
+        }
+
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+
+        }
+    }
+
+    */
+
+    private class ShowImages extends BaseAdapter {
+
+        Context theContext;
+
+        public ShowImages(Context context) {
+            theContext = context;
+        }
+
         @Override
         public int getCount() {
             return cc.getCount();
@@ -235,43 +322,29 @@ public class GridViewPhotos extends AppCompatActivity {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
+
             View row = convertView;
             ViewHolder viewHolder = null;
-            Bitmap bmp = null;
-            if(row==null) {
+
+            if (row == null) {
                 LayoutInflater theLayoutInflator = getLayoutInflater();
                 row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
                 viewHolder = new ViewHolder();
-                viewHolder.image = (ImageView) row.findViewById(R.id.viewImage);
+                viewHolder.image = (LoaderImageView) row.findViewById(R.id.viewImage);
                 row.setTag(viewHolder);
 
+            } else {
+                viewHolder = (ViewHolder) row.getTag();
             }
-            else viewHolder = (ViewHolder) row.getTag();
 
-
-            if(position==0){
-                viewHolder.image.setImageResource(R.drawable.camera);
-            }
-            else {
-                final ImageView theImage = viewHolder.image;
-                theImage.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Bitmap bmp = decodeURI(mUrls[position].getPath());
-                        theImage.setImageBitmap(bmp);
-                    }
-                });
-
-
-                //BitmapFactory.decodeFile(mUrls[position].getPath());
-                // viewHolder.image.setImageBitmap(bmp);
-            }
+            viewHolder.image.loadImageFromFile(mUrls[position].getPath());
             return row;
         }
 
     }
+
     static class ViewHolder {
-        ImageView image;
+        LoaderImageView image;
     }
 
 }

@@ -8,11 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.view.LoaderImageView;
 
 import java.util.List;
 
@@ -57,13 +57,13 @@ public class ImageAdapter extends BaseAdapter {
                     (Context.LAYOUT_INFLATER_SERVICE);
             row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
             viewHolder = new ImageAdapter.ViewHolder();
-            viewHolder.imageView = (ImageView) row.findViewById(R.id.viewImage);
+            viewHolder.imageView = (LoaderImageView) row.findViewById(R.id.viewImage);
             viewHolder.textView = (TextView) row.findViewById(R.id.dateText);
             row.setTag(viewHolder);
 
         } else viewHolder = (ImageAdapter.ViewHolder) row.getTag();
 
-        bmp = decodeURI(myImageDBs.get(position).getmImagePath());
+        //bmp = decodeURI(myImageDBs.get(position).getmImagePath());
         //BitmapFactory.decodeFile(mUrls[position].getPath());
         String theDate=myImageDBs.get(position).getmCreatedDate();
         String[] splited=theDate.split(",");
@@ -71,7 +71,7 @@ public class ImageAdapter extends BaseAdapter {
         Log.d("MyPhotos", dateYear[0]);
         Log.d("MyPhotos", myImageDBs.get(position).getmCreatedDate());
         viewHolder.textView.setText(splited[0]);
-        viewHolder.imageView.setImageBitmap(bmp);
+        viewHolder.imageView.loadImageFromFile("file:"+myImageDBs.get(position).getmImagePath());
         return row;
 
 
@@ -79,7 +79,7 @@ public class ImageAdapter extends BaseAdapter {
 
 
     private static class ViewHolder {
-        ImageView imageView;
+        LoaderImageView imageView;
         TextView textView;
     }
 
