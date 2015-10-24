@@ -102,10 +102,9 @@ public class LoaderImageView extends LinearLayout{
         new Thread(){
             public void run() {
                 try {
-                    if(imageUrl.startsWith("file")) {
-                        if(mBitmap == null) {
-                            mBitmap = decodeURI(imageUrl.replaceAll("file:", ""));
-                        }
+                    if(imageUrl.startsWith("file"))
+                    {
+                       mBitmap = decodeURI(imageUrl.replaceAll("file:", ""));
                     }
                     else {
                         mDrawable = getDrawableFromUrl(imageUrl);
