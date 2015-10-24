@@ -157,11 +157,11 @@ public class NewDataBase extends SQLiteOpenHelper {
 
 
     public boolean insertComment(List<Comment> listComment) {
-        List<Comment> mListComment =null;
+        List<Comment> mListComment = null;
         SQLiteDatabase database = null;
         mListComment = listComment;
         ContentValues contentValues = null;
-        long id=-1;
+        long id = -1;
         try {
             database = getWritableDatabase();
 
@@ -170,16 +170,16 @@ public class NewDataBase extends SQLiteOpenHelper {
                 contentValues.put("commentText", listComment.get(i).getCommentText());
                 contentValues.put("DestId", listComment.get(i).getDestId());
                 contentValues.put("UserId", listComment.get(i).getUserId());
-                 id = database.insert("Comment_and_like", null, contentValues);
+                id = database.insert("Comment_and_like", null, contentValues);
                 Log.d("Updated Databse", String.valueOf(id));
                 Log.d("Updated Column", listComment.get(i).getCommentText());
                 contentValues.clear();
             }
             database.close();
-            Log.d("Comment Table","Inserted in Comment");
-    if(id!=-1) {
-        return true;
-    }
+            Log.d("Comment Table", "Inserted in Comment");
+            if (id != -1) {
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -209,74 +209,72 @@ return listSyncData;
 
 }*/
 
-public boolean addDataToSync(String tableName,String UserId,String JsonSync){
-SQLiteDatabase sqLiteDatabase=null;
-ContentValues contentValues=null;
-long id=-1;
-    try{
-sqLiteDatabase=getWritableDatabase();
-contentValues=new ContentValues();
-contentValues.put("UserId",UserId);
-contentValues.put("JsonSync",JsonSync);
-contentValues.put("TableName",tableName);
-id=sqLiteDatabase.insert("Sync",null,contentValues);
-    }catch (Exception e){
-        e.printStackTrace();
-    }
-sqLiteDatabase.close();
-    if(id!=-1){
-        Log.d("SyncTable Updated Value",""+id);
-        return true;
-    }
-    else return false;
-}
-
-
-
-public int LikeCount(int DestId, String UserId, SQLiteDatabase sqLiteDatabase1){
- int likeCount=0;
-    SQLiteDatabase sqLiteDatabase=sqLiteDatabase1;
-    Cursor cursor=null;
-    try {
-        sqLiteDatabase=getReadableDatabase();
-        cursor=sqLiteDatabase.rawQuery("select LikeCount from comment_and_like where destid=? and userid=?",new String[]{String.valueOf(DestId),String.valueOf(UserId)});
-        if(cursor!=null){
-            if(cursor.getCount()>0){
-                cursor.moveToFirst();
-                likeCount=cursor.getInt(cursor.getColumnIndex("LikeCount"));
-            }
-            cursor.close();
-
+    public boolean addDataToSync(String tableName, String UserId, String JsonSync) {
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long id = -1;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("UserId", UserId);
+            contentValues.put("JsonSync", JsonSync);
+            contentValues.put("TableName", tableName);
+            id = sqLiteDatabase.insert("Sync", null, contentValues);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Log.d("Like Table Like Count",""+likeCount);
-    }catch (Exception e){
-        e.printStackTrace();
+        sqLiteDatabase.close();
+        if (id != -1) {
+            Log.d("SyncTable Updated Value", "" + id);
+            return true;
+        } else return false;
     }
-return likeCount+1;
-}
+
+
+    public int LikeCount(int DestId, String UserId, SQLiteDatabase sqLiteDatabase1) {
+        int likeCount = 0;
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabase1;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select LikeCount from comment_and_like where destid=? and userid=?", new String[]{String.valueOf(DestId), String.valueOf(UserId)});
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    likeCount = cursor.getInt(cursor.getColumnIndex("LikeCount"));
+                }
+                cursor.close();
+
+            }
+            Log.d("Like Table Like Count", "" + likeCount);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return likeCount + 1;
+    }
 
     public boolean insertLikes(List<Like> listLikes) {
         List<Like> mListLikes = null;
         SQLiteDatabase sqLiteDatabase = null;
-        SQLiteDatabase sqLiteDatabase1=null;
+        SQLiteDatabase sqLiteDatabase1 = null;
         mListLikes = listLikes;
         ContentValues contentValues = null;
-        long id=-1;
-        int countvalue=0;
+        long id = -1;
+        int countvalue = 0;
         try {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
             for (int i = 0; i < mListLikes.size(); i++) {
-                countvalue=LikeCount(mListLikes.get(i).getDestId(), mListLikes.get(i).getUserId(),sqLiteDatabase1);
-                contentValues=new ContentValues();
-                contentValues.put("LikeCount",countvalue);
-                id = sqLiteDatabase.update("Comment_and_like",contentValues,"userid=? and DestId=?",new String[]{mListLikes.get(i).getUserId(),
+                countvalue = LikeCount(mListLikes.get(i).getDestId(), mListLikes.get(i).getUserId(), sqLiteDatabase1);
+                contentValues = new ContentValues();
+                contentValues.put("LikeCount", countvalue);
+                id = sqLiteDatabase.update("Comment_and_like", contentValues, "userid=? and DestId=?", new String[]{mListLikes.get(i).getUserId(),
                         String.valueOf(mListLikes.get(i).getDestId())});
                 Log.d("Updated Databse", String.valueOf(id));
                 contentValues.clear();
             }
             Log.d("Like_and_Comments Table", "Inserted in Like Table" + id);
-            if(id!=-1) {
+            if (id != -1) {
                 return true;
             }
 
@@ -287,170 +285,171 @@ return likeCount+1;
         return false;
     }
 
-public boolean insertDestination(List<com.vibeosys.travelapp.data.Destination> DestList){
-    List<com.vibeosys.travelapp.data.Destination> mDestList=null;
-    mDestList=DestList;
-    SQLiteDatabase sqLiteDatabase=null;
-    ContentValues contentValues=null;
-    long count=-1;
-    try {
-        sqLiteDatabase=getWritableDatabase();
-        contentValues=new ContentValues();
-
-        for(int i=0;i<mDestList.size();i++){
-            contentValues.put("DestId",mDestList.get(i).getDestId());
-            contentValues.put("DestName",mDestList.get(i).getDestName());
-            contentValues.put("Lat",mDestList.get(i).getLat());
-            contentValues.put("Long",mDestList.get(i).getLong());
-            count= sqLiteDatabase.insert("Destination",null,contentValues);
-            contentValues.clear();
-        }
-sqLiteDatabase.close();
-    if(count!=-1){
-        return true;
-    }
-    }catch (Exception e){
-        e.printStackTrace();
-    }
-    Log.d("Destination Table", "Inserted in Destination" + count);
-    return false;
-}
-
-    public     boolean insertImages(List<Images> ImagesList){
-        List<Images> mImagesList=null;
-        mImagesList=ImagesList;
-        SQLiteDatabase sqLiteDatabase=null;
-        ContentValues contentValues=null;
-        long count=-1;
+    public boolean insertDestination(List<com.vibeosys.travelapp.data.Destination> DestList) {
+        List<com.vibeosys.travelapp.data.Destination> mDestList = null;
+        mDestList = DestList;
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
         try {
-            sqLiteDatabase=getWritableDatabase();
-            contentValues=new ContentValues();
-            for(int i=0;i<mImagesList.size();i++){
-                contentValues.put("DestId",mImagesList.get(i).getDestId());
-                contentValues.put("UserId",mImagesList.get(i).getUserId());
-                contentValues.put("ImageID",mImagesList.get(i).getImageId());
-                contentValues.put("ImagePath",mImagesList.get(i).getImagePath());
-                contentValues.put("ImageSeen",mImagesList.get(i).getImageSeen());
-                count= sqLiteDatabase.insert("Images",null,contentValues);
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+
+            for (int i = 0; i < mDestList.size(); i++) {
+                contentValues.put("DestId", mDestList.get(i).getDestId());
+                contentValues.put("DestName", mDestList.get(i).getDestName());
+                contentValues.put("Lat", mDestList.get(i).getLat());
+                contentValues.put("Long", mDestList.get(i).getLong());
+                count = sqLiteDatabase.insert("Destination", null, contentValues);
                 contentValues.clear();
             }
             sqLiteDatabase.close();
-            if(count!=-1){
-                Log.d("Images Table","Inserted in Images");
+            if (count != -1) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.d("Destination Table", "Inserted in Destination" + count);
+        return false;
+    }
+
+    public boolean insertImages(List<Images> ImagesList) {
+        List<Images> mImagesList = null;
+        mImagesList = ImagesList;
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < mImagesList.size(); i++) {
+                contentValues.put("DestId", mImagesList.get(i).getDestId());
+                contentValues.put("UserId", mImagesList.get(i).getUserId());
+                contentValues.put("ImageID", mImagesList.get(i).getImageId());
+                contentValues.put("ImagePath", mImagesList.get(i).getImagePath());
+                contentValues.put("ImageSeen", mImagesList.get(i).getImageSeen());
+                count = sqLiteDatabase.insert("Images", null, contentValues);
+                contentValues.clear();
+            }
+            sqLiteDatabase.close();
+            if (count != -1) {
+                Log.d("Images Table", "Inserted in Images");
+                return true;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return false;
     }
 
-    public  boolean insertUsers(List<User> UsersList){
-        List<User> musersList=null;
-        musersList=UsersList;
-        SQLiteDatabase sqLiteDatabase=null;
-        ContentValues contentValues=null;
-        long count=-1;
+    public boolean insertUsers(List<User> UsersList) {
+        List<User> musersList = null;
+        musersList = UsersList;
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
         try {
-            sqLiteDatabase=getWritableDatabase();
-            contentValues=new ContentValues();
-            for(int i=0;i<musersList.size();i++){
-                contentValues.put("UserId",musersList.get(i).getUserId());
-                contentValues.put("UserName",musersList.get(i).getUserName());
-                contentValues.put("PhotoURL",musersList.get(i).getPhotoURL());
-                count= sqLiteDatabase.insert("User",null,contentValues);
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < musersList.size(); i++) {
+                contentValues.put("UserId", musersList.get(i).getUserId());
+                contentValues.put("UserName", musersList.get(i).getUserName());
+                contentValues.put("PhotoURL", musersList.get(i).getPhotoURL());
+                count = sqLiteDatabase.insert("User", null, contentValues);
                 contentValues.clear();
             }
             sqLiteDatabase.close();
-            if(count!=-1){
+            if (count != -1) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-Log.d("User Table","Inserted in User Table"+count);
+        Log.d("User Table", "Inserted in User Table" + count);
         return false;
     }
 
-    public  boolean insertQuestions(List<com.vibeosys.travelapp.data.Question> QuestionsList){
-        List<com.vibeosys.travelapp.data.Question> mQuestionsList=null;
-        mQuestionsList=QuestionsList;
-        SQLiteDatabase sqLiteDatabase=null;
-        ContentValues contentValues=null;
-        long count=-1;
+    public boolean insertQuestions(List<com.vibeosys.travelapp.data.Question> QuestionsList) {
+        List<com.vibeosys.travelapp.data.Question> mQuestionsList = null;
+        mQuestionsList = QuestionsList;
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
         try {
-            sqLiteDatabase=getWritableDatabase();
-            contentValues=new ContentValues();
-            for(int i=0;i<mQuestionsList.size();i++){
-                contentValues.put("QuestionId",mQuestionsList.get(i).getQuestionId());
-                contentValues.put("QuestionText",mQuestionsList.get(i).getQuestionText());
-                count= sqLiteDatabase.insert("Question",null,contentValues);
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < mQuestionsList.size(); i++) {
+                contentValues.put("QuestionId", mQuestionsList.get(i).getQuestionId());
+                contentValues.put("QuestionText", mQuestionsList.get(i).getQuestionText());
+                count = sqLiteDatabase.insert("Question", null, contentValues);
                 contentValues.clear();
             }
             sqLiteDatabase.close();
-            if(count!=-1){
+            if (count != -1) {
                 return true;
             }
-            Log.d("Inserted in Question","Question Table"+count);
-        }catch (Exception e){
+            Log.d("Inserted in Question", "Question Table" + count);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return false;
     }
-    public  boolean insertOptions(List<Option> OptionsList){
-        List<Option> mOptionsList=null;
-        mOptionsList=OptionsList;
-        SQLiteDatabase sqLiteDatabase=null;
-        ContentValues contentValues=null;
-        long count=-1;
+
+    public boolean insertOptions(List<Option> OptionsList) {
+        List<Option> mOptionsList = null;
+        mOptionsList = OptionsList;
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
         try {
-            sqLiteDatabase=getWritableDatabase();
-            contentValues=new ContentValues();
-            for(int i=0;i<mOptionsList.size();i++){
-                contentValues.put("QuestionId",mOptionsList.get(i).getQuestionId());
-                contentValues.put("OptionText",mOptionsList.get(i).getOptionText());
-                contentValues.put("OptionId",mOptionsList.get(i).getOptionId());
-                count= sqLiteDatabase.insert("Option",null,contentValues);
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < mOptionsList.size(); i++) {
+                contentValues.put("QuestionId", mOptionsList.get(i).getQuestionId());
+                contentValues.put("OptionText", mOptionsList.get(i).getOptionText());
+                contentValues.put("OptionId", mOptionsList.get(i).getOptionId());
+                count = sqLiteDatabase.insert("Option", null, contentValues);
                 contentValues.clear();
             }
             sqLiteDatabase.close();
-            if(count!=-1){
+            if (count != -1) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-Log.d("Qptions Table ","Inserted in Option Table"+count);
+        Log.d("Qptions Table ", "Inserted in Option Table" + count);
         return false;
     }
 
-    public  boolean insertAnswers(List<Answer> AnswersList){
-        List<Answer> mAnswersList=null;
-        mAnswersList=AnswersList;
-        SQLiteDatabase sqLiteDatabase=null;
-        ContentValues contentValues=null;
-        long count=-1;
+    public boolean insertAnswers(List<Answer> AnswersList) {
+        List<Answer> mAnswersList = null;
+        mAnswersList = AnswersList;
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
         try {
-            sqLiteDatabase=getWritableDatabase();
-            contentValues=new ContentValues();
-            for(int i=0;i<mAnswersList.size();i++){
-                contentValues.put("AnswerId",mAnswersList.get(i).getAnswerId());
-                contentValues.put("DestId",mAnswersList.get(i).getDestId());
-                contentValues.put("OptionId",mAnswersList.get(i).getOptionId());
-                contentValues.put("UserId",mAnswersList.get(i).getUserId());
-                count= sqLiteDatabase.insert("Answer",null,contentValues);
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            for (int i = 0; i < mAnswersList.size(); i++) {
+                contentValues.put("AnswerId", mAnswersList.get(i).getAnswerId());
+                contentValues.put("DestId", mAnswersList.get(i).getDestId());
+                contentValues.put("OptionId", mAnswersList.get(i).getOptionId());
+                contentValues.put("UserId", mAnswersList.get(i).getUserId());
+                count = sqLiteDatabase.insert("Answer", null, contentValues);
                 contentValues.clear();
             }
             sqLiteDatabase.close();
-            if(count!=-1){
+            if (count != -1) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.d("Answer Table","Inserted in Answer Table"+count);
+        Log.d("Answer Table", "Inserted in Answer Table" + count);
         return false;
     }
 
@@ -471,7 +470,8 @@ Log.d("Qptions Table ","Inserted in Option Table"+count);
                                 cursor.getString(cursor.getColumnIndex("ImageId")),
                                 cursor.getString(cursor.getColumnIndex("ImagePath")),
                                 cursor.getInt(cursor.getColumnIndex("DestId")),
-                                cursor.getString(cursor.getColumnIndex("UserId"))
+                                cursor.getString(cursor.getColumnIndex("UserId")),
+                                        cursor.getString(cursor.getColumnIndex("UserName"))
                         );
                         cImagePaths.add(theUsersImages);
                     } while (cursor.moveToNext());
@@ -534,46 +534,45 @@ Log.d("Qptions Table ","Inserted in Option Table"+count);
         return noOfQuestions;
     }
 
-public boolean updateUser(String UserName,String EmailAddress,String UserId){
-      SQLiteDatabase sqLiteDatabase=null;
-      ContentValues contentValues=null;
-    int rowsid=0;
-    try{
-    sqLiteDatabase=getWritableDatabase();
-    contentValues=new ContentValues();
-    contentValues.put("UserName",UserName);
-    contentValues.put("UserEmail",EmailAddress);
-    rowsid=sqLiteDatabase.update("MyUser", contentValues, "UserId=?", new String[]{UserId});
-    }catch (Exception e){
-        e.printStackTrace();
+    public boolean updateUser(String UserName, String EmailAddress, String UserId) {
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        int rowsid = 0;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("UserName", UserName);
+            contentValues.put("UserEmail", EmailAddress);
+            rowsid = sqLiteDatabase.update("MyUser", contentValues, "UserId=?", new String[]{UserId});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        contentValues.clear();
+        sqLiteDatabase.close();
+        if (rowsid > 0) {
+            return true;
+        } else return false;
     }
-    contentValues.clear();
-    sqLiteDatabase.close();
-if(rowsid>0){
-    return true;
-}
-    else return false;
-}
 
-  public boolean updateUserInfo(String userId){
-      SQLiteDatabase sqLiteDatabase=null;
-      ContentValues contentValues=null;
-      long count=-1;
-      try{
-          sqLiteDatabase=getWritableDatabase();
-          contentValues=new ContentValues();
-          contentValues.put("UserId",userId);
-          sqLiteDatabase.insert("MyUser",null,contentValues);
-      }catch (Exception e){
-          e.printStackTrace();
-      }
+    public boolean updateUserInfo(String userId) {
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long count = -1;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("UserId", userId);
+            sqLiteDatabase.insert("MyUser", null, contentValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-      contentValues.clear();
-      sqLiteDatabase.close();
-      if(count==-1)return false;
-      else return true;
+        contentValues.clear();
+        sqLiteDatabase.close();
+        if (count == -1) return false;
+        else return true;
 
-  }
+    }
 
     public int MsgCount(int cDestId) {
         int count = 0;
@@ -672,8 +671,6 @@ if(rowsid>0){
         }
         return null;
     }
-
-
 
 
     public List<TempData> GetLatLong(int cDestId) {
