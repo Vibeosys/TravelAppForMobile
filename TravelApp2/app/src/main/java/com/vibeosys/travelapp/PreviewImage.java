@@ -61,7 +61,7 @@ public class PreviewImage extends FragmentActivity {
                 ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
                 imageUploadDTO.setImageData(imageData);
                 String path = getIntent().getExtras().getString("Data");
-                progress = new ProgressDialog(getApplicationContext());
+                progress = new ProgressDialog(PreviewImage.this);
                 progress.setMessage("Uploading Image...");
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progress.setIndeterminate(true);
@@ -127,7 +127,7 @@ public class PreviewImage extends FragmentActivity {
     public void uploadImage(final String encodedString, final String filename, final int string, final String s) {
 
         RequestQueue rq = Volley.newRequestQueue(this);
-        String url = getResources().getString(R.string.URL);
+        final String url = getResources().getString(R.string.URL);
         Log.d("URL", url);
         Log.d("PreviewImage Destid", "" + string);
         Log.d("PreviewImage UserId", "" + s);
@@ -136,7 +136,7 @@ public class PreviewImage extends FragmentActivity {
 
         Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url+"upload1", new Response.Listener<String>() {
+                url+"images/upload1", new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -163,7 +163,9 @@ public class PreviewImage extends FragmentActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("ERROR", "Error [" + error + "]");
+                Log.e("ERROR", "Error [" + error + "]");
+                Log.e("URL Called",url);
+
                 progress.dismiss();
                 Toast.makeText(getBaseContext(),
                         "Cannot connect to server", Toast.LENGTH_LONG)
