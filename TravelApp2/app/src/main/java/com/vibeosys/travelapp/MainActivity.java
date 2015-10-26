@@ -273,7 +273,8 @@ public class MainActivity extends BaseActivity
 
         ArrayAdapter<String> arrayAdapter = null;
         try {
-            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, Collections.list(Collections.enumeration(mDestinationNames.keySet())));
+            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                    Collections.list(Collections.enumeration(mDestinationNames.keySet())));
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -295,7 +296,8 @@ public class MainActivity extends BaseActivity
                 Log.d("MainActivity", String.valueOf(mDestId));
                 mCurrentDestinationData = newDataBase.GetLatLong(mDestId);//Get Lat Long of DestName
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
-                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(),
+                        mCurrentDestinationData.get(0).getmLong())).title(mDestName));
                 Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
 
 
@@ -303,7 +305,8 @@ public class MainActivity extends BaseActivity
 
                 destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
 
-                final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
+                final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(),
+                        mCurrentDestinationData.get(0).getmLong()));
                 mMap.moveCamera(center);
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
                 mMap.animateCamera(zoom);
@@ -567,7 +570,7 @@ public class MainActivity extends BaseActivity
     }
 
 
-    void CustDialog(String title, final int cDestId) {
+    void CustDialog(final String title, final int cDestId) {
         // Create custom dialog object
         final Dialog dialog = new Dialog(this);
         // Include dialog.xml file
@@ -590,6 +593,7 @@ public class MainActivity extends BaseActivity
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
                 intent.putExtra("DestId", cDestId);
+                intent.putExtra("DestName", title);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }
@@ -600,6 +604,7 @@ public class MainActivity extends BaseActivity
             public void onClick(View v) {
                 Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
                 intentphoto.putExtra("DestId", cDestId);
+                intentphoto.putExtra("DestName", title);
                 startActivity(intentphoto);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -612,6 +617,7 @@ public class MainActivity extends BaseActivity
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
                 theIntent.putExtra("DestId", cDestId);
+                theIntent.putExtra("DestName", title);
                 startActivity(theIntent);
             }
         });
@@ -620,6 +626,7 @@ public class MainActivity extends BaseActivity
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
                 theIntent.putExtra("DestId", cDestId);
+                theIntent.putExtra("DestName", title);
                 startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -629,6 +636,7 @@ public class MainActivity extends BaseActivity
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GridViewPhotos.class);
                 intent.putExtra("DestId", cDestId);
+                intent.putExtra("DestName", title);
                 startActivity(intent);
             }
         });

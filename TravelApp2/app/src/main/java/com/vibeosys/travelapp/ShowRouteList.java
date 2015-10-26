@@ -22,7 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,7 +92,7 @@ public class ShowRouteList extends AppCompatActivity {
             textdatetext = (TextView) row.findViewById(R.id.textdate);
             title.setText(theRouteList.get(position).getmRouteName());
             String date= theRouteList.get(position).getmRouteDate();
-            SimpleDateFormat simpleDateFormat=new SimpleDateFormat();
+            //SimpleDateFormat simpleDateFormat=new SimpleDateFormat();
 
             textdatetext.setText(date.substring(0,14));
             List<String> theRouteNames = new ArrayList<>();

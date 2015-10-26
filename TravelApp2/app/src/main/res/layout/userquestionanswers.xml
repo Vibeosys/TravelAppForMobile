@@ -1,26 +1,33 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-  android:id="@+id/questionText"
-    android:textStyle="bold"
-    android:textSize="22dp"/>
-<View
-    android:layout_width="match_parent"
-    android:layout_height="4dp"
-    android:background="@android:color/background_dark"/>
- <RadioGroup
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:id="@+id/questionradiogroup">
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
- </RadioGroup>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="5dp">
 
-</LinearLayout>
-    </ScrollView>
+        <TextView
+            android:id="@+id/questionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="22dp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@android:color/background_dark" />
+
+        <RadioGroup
+            android:id="@+id/questionradiogroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>
