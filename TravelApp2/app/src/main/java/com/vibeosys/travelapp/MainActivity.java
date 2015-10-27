@@ -43,7 +43,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
-import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
@@ -78,7 +77,7 @@ public class MainActivity extends BaseActivity
     public void onFailure(String aData, int id) {
         super.onFailure(aData, id);
         try {
-            Log.d("Failed to Load", "Data" + aData.toString());
+         //   Log.d("Failed to Load", "Data" + aData.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -237,6 +236,8 @@ public class MainActivity extends BaseActivity
             Log.d("UserId", UserId);
             super.fetchData(url + "download?userid=" + UserId, true, 1);//id 1=>download 2=>upload
             Log.d("Download Calling..", "DownloadUrl:-" + url + "download");
+            newDataBase.updateUserInfo(String.valueOf(UserId));
+            newDataBase.updateUser("abc", "abc@abc.com", String.valueOf(UserId));
         } else {
 
             layoutInflater = getLayoutInflater();
@@ -459,7 +460,7 @@ public class MainActivity extends BaseActivity
                 public void onInfoWindowClick(Marker mark) {
                     int mDestId = mDestinationNames.get(mark.getTitle());
                     Log.d("MainActivityMarker", "" + mDestId);
-                    CustDialog(mark.getTitle(), mDestId);
+                    ShowDestinationInfoDialog(mark.getTitle(), mDestId);
 
                 }
             });
@@ -482,12 +483,12 @@ public class MainActivity extends BaseActivity
                 uuid = UUID.randomUUID();
                 String data = "userid"
                         + "=" + String.valueOf(uuid);
+                Log.d("UUId",data);
                 String callurl = getResources().getString(R.string.URL);
-
+                Log.d("called Url", callurl +"downloadDb"+ "?" + data);
                 url = new URL(callurl +"downloadDb"+ "?" + data);
                 editor.putString("UserId", String.valueOf(uuid));
-                newDataBase.updateUserInfo(String.valueOf(uuid));
-                newDataBase.updateUser("abc", "abc@abc.com", String.valueOf(uuid));
+
                 editor.putString("UserName", "abc");
                 editor.putString("EmailId", "abc@abc.com");
 
@@ -567,72 +568,7 @@ public class MainActivity extends BaseActivity
     }
 
 
-    void CustDialog(String title, final int cDestId) {
-        // Create custom dialog object
-        final Dialog dialog = new Dialog(this);
-        // Include dialog.xml file
-        dialog.setContentView(R.layout.cust_dialog);
-        // Set dialog title
-        dialog.setTitle(title);
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        int count = newDataBase.ImageCount(cDestId);
-        int count1 = newDataBase.MsgCount(cDestId);
-        dialog.show();
-        Log.d("INDialog", "" + cDestId);
-        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
-        mCountPhotos.setText(String.valueOf(count));
-        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
-        mCountMsgs.setText(String.valueOf(count1));
-        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
-        relativeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
-                intent.putExtra("DestId", cDestId);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
-            }
-        });
-        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.mymessages);
-        relativeLayout1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
-                intentphoto.putExtra("DestId", cDestId);
-                startActivity(intentphoto);
-                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
-            }
-        });
-        Button sendphoto_button = (Button) dialog.findViewById(R.id.senduserButton);
-        Button sendmsg_button = (Button) dialog.findViewById(R.id.sendbutton);
-        Button usercomments = (Button) dialog.findViewById(R.id.usercommentsButton);
-        usercomments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
-                theIntent.putExtra("DestId", cDestId);
-                startActivity(theIntent);
-            }
-        });
-        sendmsg_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
-                theIntent.putExtra("DestId", cDestId);
-                startActivity(theIntent);
-                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
-            }
-        });
-        sendphoto_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, GridViewPhotos.class);
-                intent.putExtra("DestId", cDestId);
-                startActivity(intent);
-            }
-        });
-    }
+
 
     @Override
     public void onBackPressed() {

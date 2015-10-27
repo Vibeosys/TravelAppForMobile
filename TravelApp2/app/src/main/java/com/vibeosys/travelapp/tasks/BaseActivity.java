@@ -1,11 +1,19 @@
 package com.vibeosys.travelapp.tasks;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -15,7 +23,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.vibeosys.travelapp.DestinationUsersImages;
+import com.vibeosys.travelapp.GridViewPhotos;
+import com.vibeosys.travelapp.QuestionSlidingView;
+import com.vibeosys.travelapp.QuestionsFromOthers;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.data.*;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
@@ -134,24 +147,19 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
           @Override
           public void onResponse(JSONObject response) {
+                  Log.d("Upload Response",""+response.toString());
               try {
-                  //com.vibeosys.travelapp.data.Error vbError = new Gson().fromJson(response.toString(), com.vibeosys.travelapp.data.Error.class);
-                 Log.d("Upload Response",""+response.toString());
-                  if(response.getString("errorCode").equals("o")){
+                  if(response.getInt("errorCode")==0){
                       Toast.makeText(getApplicationContext(),"Data Updated Successfully",Toast.LENGTH_SHORT).show();
                   }
                   else {
-                      Toast.makeText(getApplicationContext(),"Error Occoured Please try again",Toast.LENGTH_SHORT).show();
+                      //Toast.makeText(getApplicationContext(),"Error Occoured Please try again",Toast.LENGTH_SHORT).show();
                   }
-                  progress.dismiss();
-
-
-              } catch (Exception e) {
-                  Log.d("JSON Exception", e.toString());
-                  Toast.makeText(getBaseContext(),
-                          "Error while loadin data!",
-                          Toast.LENGTH_LONG).show();
+              } catch (JSONException e) {
+                  e.printStackTrace();
               }
+              progress.dismiss();
+
 
           }
 
@@ -272,6 +280,73 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         }
     }
 
+    protected void ShowDestinationInfoDialog(String title, final int cDestId) {
+        // Create custom dialog object
+        final Dialog dialog = new Dialog(this);
+        // Include dialog.xml file
+        dialog.setContentView(R.layout.cust_dialog);
+        // Set dialog title
+        newDataBase = new NewDataBase(getApplicationContext());
+        dialog.setTitle(title);
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int count = newDataBase.ImageCount(cDestId);
+        int count1 = newDataBase.MsgCount(cDestId);
+        dialog.show();
+        Log.d("INDialog", "" + cDestId);
+        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
+        mCountPhotos.setText(String.valueOf(count));
+        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
+        mCountMsgs.setText(String.valueOf(count1));
+        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
+                intent.putExtra("DestId", cDestId);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.mymessages);
+        relativeLayout1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
+                intentphoto.putExtra("DestId", cDestId);
+                startActivity(intentphoto);
+                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Button sendphoto_button = (Button) dialog.findViewById(R.id.senduserButton);
+        Button sendmsg_button = (Button) dialog.findViewById(R.id.sendbutton);
+        Button usercomments = (Button) dialog.findViewById(R.id.usercommentsButton);
+        usercomments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
+                theIntent.putExtra("DestId", cDestId);
+                startActivity(theIntent);
+            }
+        });
+        sendmsg_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
+                theIntent.putExtra("DestId", cDestId);
+                startActivity(theIntent);
+                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        sendphoto_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BaseActivity.this, GridViewPhotos.class);
+                intent.putExtra("DestId", cDestId);
+                startActivity(intent);
+            }
+        });
+    }
     @Override
     public void onFailure(String aData, int id) {
         Log.d("BaseActivity", "IN Base");

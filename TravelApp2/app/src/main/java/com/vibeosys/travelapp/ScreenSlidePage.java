@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
@@ -123,7 +122,7 @@ public class ScreenSlidePage extends Fragment {
              int id = (int) group.getTag();
              int lo = group.getCheckedRadioButtonId();
              onDataPass.onDataPass(String.valueOf(lo));
-             Toast.makeText(getActivity(), "Clicked On" + lo, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getActivity(), "Clicked On" + lo, Toast.LENGTH_SHORT).show();
          }
      });
 

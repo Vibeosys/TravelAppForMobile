@@ -77,6 +77,7 @@ public class PreviewImage extends AppCompatActivity {
                     String url = getResources().getString(R.string.URL);
                     Log.d("UserId", UserId);
                     String filename = path.substring(path.lastIndexOf("/") + 1);
+
                     Bitmap myImg = BitmapFactory.decodeFile(path);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     // Must compress the Image to reduce image size to make upload easy

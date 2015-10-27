@@ -3,6 +3,7 @@ package com.vibeosys.travelapp;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,7 +12,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,15 +26,27 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.view.LoaderImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by mahesh on 10/12/2015.
@@ -53,7 +68,8 @@ public class GridViewPhotos extends AppCompatActivity {
     private Uri imageUri;
     private NewDataBase newDataBase;
     int DestId;
-
+SharedPreferences sharedPreferences;
+    public static final String MyPREFERENCES = "MyPrefs";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +119,7 @@ public class GridViewPhotos extends AppCompatActivity {
             mGridViewPhotos.setAdapter(theAdapter);
             mGridViewPhotos.setOnItemClickListener(theAdapter);
             */
-
+            sharedPreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
             mGridViewPhotos.invalidate();
 
         }
@@ -184,6 +200,44 @@ public class GridViewPhotos extends AppCompatActivity {
                 String date = DateFormat.getDateTimeInstance().format(new Date());
                 newDataBase = new NewDataBase(getApplicationContext());
                 newDataBase.mSaveMyImages(imageUri.getPath(), date);
+                Gson gson = new Gson();
+                ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
+                imageUploadDTO.setImageData(imageUri.getPath());
+               ProgressDialog progress = new ProgressDialog(GridViewPhotos.this);
+                progress.setMessage("Uploading Image...");
+                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progress.setIndeterminate(true);
+                progress.show();
+                String UserId = sharedPreferences.getString("UserId", null);
+                imageUploadDTO.setImageName(imageUri.getPath());
+                String SerializedJsonString = gson.toJson(imageUploadDTO);
+                if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
+                    String url = getResources().getString(R.string.URL);
+                    Log.d("UserId", UserId);
+                    String filename = imageUri.getPath().substring(imageUri.getPath().lastIndexOf("/") + 1);
+                    Bitmap myImg = BitmapFactory.decodeFile(imageUri.getPath());
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    // Must compress the Image to reduce image size to make upload easy
+                    myImg.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                    byte[] byte_arr = stream.toByteArray();
+                    // Encode Image to String
+                    String encodedString = Base64.encodeToString(byte_arr, 0);
+                    uploadImage(encodedString, filename, DestId, UserId);
+
+                } else {
+                    try {
+                        newDataBase.addDataToSync("MyImages", UserId, SerializedJsonString);
+                        LayoutInflater layoutInflater = getLayoutInflater();
+                        View view = layoutInflater.inflate(R.layout.cust_toast, null);
+                        Toast toast = new Toast(getApplicationContext());
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        toast.setView(view);//setting the view of custom toast layout
+                        toast.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 Toast.makeText(getApplicationContext(),
                         "User image capture" + imageUri.getPath(), Toast.LENGTH_SHORT)
                         .show();
@@ -200,6 +254,69 @@ public class GridViewPhotos extends AppCompatActivity {
                         .show();
             }
         }
+    }
+
+    private void uploadImage(final String encodedString, final String filename, int destId, final String userId) {
+
+        RequestQueue rq = Volley.newRequestQueue(this);
+        final String url = getResources().getString(R.string.URL);
+
+        // final String fileName = filename.replaceAll(" ", "");
+
+        Log.d("FileName", filename);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                url + "images/upload1", new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                try {
+
+                    Log.e("RESPONSE", response);
+                    //  JSONObject json = new JSONObject(response);
+                    Toast.makeText(getBaseContext(),
+                            "The image is upload", Toast.LENGTH_SHORT)
+                            .show();
+
+                } catch (Exception e) {
+                    Log.d("JSON Exception", e.toString());
+                    Toast.makeText(getBaseContext(),
+                            "Error while loadin data!",
+                            Toast.LENGTH_LONG).show();
+
+                }
+
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("ERROR", "Error [" + error + "]");
+                Log.e("URL Called", url);
+                Toast.makeText(getBaseContext(),
+                        "Cannot connect to server", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+        })
+
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+
+                params.put("upload", encodedString);
+                params.put("imagename", filename);
+                params.put("DestId", String.valueOf(DestId));
+                params.put("UserId", userId);
+
+                return params;
+
+            }
+
+        };
+
+        rq.add(stringRequest);
+
     }
 
     public Bitmap decodeURI(String filePath) {

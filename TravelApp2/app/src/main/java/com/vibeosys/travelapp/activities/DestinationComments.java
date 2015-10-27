@@ -119,7 +119,7 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
 
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
 
-        tableDataList.add(new TableDataDTO("Comment", SerializedJsonString));
+        tableDataList.add(new TableDataDTO("comment", SerializedJsonString));
         String EmailId = sharedPref.getString("EmailId", null);
         Log.d("EmailId", "" + EmailId);
         String uploadData = gson.toJson(new Upload(new UploadUser(userId, EmailId), tableDataList));

@@ -35,6 +35,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vibeosys.travelapp.BuildConfig;
@@ -55,7 +56,7 @@ import java.util.List;
  * cache is retained over configuration changes like orientation change so the images are populated
  * quickly if, for example, the user rotates the device.
  */
-public class ImageGridFragment extends Fragment implements AdapterView.OnItemClickListener,View.OnClickListener {
+public class ImageGridFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "ImageGridFragment";
     private static final String IMAGE_CACHE_DIR = "thumbs";
     private int mImageThumbSize;
@@ -92,6 +93,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         mImageFetcher.setLoadingImage(R.drawable.empty_photo);
         mImageFetcher.addImageCache(getActivity().getSupportFragmentManager(), cacheParams);
     }
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -113,6 +115,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
                     mImageFetcher.setPauseWork(false);
                 }
             }
+
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
@@ -193,8 +196,8 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onClick(View v) {
-int id=v.getId();
-        Toast.makeText(getActivity(),""+id,Toast.LENGTH_SHORT).show();
+        int id = v.getId();
+        Toast.makeText(getActivity(), "" + id, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -283,21 +286,22 @@ int id=v.getId();
             View view;
             ImageView imageView;
             ImageView likeBtn;
-
-                layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = layoutInflater.inflate(R.layout.showdestinationimages, null);
-                imageView = (ImageView) view.findViewById(R.id.userimages);
-                likeBtn = (ImageView) view.findViewById(R.id.likebutton);
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-               // imageView.setLayoutParams(mImageViewLayoutParams);
-
+            TextView userNameTxt;
+            TextView likecountText;
+            layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = layoutInflater.inflate(R.layout.showdestinationimages, null);
+            imageView = (ImageView) view.findViewById(R.id.userimages);
+            likeBtn = (ImageView) view.findViewById(R.id.likebutton);
+            userNameTxt = (TextView) view.findViewById(R.id.usertext);
+            likecountText=(TextView)view.findViewById(R.id.likecounttext);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            // imageView.setLayoutParams(mImageViewLayoutParams);
             likeBtn.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-
-        int id=v.getId();
-        Toast.makeText(getActivity(),""+ id,Toast.LENGTH_SHORT).show();
-    }
+                @Override
+                public void onClick(View v) {
+                    int id = v.getId();
+                    Toast.makeText(getActivity(), "" + id, Toast.LENGTH_SHORT).show();
+                }
 
             });
             likeBtn.setId(position);
@@ -307,8 +311,9 @@ int id=v.getId();
             }*/
             // Finally load the image asynchronously into the ImageView, this also takes care of
             // setting a placeholder image while the background thread runs
-            mImageFetcher.loadImage(mPhotoList.get(position-mNumColumns).getmImagePaths(), imageView);
-
+            mImageFetcher.loadImage(mPhotoList.get(position - mNumColumns).getmImagePaths(), imageView);
+            userNameTxt.setText("Uploaded By  " + mPhotoList.get(position - mNumColumns).getUsername());
+            Log.d("UserName",""+mPhotoList.get(position).getUsername());
             return view;
             //END_INCLUDE(load_gridview_item)
         }
@@ -316,7 +321,7 @@ int id=v.getId();
         /**
          * Sets the item height. Useful for when we know the column width so the height can be set
          * to match.
-         *
+         * <p/>
          * //@param height
          */
         /*public void setItemHeight(int height) {
@@ -329,7 +334,6 @@ int id=v.getId();
             mImageFetcher.setImageSize(height);
             notifyDataSetChanged();
         }*/
-
         public void setNumColumns(int numColumns) {
             mNumColumns = numColumns;
         }
