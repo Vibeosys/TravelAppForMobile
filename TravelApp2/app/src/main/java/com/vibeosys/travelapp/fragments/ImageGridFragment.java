@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build.VERSION_CODES;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -80,9 +80,9 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
         mImageThumbSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
         NewDataBase newDataBase = new NewDataBase(getActivity());
-        int value = getActivity().getIntent().getExtras().getInt("DestId");
-        Log.d("PhotosFromOthers", "" + value);
-        mPhotoList = newDataBase.Images(mDestId);
+        int destId = getActivity().getIntent().getExtras().getInt("DestId");
+        Log.d("PhotosFromOthers", "" + destId);
+        mPhotoList = newDataBase.Images(destId,true);
         Log.d("ImageGridFragment", "" + mPhotoList.size());
         mAdapter = new ImageAdapter(getActivity(), mPhotoList);
         ImageCache.ImageCacheParams cacheParams =
@@ -92,12 +92,12 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         mImageFetcher = new ImageFetcher(getActivity(), mImageThumbSize);
         mImageFetcher.setLoadingImage(R.drawable.empty_photo);
         mImageFetcher.addImageCache(getActivity().getSupportFragmentManager(), cacheParams);
+        
     }
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         final View v = inflater.inflate(R.layout.destination_users_images, container, false);
         final GridView mGridView = (GridView) v.findViewById(R.id.gridView);
         mGridView.setAdapter(mAdapter);
@@ -127,7 +127,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         // of each view so we get nice square thumbnails.
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @TargetApi(VERSION_CODES.JELLY_BEAN)
+                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public void onGlobalLayout() {
                         if (mAdapter.getNumColumns() == 0) {
@@ -152,6 +152,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
                         }
                     }
                 });
+
 
         return v;
     }
@@ -313,7 +314,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
             // setting a placeholder image while the background thread runs
             mImageFetcher.loadImage(mPhotoList.get(position - mNumColumns).getmImagePaths(), imageView);
             userNameTxt.setText("Uploaded By  " + mPhotoList.get(position - mNumColumns).getUsername());
-            Log.d("UserName",""+mPhotoList.get(position).getUsername());
+            Log.d("UserName",""+mPhotoList.get(position - mNumColumns).getUsername());
             return view;
             //END_INCLUDE(load_gridview_item)
         }

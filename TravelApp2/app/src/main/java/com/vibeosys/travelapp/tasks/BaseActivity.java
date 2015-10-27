@@ -65,7 +65,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
     public void UploadUserDetails() {
         Gson gson = new Gson();
-        sharedPref=getSharedPreferences(MyPREFERENCES,MODE_PRIVATE);
+        sharedPref = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
         String EmailId = sharedPref.getString("EmailId", null);
         String UserId = sharedPref.getString("UserId", null);
         String UserName = sharedPref.getString("UserName", null);
@@ -76,13 +76,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         Log.d("Encoded String", encodedString);
         rq = Volley.newRequestQueue(this);
         JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-                url+"updateuser", encodedString, new Response.Listener<JSONObject>() {
+                url + "updateuser", encodedString, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONObject jresponse = response;//.getJSONObject(0);
-                    Log.d("UploadUserDetails", jresponse+"");
+                    Log.d("UploadUserDetails", jresponse + "");
                     String res = jresponse.getString("message");
                     String code = jresponse.getString("errorCode");
                     if (code.equals("0")) {
@@ -133,143 +133,142 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         new BackgroundTask(aShowProgressDlg).execute(aServiceUrl, String.valueOf(id));
     }
 
-  public void uploadToServer(final String aServiceUrl,  String uploadData,Context context){
-      final ProgressDialog progress = new ProgressDialog(context);
-      progress.setMessage("Please Wait ...");
-      progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-      progress.setIndeterminate(true);
-      Log.d("Upload To Server", "");
-      progress.show();
-      RequestQueue rq = Volley.newRequestQueue(this);
+    public void uploadToServer(final String aServiceUrl, String uploadData, Context context) {
+        final ProgressDialog progress = new ProgressDialog(context);
+        progress.setMessage("Please Wait ...");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setIndeterminate(true);
+        Log.d("Upload To Server", "");
+        progress.show();
+        RequestQueue rq = Volley.newRequestQueue(this);
 
-      JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-              aServiceUrl, uploadData, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
+                aServiceUrl, uploadData, new Response.Listener<JSONObject>() {
 
-          @Override
-          public void onResponse(JSONObject response) {
-                  Log.d("Upload Response",""+response.toString());
-              try {
-                  if(response.getInt("errorCode")==0){
-                      Toast.makeText(getApplicationContext(),"Data Updated Successfully",Toast.LENGTH_SHORT).show();
-                  }
-                  else {
-                      //Toast.makeText(getApplicationContext(),"Error Occoured Please try again",Toast.LENGTH_SHORT).show();
-                  }
-              } catch (JSONException e) {
-                  e.printStackTrace();
-              }
-              progress.dismiss();
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("Upload Response", "" + response.toString());
+                try {
+                    if (response.getInt("errorCode") == 0) {
+                        Toast.makeText(getApplicationContext(), "Data Updated Successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //Toast.makeText(getApplicationContext(),"Error Occoured Please try again",Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progress.dismiss();
 
 
-          }
+            }
 
-      }, new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-              Log.d("ERROR", "Error [" + error.getMessage() + "]");
-              progress.dismiss();
-              Toast.makeText(getBaseContext(),
-                      "Cannot connect to server", Toast.LENGTH_LONG)
-                      .show();
-          }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", "Error [" + error.getMessage() + "]");
+                progress.dismiss();
+                Toast.makeText(getBaseContext(),
+                        "Cannot connect to server", Toast.LENGTH_LONG)
+                        .show();
+            }
 
-      });
+        });
 
-      rq.add(jsonArrayRequest);
-  }
+        rq.add(jsonArrayRequest);
+    }
 
     @Override
     public void onSuccess(String aData, int id) {
         newDataBase = new NewDataBase(getApplicationContext());
         if (id == 1) {
-            Log.d("Calling Downloading",""+aData);
+            Log.d("Calling Downloading", "" + aData);
             Gson gson = new Gson();
             BufferedReader bufferedReader = null;
             try {
                /* bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("file.json")));*/
-            Download downloadDTO = gson.fromJson(aData, Download.class);
-            Log.d("TableDataDTO", "" + downloadDTO.toString());
-            Log.d("TableDataDTO Size",""+downloadDTO.getData().size());
-            HashMap<String, ArrayList<String>> theTableData = new HashMap<>();
-            for (int i = 0; i < downloadDTO.getData().size(); i++) {
-                String theTableName = downloadDTO.getData().get(i).getTableName();
-                String theTableValue = downloadDTO.getData().get(i).getTableData().replaceAll("\\\\", "");
-                if (!theTableData.containsKey(theTableName))
-                    theTableData.put(theTableName, new ArrayList<>(Arrays.asList(theTableValue)));
-                else {
-                    theTableData.get(theTableName).add(theTableValue);
+                Download downloadDTO = gson.fromJson(aData, Download.class);
+                Log.d("TableDataDTO", "" + downloadDTO.toString());
+                Log.d("TableDataDTO Size", "" + downloadDTO.getData().size());
+                HashMap<String, ArrayList<String>> theTableData = new HashMap<>();
+                for (int i = 0; i < downloadDTO.getData().size(); i++) {
+                    String theTableName = downloadDTO.getData().get(i).getTableName();
+                    String theTableValue = downloadDTO.getData().get(i).getTableData().replaceAll("\\\\", "");
+                    if (!theTableData.containsKey(theTableName))
+                        theTableData.put(theTableName, new ArrayList<>(Arrays.asList(theTableValue)));
+                    else {
+                        theTableData.get(theTableName).add(theTableValue);
+                    }
                 }
-            }
-            commentList = new ArrayList<>();
-            likeList = new ArrayList<>();
-            destinationList = new ArrayList<>();
-            usersList = new ArrayList<>();
-            answerList = new ArrayList<>();
-            imagesList = new ArrayList<>();
-            questionsList = new ArrayList<>();
-            optionsList = new ArrayList<>();
-            for (Map.Entry<String, ArrayList<String>> entry : theTableData.entrySet()) {
-                String tableName = entry.getKey();
+                commentList = new ArrayList<>();
+                likeList = new ArrayList<>();
+                destinationList = new ArrayList<>();
+                usersList = new ArrayList<>();
+                answerList = new ArrayList<>();
+                imagesList = new ArrayList<>();
+                questionsList = new ArrayList<>();
+                optionsList = new ArrayList<>();
+                for (Map.Entry<String, ArrayList<String>> entry : theTableData.entrySet()) {
+                    String tableName = entry.getKey();
 
-                if (entry.getKey().equals("Comment")) {
-                    Log.d("Comment Found","");
-                    commentList = Comment.deserializeSting(entry.getValue());
+                    if (entry.getKey().equals("Comment")) {
+                        Log.d("Comment Found", "");
+                        commentList = Comment.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("Like")) {
+                        Log.d("Like Found", "");
+                        likeList = Like.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("Images")) {
+                        Log.d("images Found", "");
+                        imagesList = Images.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("Option")) {
+                        Log.d("Optons Found", "");
+                        optionsList = Option.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("Answer")) {
+                        Log.d("Answers Found", "");
+                        answerList = Answer.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("Destination")) {
+                        Log.d("Destination Found", "");
+                        destinationList = Destination.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("Question")) {
+                        Log.d("Question Found", "");
+                        questionsList = com.vibeosys.travelapp.data.Question.deserializeSting(entry.getValue());
+                    }
+                    if (entry.getKey().equals("User")) {
+                        Log.d("User Found", "");
+                        usersList = User.deserializeSting(entry.getValue());
+                    }
                 }
-                if (entry.getKey().equals("Like")) {
-                    Log.d("Like Found","");
-                    likeList = Like.deserializeSting(entry.getValue());
-                }
-                if (entry.getKey().equals("Images")) {
-                    Log.d("images Found","");
-                    imagesList = Images.deserializeSting(entry.getValue());
-                }
-                if (entry.getKey().equals("Option")) {
-                    Log.d("Optons Found","");
-                    optionsList = Option.deserializeSting(entry.getValue());
-                }
-                if (entry.getKey().equals("Answer")) {
-                    Log.d("Answers Found","");
-                    answerList=Answer.deserializeSting(entry.getValue());
-                }
-                if (entry.getKey().equals("Destination")) {
-                    Log.d("Destination Found","");
-                    destinationList=Destination.deserializeSting(entry.getValue());
-                }
-                if (entry.getKey().equals("Question")) {
-                    Log.d("Question Found","");
-                    questionsList=com.vibeosys.travelapp.data.Question.deserializeSting(entry.getValue());
-                }
-                if (entry.getKey().equals("User")) {
-                    Log.d("User Found","");
-                    usersList=User.deserializeSting(entry.getValue());
-                }
-            }
 
-            if(!commentList.isEmpty()) {
-                newDataBase.insertComment(commentList);
-            }
-            if(!likeList.isEmpty()) {
-                newDataBase.insertLikes(likeList);
-            }
-            if(!destinationList.isEmpty()) {
-                newDataBase.insertDestination(destinationList);
-            }
-            if(!usersList.isEmpty()) {
-                newDataBase.insertUsers(usersList);
-            }
-            if(!answerList.isEmpty()) {
-                newDataBase.insertAnswers(answerList);
-            }
-            if(!imagesList.isEmpty()) {
-                newDataBase.insertImages(imagesList);
-            }
-            if(!questionsList.isEmpty()) {
-                newDataBase.insertQuestions(questionsList);
-            }
-            if(!optionsList.isEmpty()) {
-                newDataBase.insertOptions(optionsList);
-            }
-            } catch (Exception e){
+                if (!commentList.isEmpty()) {
+                    newDataBase.insertComment(commentList);
+                }
+                if (!likeList.isEmpty()) {
+                    newDataBase.insertLikes(likeList);
+                }
+                if (!destinationList.isEmpty()) {
+                    newDataBase.insertDestination(destinationList);
+                }
+                if (!usersList.isEmpty()) {
+                    newDataBase.insertUsers(usersList);
+                }
+                if (!answerList.isEmpty()) {
+                    newDataBase.insertAnswers(answerList);
+                }
+                if (!imagesList.isEmpty()) {
+                    newDataBase.insertImages(imagesList);
+                }
+                if (!questionsList.isEmpty()) {
+                    newDataBase.insertQuestions(questionsList);
+                }
+                if (!optionsList.isEmpty()) {
+                    newDataBase.insertOptions(optionsList);
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -280,30 +279,32 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         }
     }
 
-    protected void ShowDestinationInfoDialog(String title, final int cDestId) {
+    protected void showDestinationInfoDialog(String title, final int cDestId) {
         // Create custom dialog object
+        final String titlename = title;
         final Dialog dialog = new Dialog(this);
         // Include dialog.xml file
         dialog.setContentView(R.layout.cust_dialog);
         // Set dialog title
-        newDataBase = new NewDataBase(getApplicationContext());
         dialog.setTitle(title);
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        int count = newDataBase.ImageCount(cDestId);
-        int count1 = newDataBase.MsgCount(cDestId);
+        newDataBase=new NewDataBase(getApplicationContext());
+        int imageCount = this.newDataBase.Images(cDestId, false).size();
+        int msgCount = this.newDataBase.MsgCount(cDestId);
         dialog.show();
         Log.d("INDialog", "" + cDestId);
         TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
-        mCountPhotos.setText(String.valueOf(count));
+        mCountPhotos.setText(String.valueOf(imageCount));
         TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
-        mCountMsgs.setText(String.valueOf(count1));
+        mCountMsgs.setText(String.valueOf(msgCount));
         RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
                 intent.putExtra("DestId", cDestId);
+                intent.putExtra("DestName", titlename);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }
@@ -314,6 +315,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             public void onClick(View v) {
                 Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
                 intentphoto.putExtra("DestId", cDestId);
+                intentphoto.putExtra("DestName", titlename);
                 startActivity(intentphoto);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -326,6 +328,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
                 theIntent.putExtra("DestId", cDestId);
+                theIntent.putExtra("DestName", titlename);
                 startActivity(theIntent);
             }
         });
@@ -334,6 +337,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             public void onClick(View v) {
                 Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
                 theIntent.putExtra("DestId", cDestId);
+                theIntent.putExtra("DestName", titlename);
                 startActivity(theIntent);
                 Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
             }
@@ -343,10 +347,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             public void onClick(View v) {
                 Intent intent = new Intent(BaseActivity.this, GridViewPhotos.class);
                 intent.putExtra("DestId", cDestId);
+                intent.putExtra("DestName", titlename);
                 startActivity(intent);
             }
         });
     }
+
     @Override
     public void onFailure(String aData, int id) {
         Log.d("BaseActivity", "IN Base");
@@ -382,8 +388,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
             try {
                 URL url = new URL(params[0]);
-                String id=params[1];
-                 Log.d("Param",id);
+                String id = params[1];
+                Log.d("Param", id);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String dataLine = null;

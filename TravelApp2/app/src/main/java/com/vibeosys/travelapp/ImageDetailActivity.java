@@ -62,7 +62,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         Bundle extras = intent.getExtras();
        // mDestId= extras.getInt("DestId");
         Log.d("PhotosFromOthers", "" + mDestId);
-        mPhotoList=newDataBase.Images(mDestId);
+        mPhotoList=newDataBase.Images(mDestId,true);
         setContentView(R.layout.image_detail_pager);
         // Fetch screen height and width, to use as our max size when loading images as this
         // activity runs full screen

@@ -453,14 +453,19 @@ return listSyncData;
         return false;
     }
 
-    public List<usersImages> Images(int cDestId) {
+    public List<usersImages> Images(int cDestId, Boolean showSeenImages) {
         List<usersImages> cImagePaths = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
-                    /*cursor = sqLiteDatabase.rawQuery("select * from Images where not imageseen and destid=?", new String[]{String.valueOf(cDestId)});*/
-            cursor = sqLiteDatabase.rawQuery("select * from Images natural join user where user.userid=images.userid", null);
+            String qureyToAppend = " and ImageSeen = 'false'";
+            String mainQurey = "select * from Images natural join user where user.userid=images.userid and destid=? ";
+            if (showSeenImages == false) {
+                mainQurey += qureyToAppend;
+            }
+            cursor = sqLiteDatabase.rawQuery(mainQurey,
+                    new String[]{String.valueOf(cDestId)});
 
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
@@ -471,7 +476,7 @@ return listSyncData;
                                 cursor.getString(cursor.getColumnIndex("ImagePath")),
                                 cursor.getInt(cursor.getColumnIndex("DestId")),
                                 cursor.getString(cursor.getColumnIndex("UserId")),
-                                        cursor.getString(cursor.getColumnIndex("UserName"))
+                                cursor.getString(cursor.getColumnIndex("UserName"))
                         );
                         cImagePaths.add(theUsersImages);
                     } while (cursor.moveToNext());
@@ -591,22 +596,6 @@ return listSyncData;
         return count;
     }
 
-    public int ImageCount(int cDestId) {
-        int count = 0;
-        SQLiteDatabase sqLiteDatabase = null;
-        Cursor cursor = null;
-        try {
-            sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select * from images where not imageseen and DestId=?", new String[]{String.valueOf(cDestId)});
-            count = cursor.getCount();
-            cursor.close();
-            sqLiteDatabase.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
 
     public void GetUser() {
         SQLiteDatabase db = null;
@@ -1008,7 +997,7 @@ return listSyncData;
         Routes mRoutes = new Routes();
         try {
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("select * from MyMap where RouteName='"+ routeName + "'", null);
+            Cursor cursor = sqLiteDatabase.rawQuery("select * from MyMap where RouteName='" + routeName + "'", null);
 
             if (cursor.moveToFirst()) {
                 do {

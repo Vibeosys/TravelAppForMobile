@@ -132,7 +132,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 mDestId = mDestinationNames.get(marker.getTitle());
                 final int finalMDestId = mDestId;
                 final Marker tempMarker=marker;
-                ShowDestinationInfoDialog(marker.getTitle(),mDestId);
+                showDestinationInfoDialog(marker.getTitle(), mDestId);
 
                 return true;
             }

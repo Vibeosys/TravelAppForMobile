@@ -335,14 +335,14 @@ public class MainActivity extends BaseActivity
                 View view = null;
                 @Override
                 public View getInfoWindow(Marker mark) {
-                    if (view == null) {
+                    //if (view == null) {
                         view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
                         view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
                         View phtotosView = view.findViewById(R.id.item_title);
                         int mDestId = mDestinationNames.get(mark.getTitle());
                         TextView countimages = (TextView) view.findViewById(R.id.item_counter);
                         TextView countmsgs = (TextView) view.findViewById(R.id.countmsgs);
-                        int count = newDataBase.ImageCount(mDestId);
+                        int count = newDataBase.Images(mDestId,false).size();
                         int count1 = newDataBase.MsgCount(mDestId);
                         countimages.setText(String.valueOf(count1));
                         countmsgs.setText(String.valueOf(count));
@@ -356,7 +356,7 @@ public class MainActivity extends BaseActivity
                         TextView title = (TextView) view.findViewById(R.id.textView3);
                         title.setText(mark.getTitle());
 
-                    }
+                    //}
                     return view;
                 }
 
@@ -371,8 +371,7 @@ public class MainActivity extends BaseActivity
                 public void onInfoWindowClick(Marker mark) {
                     int mDestId = mDestinationNames.get(mark.getTitle());
                     Log.d("MainActivityMarker", "" + mDestId);
-                    ShowDestinationInfoDialog(mark.getTitle(), mDestId);
-
+                    showDestinationInfoDialog (mark.getTitle(), mDestId);
                 }
             });
 
