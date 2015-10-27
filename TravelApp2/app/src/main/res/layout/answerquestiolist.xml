@@ -8,5 +8,6 @@
         android:layout_height="match_parent"
         android:id="@+id/answerquestionlist"
         android:dividerHeight="3dp"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:padding="10dp"/>
 </LinearLayout>

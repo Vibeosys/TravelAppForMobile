@@ -1,46 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:weightSum="1">
+
     <EditText
+        android:id="@+id/mapNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/mapNameText"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="6dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="3dp"
-        android:hint="Enter Journey Name"
-        android:textSize="12dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="0.06"
-        android:layout_marginBottom="6dp"/>
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-<Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:id="@+id/SaveMapButton"
-    android:layout_marginLeft="20dp"
-    android:background="@color/colorPrimary"
-    android:textColor="#fff"
-    android:layout_marginRight="20dp"
-    android:text="Save"
-    android:layout_marginBottom="20dp"/>
-<Button
-    android:layout_width="wrap_content"
-    android:layout_weight="1"
-    android:id="@+id/CancelMapButton"
-    android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    android:textColor="#fff"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
-    android:text="Cancel"
-    android:layout_marginBottom="20dp"/>
-</LinearLayout>
+        android:hint="Enter Journey Name"
+        android:textSize="12dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/SaveMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="Save"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/CancelMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="Cancel"
+            android:textColor="#fff" />
+    </LinearLayout>
 
 </LinearLayout>

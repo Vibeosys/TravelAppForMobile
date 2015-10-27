@@ -44,7 +44,8 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
     List<Comment> listComment;
     int DestId;
     String UserId;
-    String  UserName;
+    String UserName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +54,8 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         submitBtn = (Button) findViewById(R.id.submitButton);
         submitBtn.setOnClickListener(this);
         mListDestination = new ArrayList<>();
-        setTitle("Comments By User");
+        String destName = getIntent().getExtras().getString("DestName");
+        setTitle("Comments about " + destName + " by travellers");
         DestId = getIntent().getExtras().getInt("DestId");
         Log.d("DestId Comments", "" + DestId);
         editTextCommentByUser = (EditText) findViewById(R.id.commnetbyUser);
@@ -63,8 +65,8 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         mListDestination = newDataBase.DestinationComments(DestId);
         Log.d("DestinationComment", String.valueOf(mListDestination.size()));
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-         UserId = sharedPref.getString("UserId", null);
-         UserName=sharedPref.getString("UserName",null);
+        UserId = sharedPref.getString("UserId", null);
+        UserName = sharedPref.getString("UserName", null);
         mDestinationCommentListView.setAdapter(new ShowDestinationCommentsAdaptor(getApplicationContext(), mListDestination, DestId));
 
     }

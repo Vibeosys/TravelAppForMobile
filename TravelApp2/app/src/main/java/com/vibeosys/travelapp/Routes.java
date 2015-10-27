@@ -3,7 +3,7 @@ package com.vibeosys.travelapp;
 /**
  * Created by mahesh on 10/12/2015.
  */
-public class Routes {
+public class Routes  {
 String mRouteName;
 String mRoutetripsNamesJson;
 String mRouteDate;

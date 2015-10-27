@@ -65,7 +65,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                     mDestLatLong.setLatitude(jsonObject.getDouble("Lat"));
                     mDestLatLong.setLongitude(jsonObject.getDouble("Long"));
                     mDestLatLong.setmDestName(jsonObject.getString("DestName"));
-                    int id = jsonObject.getInt("Id");
+                    //int id = jsonObject.getInt("Id");
                     //mHashMapRoutes.put(id, mDestLatLong);
                     mDestinationLatLongs.add(mDestLatLong);
                 }
@@ -118,8 +118,8 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
         for (int i = 0; i < theLatLongList.size() - 1; i++) {
             googleMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(theLatLongList.get(i).getmLat(), theLatLongList.get(i).getmLong()))
-                            .add(new LatLng(theLatLongList.get(i + 1).getmLat(), theLatLongList.get(i + 1).getmLong())).width(5).color(Color.BLACK)
-            );
+                            .add(new LatLng(theLatLongList.get(i + 1).getmLat(),
+                                    theLatLongList.get(i + 1).getmLong())).width(5).color(Color.BLACK));
 
 
         }

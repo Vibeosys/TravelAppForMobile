@@ -26,38 +26,43 @@ import java.util.List;
 public class QuestionsFromOthers extends BaseActivity {
 
     ExpandableListView questionslistView;
-    NewDataBase newDataBase=null;
-    List<SendQuestionAnswers> mListQuestions=null;
-    List<SendQuestionAnswers> mListOptions=null;
-    HashMap<String,Options> mListQuestionsAnswers=null;
+    NewDataBase newDataBase = null;
+    List<SendQuestionAnswers> mListQuestions = null;
+    List<SendQuestionAnswers> mListOptions = null;
+    HashMap<String, Options> mListQuestionsAnswers = null;
+
     @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        String destName = getIntent().getExtras().getString("DestName");
+        this.setTitle("Traveller reviews for " + destName);
+
         setContentView(R.layout.otherquestionlist_layout);
         questionslistView = (ExpandableListView) findViewById(R.id.listView2);
-        newDataBase=new NewDataBase(this);
-        mListQuestions=newDataBase.mListQuestions();
-        Log.d("Questions", "" + mListQuestions.size());
-        if(mListQuestions!=null&&mListQuestions.size()>0) {
-            Options options=null;
-            mListQuestionsAnswers=new HashMap<>();
-            for(int i = 0;i<mListQuestions.size();i++){
-                mListOptions=new ArrayList<>();
-                String m=mListQuestions.get(i).getmQuestionText();
+        newDataBase = new NewDataBase(this);
+        mListQuestions = newDataBase.mListQuestions();
+
+        if (mListQuestions != null && mListQuestions.size() > 0) {
+            Log.d("Questions", "" + mListQuestions.size());
+            Options options = null;
+            mListQuestionsAnswers = new HashMap<>();
+            for (int i = 0; i < mListQuestions.size(); i++) {
+                mListOptions = new ArrayList<>();
+                String m = mListQuestions.get(i).getmQuestionText();
                 mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId());
                 options = new Options();
-                String[] option=new String[mListOptions.size()];
-                int [] optionids=new int[mListOptions.size()];
-                int [] UsersCount=new int[mListOptions.size()];
-                for(int j=0;j<mListOptions.size();j++) {
-                    option[j]=mListOptions.get(j).getmOptionText();
-                    optionids[j]=mListOptions.get(j).getmOptionId();
-                    UsersCount[j]=newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId());
+                String[] option = new String[mListOptions.size()];
+                int[] optionids = new int[mListOptions.size()];
+                int[] UsersCount = new int[mListOptions.size()];
+                for (int j = 0; j < mListOptions.size(); j++) {
+                    option[j] = mListOptions.get(j).getmOptionText();
+                    optionids[j] = mListOptions.get(j).getmOptionId();
+                    UsersCount[j] = newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId());
                 }
                 options.setmOptionText(option);
                 options.setmOptionIds(optionids);
                 options.setmUserCounts(UsersCount);
-                mListQuestionsAnswers.put(m,options);
+                mListQuestionsAnswers.put(m, options);
             }
 
         }
@@ -73,21 +78,25 @@ public class QuestionsFromOthers extends BaseActivity {
 
     private class OthersQuestionsAdaptor implements ExpandableListAdapter {
         private Context mContext;
-        private HashMap<String,Options> mList;
+        private HashMap<String, Options> mList;
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
         ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
+
         OthersQuestionsAdaptor(Context aContext, HashMap<String, Options> aList) {
             mContext = aContext;
             mList = aList;
         }
+
         @Override
         public void registerDataSetObserver(DataSetObserver observer) {
 
         }
+
         @Override
         public void unregisterDataSetObserver(DataSetObserver observer) {
 
         }
+
         @Override
         public int getGroupCount() {
             if (keyList != null) {
@@ -95,6 +104,7 @@ public class QuestionsFromOthers extends BaseActivity {
             }
             return 0;
         }
+
         @Override
         public int getChildrenCount(int groupPosition) {
 
@@ -108,15 +118,18 @@ public class QuestionsFromOthers extends BaseActivity {
             }
             return 0;
         }
+
         @Override
         public Options getGroup(int groupPosition) {
             return mList.get(groupPosition);
         }
+
         @Override
         public String getChild(int groupPosition, int childPosition) {
             return valueList.get(groupPosition).getmOptionText()[childPosition];
             // return null;
         }
+
         @Override
         public long getGroupId(int groupPosition) {
             return groupPosition;
@@ -152,21 +165,23 @@ public class QuestionsFromOthers extends BaseActivity {
             TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
             theText.setText(valueList.get(groupPosition).getmOptionText()[childPosition]);
             theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
-            if(getChildrenCount(groupPosition) > childPosition) {
-                theText2.setText(valueList.get(groupPosition).getmOptionText()[childPosition+1]);
-                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]+1));
+            if (getChildrenCount(groupPosition) > childPosition) {
+                theText2.setText(valueList.get(groupPosition).getmOptionText()[childPosition + 1]);
+                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition] + 1));
             }
             return aView;
         }
 
         @Override
         public boolean isChildSelectable(int groupPosition, int childPosition) {
-            return true;
+            return false;
         }
+
         @Override
         public boolean areAllItemsEnabled() {
             return true;
         }
+
         @Override
         public boolean isEmpty() {
             return false;

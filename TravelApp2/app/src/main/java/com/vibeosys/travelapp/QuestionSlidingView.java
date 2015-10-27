@@ -44,7 +44,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     public static final String MyPREFERENCES = "MyPrefs";
     String UserId;
     int DestId;
-   String EmailId;
+    String EmailId;
     SharedPreferences sharedPreferences;
     List<String> mListOptions;
 
@@ -52,15 +52,18 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.questionslidingview);
+        String destName = getIntent().getExtras().getString("DestName");
+
+        this.setTitle("Your feedback about " + destName);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-      //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         DestId = getIntent().getExtras().getInt("DestId");
         mListOptions = new ArrayList<>();
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         UserId = sharedPreferences.getString("UserId", null);
-        EmailId=sharedPreferences.getString("EmailId",null);
+        EmailId = sharedPreferences.getString("EmailId", null);
         newDataBase = new NewDataBase(this);
         int pages = newDataBase.Questions(DestId);
         NUM_PAGES = pages;
@@ -84,28 +87,28 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
             public void onClick(View v) {
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
 
-                if((mViewPager.getCurrentItem()+1 == mPagerAdapter.getCount())){
-                    Log.d("Calling Finish","");
+                if ((mViewPager.getCurrentItem() + 1 == mPagerAdapter.getCount())) {
+                    Log.d("Calling Finish", "");
                 }
                 String uploadData;
-                if ((mViewPager.getCurrentItem() == mPagerAdapter.getCount()-1)) {
+                if ((mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1)) {
                     if (mListOptions.size() > 0) {
                         Gson gson = new Gson();
                         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
                         for (int i = 0; i < mListOptions.size(); i++) {
-                            Answer answer = new Answer(mListOptions.get(i),String.valueOf(DestId),UserId);
+                            Answer answer = new Answer(mListOptions.get(i), String.valueOf(DestId), UserId);
                             String SerializedJsonString = gson.toJson(answer);
-                            Log.d("Option Data",SerializedJsonString);
+                            Log.d("Option Data", SerializedJsonString);
                             tableDataList.add(new TableDataDTO("answer", SerializedJsonString));
                         }
 
-                         uploadData = gson.toJson(new Upload(new UploadUser(UserId, EmailId), tableDataList));
+                        uploadData = gson.toJson(new Upload(new UploadUser(UserId, EmailId), tableDataList));
                         Log.d("Like Data to Uplaod", uploadData);
 
                         if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
                             String url = getResources().getString(R.string.URL);
 
-                            Upload(url,uploadData);
+                            Upload(url, uploadData);
                             Log.d("Download Calling..", "DownloadUrl:-" + url);
 
                         } else {
@@ -139,9 +142,9 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         });
     }
 
-    void Upload(String url,String uploadData){
+    void Upload(String url, String uploadData) {
         super.UploadUserDetails();
-        super.uploadToServer(url + "upload", uploadData,QuestionSlidingView.this);//id 1=>download 2=>upload
+        super.uploadToServer(url + "upload", uploadData, QuestionSlidingView.this);//id 1=>download 2=>upload
     }
 
     @Override
