@@ -86,90 +86,6 @@ public class MainActivity extends BaseActivity
     @Override
     public void onSuccess(String aData, int id) {
         super.onSuccess(aData, id);
-        if (id == 1) {//Download
-
-            /*    jsonObject1 = new JSONObject(aData);
-                JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                if (jsonArray.length() > 0) {
-                    mListDownload = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        if (jsonObject.has("Comment")) {
-                            Download download = new Download();
-                            download.setmKey("Comment");
-                            download.setmValue(new String[]{jsonObject.getString("Comment")});
-                            mListDownload.add(download);
-                            Log.d("Comments Value", "" + jsonObject.getString("Comment"));
-                        }
-
-                        if (jsonObject.has("Like")) {
-                            Download download = new Download();
-                            download.setmKey("Like");
-                            download.setmValue(new String[]{jsonObject.getString("Like")});
-                            mListDownload.add(download);
-                            Log.d("Likes Values", "" + jsonObject.getString("Like"));
-                        }
-
-                        if (jsonObject.has("Destination")) {
-                            Download download = new Download();
-                            download.setmKey("Destination");
-                            download.setmValue(new String[]{jsonObject.getString("Destination")});
-                            mListDownload.add(download);
-                            Log.d("Destination Values", "" + jsonObject.getString("Destination"));
-                        }
-
-                        if (jsonObject.has("Answer")) {
-                            Download download = new Download();
-                            download.setmKey("Answer");
-                            download.setmValue(new String[]{jsonObject.getString("Answer")});
-                            mListDownload.add(download);
-                            Log.d("Answer Values", "" + jsonObject.getString("Answer"));
-                        }
-
-                        if (jsonObject.has("Options")) {
-                            Download download = new Download();
-                            download.setmKey("Options");
-                            download.setmValue(new String[]{jsonObject.getString("Options")});
-                            mListDownload.add(download);
-                            Log.d("Options Values", "" + jsonObject.getString("Options"));
-                        }
-
-                        if (jsonObject.has("Question")) {
-                            Download download = new Download();
-                            download.setmKey("Question");
-                            download.setmValue(new String[]{jsonObject.getString("Question")});
-                            mListDownload.add(download);
-                            Log.d("Questions Values", "" + jsonObject.getString("Question"));
-                        }
-                        if (jsonObject.has("Images")) {
-                            Download download = new Download();
-                            download.setmKey("Images");
-                            download.setmValue(new String[]{jsonObject.getString("Images")});
-                            mListDownload.add(download);
-                            Log.d("Images Values", "" + jsonObject.getString("Images"));
-                        }
-
-                        if (jsonObject.has("User")) {
-                            Download download = new Download();
-                            download.setmKey("User");
-                            download.setmValue(new String[]{jsonObject.getString("User")});
-                            mListDownload.add(download);
-                            Log.d("User Values", "" + jsonObject.getString("User"));
-                        }
-
-                    }
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
-            //         Log.d("Loaded Data", "Data" + mListDownload.size());
-        }
-        if (id == 2) {//Upload
-
-        }
 
     }
 
@@ -208,7 +124,6 @@ public class MainActivity extends BaseActivity
                     mMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(mList.get(i).getLat(), mList.get(i).getLong()))
                             .add(new LatLng(mList.get(i + 1).getLat(), mList.get(i + 1).getLong())).width(5).color(Color.BLACK));
-
                 }
             }
         }
@@ -253,9 +168,7 @@ public class MainActivity extends BaseActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
-
-        mDestList = new ArrayList<Destination>();
-
+        mDestList = new ArrayList<>();
         UserDetails userDetails = new UserDetails();
 
         // newDataBase.AddUser(UserId,UserName);
@@ -263,7 +176,6 @@ public class MainActivity extends BaseActivity
 
         //       newDataBase.addDestinations(mDestList);
         mDestinationNames = newDataBase.getDestNames();
-
         mDestinationList = new ArrayList<>();
         mDestinationList = newDataBase.GetFromTempLatLong();
       /* boolean temp=true;
@@ -278,8 +190,8 @@ public class MainActivity extends BaseActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        text_dest.setAdapter(arrayAdapter);
 
+        text_dest.setAdapter(arrayAdapter);
         text_dest.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -303,7 +215,6 @@ public class MainActivity extends BaseActivity
                 newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
 
                 destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
-
                 final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
                 mMap.moveCamera(center);
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
@@ -365,7 +276,7 @@ public class MainActivity extends BaseActivity
                                     newDataBase.DeleteTempMaps();
                                     Log.d("DATABSE", "DELETED DATA FROm TEMPDATA TABLE");
                                     Toast.makeText(getApplicationContext(), "Saved Map..", Toast.LENGTH_SHORT).show();
-
+                                    mMap.clear();
                                     dialog.dismiss();
                                 } else {
                                     Log.d("ERROR", "Error During Inserting in MyMap");
