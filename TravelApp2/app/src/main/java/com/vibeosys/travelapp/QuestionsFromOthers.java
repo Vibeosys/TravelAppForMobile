@@ -1,16 +1,24 @@
 package com.vibeosys.travelapp;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.BaseAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
@@ -24,24 +32,25 @@ import java.util.List;
  * Created by mahesh on 10/7/2015.
  */
 
-public class QuestionsFromOthers extends BaseActivity implements View.OnClickListener {
+public class QuestionsFromOthers extends BaseActivity {
 
     ExpandableListView questionslistView;
     NewDataBase newDataBase = null;
     List<SendQuestionAnswers> mListQuestions = null;
     List<SendQuestionAnswers> mListOptions = null;
     HashMap<String, Options> mListQuestionsAnswers = null;
-
+    private List<UserDetails> listUsersDetails=new ArrayList<>();
+    String destId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String destName = getIntent().getExtras().getString("DestName");
         this.setTitle("Traveller reviews for " + destName);
-
+        destId= String.valueOf(getIntent().getExtras().getInt("DestId"));
         setContentView(R.layout.otherquestionlist_layout);
         questionslistView = (ExpandableListView) findViewById(R.id.listView2);
         newDataBase = new NewDataBase(this);
-        mListQuestions = newDataBase.mListQuestions();
+        mListQuestions = newDataBase.mListQuestions(destId);
 
         if (mListQuestions != null && mListQuestions.size() > 0) {
             Log.d("Questions", "" + mListQuestions.size());
@@ -50,7 +59,7 @@ public class QuestionsFromOthers extends BaseActivity implements View.OnClickLis
             for (int i = 0; i < mListQuestions.size(); i++) {
                 mListOptions = new ArrayList<>();
                 String m = mListQuestions.get(i).getmQuestionText();
-                mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId());
+                mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId(),Integer.parseInt(destId));
                 options = new Options();
                 String[] option = new String[mListOptions.size()];
                 int[] optionids = new int[mListOptions.size()];
@@ -58,7 +67,7 @@ public class QuestionsFromOthers extends BaseActivity implements View.OnClickLis
                 for (int j = 0; j < mListOptions.size(); j++) {
                     option[j] = mListOptions.get(j).getmOptionText();
                     optionids[j] = mListOptions.get(j).getmOptionId();
-                    UsersCount[j] = newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId());
+                    UsersCount[j] =newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId(),destId);
                 }
                 options.setmOptionText(option);
                 options.setmOptionIds(optionids);
@@ -71,32 +80,25 @@ public class QuestionsFromOthers extends BaseActivity implements View.OnClickLis
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                Toast.makeText(getApplicationContext(), "Clicked On.." + mListOptions.get(groupPosition), Toast.LENGTH_SHORT).show();
+
+            //    Toast.makeText(getApplicationContext(), "Clicked On.." + id, Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.firstquestion:
-
-            case R.id.secondquestion:
-        }
-    }
 
 
-    private class OthersQuestionsAdaptor implements ExpandableListAdapter {
+    private class OthersQuestionsAdaptor implements ExpandableListAdapter,View.OnClickListener {
         private Context mContext;
         private HashMap<String, Options> mList;
-
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
         ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
 
         OthersQuestionsAdaptor(Context aContext, HashMap<String, Options> aList) {
             mContext = aContext;
             mList = aList;
+
         }
 
         @Override
@@ -149,7 +151,7 @@ public class QuestionsFromOthers extends BaseActivity implements View.OnClickLis
 
         @Override
         public long getChildId(int groupPosition, int childPosition) {
-            return childPosition;
+            return valueList.get(groupPosition).getmOptionIds()[childPosition];
         }
 
         @Override
@@ -178,18 +180,41 @@ public class QuestionsFromOthers extends BaseActivity implements View.OnClickLis
             TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
             LinearLayout firstQuestion=(LinearLayout)aView.findViewById(R.id.firstquestion);
             LinearLayout secondQuestion=(LinearLayout)aView.findViewById(R.id.secondquestion);
-            firstQuestion.setOnClickListener((View.OnClickListener) mContext);
-            secondQuestion.setOnClickListener((View.OnClickListener) mContext);
             TextView showTextto=(TextView)aView.findViewById(R.id.texttodisplay);
-            theText.setText(valueList.get(groupPosition).getmOptionText()[childPosition]);
+            SpannableString contentq = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition ]);
+            contentq.setSpan(new UnderlineSpan(), 0, contentq.length(), 0);
+
+            theText.setText(contentq);
             theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
             showText.setText("Says");
-            firstQuestion.setId(valueList.get(groupPosition).getmOptionId());
-            if (getChildrenCount(groupPosition) > childPosition) {
-                theText2.setText(valueList.get(groupPosition).getmOptionText()[childPosition + 1]);
-                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition] + 1));
-            showTextto.setText("Says");
+            firstQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition]);
+
+            if (getChildrenCount(groupPosition) > childPosition+1) {
+                SpannableString content = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition + 1]);
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                theText2.setText(content);
+                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]+1));
+                  showTextto.setText("Says");
+                secondQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition + 1]);
             }
+
+            firstQuestion.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    showUsersList(v.getId());
+                    Toast.makeText(getApplicationContext(), "Clicked on first" + v.getId(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            secondQuestion.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showUsersList(v.getId());
+                    Toast.makeText(getApplicationContext(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
             return aView;
         }
 
@@ -226,7 +251,70 @@ public class QuestionsFromOthers extends BaseActivity implements View.OnClickLis
             return 0;
         }
 
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.firstquestion:
+                    break;
+                case R.id.secondquestion:
+                    Toast.makeText(getApplicationContext(),"Clicked on"+v.getId(),Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
     }
 
+    private void showUsersList(int id) {
+        userListDialog(id);
+    }
 
+   private void userListDialog(int questionId){
+       Log.d("DestId QS", "" + destId);
+       final Dialog dialog = new Dialog(this);
+       dialog.setContentView(R.layout.userlistview);
+       dialog.setTitle("Users List");
+       Window window = dialog.getWindow();
+       window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+       listUsersDetails=newDataBase.answerlikesUsers(questionId,destId);
+       //likeCount=
+       dialog.show();
+       ListView usersListView=(ListView)dialog.findViewById(R.id.userlistview);
+       usersListView.setAdapter(new UserListAdaptor(QuestionsFromOthers.this,listUsersDetails));
+
+
+         }
+
+
+    private class UserListAdaptor extends BaseAdapter {
+        List<UserDetails> userDetailsList;
+        Context mContext;
+        public UserListAdaptor(QuestionsFromOthers questionsFromOthers, List<UserDetails> listUsersDetails) {
+            userDetailsList=listUsersDetails;
+            mContext=questionsFromOthers;
+        }
+
+
+        @Override
+        public int getCount() {
+            return userDetailsList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return userDetailsList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater= (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view=inflater.inflate(R.layout.userlikelist,null);
+            TextView usernameText=(TextView)view.findViewById(R.id.userlikesname);
+            usernameText.setText(userDetailsList.get(position).getUsername());
+            return view;
+        }
+    }
 }

@@ -36,6 +36,7 @@ import java.util.Map;
 /**
  * Created by mahesh on 10/13/2015.
  */
+
 public class PreviewImage extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
@@ -64,6 +65,7 @@ public class PreviewImage extends AppCompatActivity {
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progress.setIndeterminate(true);
                 progress.show();
+
                 Gson gson = new Gson();
                 ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
                 imageUploadDTO.setImageData(imageData);
@@ -85,6 +87,7 @@ public class PreviewImage extends AppCompatActivity {
                     byte[] byte_arr = stream.toByteArray();
                     // Encode Image to String
                     String encodedString = Base64.encodeToString(byte_arr, 0);
+                    //Log.d("EncodedString",encodedString);
                     uploadImage(encodedString, filename, DestId, UserId);
 
                 } else {
@@ -136,7 +139,6 @@ public class PreviewImage extends AppCompatActivity {
     }
 
     public void uploadImage(final String encodedString, final String filename, final int string, final String s) {
-
         RequestQueue rq = Volley.newRequestQueue(this);
         final String url = getResources().getString(R.string.URL);
         Log.d("URL", url);
@@ -188,13 +190,13 @@ public class PreviewImage extends AppCompatActivity {
         {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
 
+                Map<String, String> params = new HashMap<>();
+                params.put("imageId",s);
                 params.put("upload", encodedString);
                 params.put("imagename", filename);
-                params.put("DestId", String.valueOf(string));
-                params.put("UserId", s);
-
+                params.put("destId", String.valueOf(string));
+                params.put("userId", s);
                 return params;
 
             }
@@ -204,33 +206,6 @@ public class PreviewImage extends AppCompatActivity {
         rq.add(stringRequest);
     }
 
-
-    public Bitmap decodeURI(String filePath) {
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(filePath, options);
-
-        // Only scale if we need to
-        // (16384 buffer for img processing)
-        Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
-        if (options.outHeight * options.outWidth * 2 >= 50000) {
-            // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
-            double sampleSize = scaleByHeight
-                    ? options.outHeight / 100
-                    : options.outWidth / 100;
-            options.inSampleSize =
-                    (int) Math.pow(2d, Math.floor(
-                            Math.log(sampleSize) / Math.log(2d)));
-        }
-
-        // Do the actual decoding
-        options.inJustDecodeBounds = false;
-        options.inTempStorage = new byte[512];
-        Bitmap output = BitmapFactory.decodeFile(filePath, options);
-
-        return output;
-    }
 
     public String getStringImage(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

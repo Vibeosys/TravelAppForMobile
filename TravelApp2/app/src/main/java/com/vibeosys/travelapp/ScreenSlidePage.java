@@ -42,11 +42,8 @@ public class ScreenSlidePage extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
     public ScreenSlidePage() {
-
     }
-
     public interface OnDataPass {
         public void onDataPass(String data);
     }
@@ -61,7 +58,7 @@ public class ScreenSlidePage extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         newDataBase=new NewDataBase(getActivity());
-        mListQuestions=newDataBase.mListQuestions();
+        mListQuestions=newDataBase.listQuestions();
         Log.d("Questions", "" + mListQuestions.size());
 
       if(mListQuestions!=null&&mListQuestions.size()>0) {
@@ -70,7 +67,7 @@ public class ScreenSlidePage extends Fragment {
           for(int i = 0;i<mListQuestions.size();i++){
               mListOptions=new ArrayList<>();
               String m=mListQuestions.get(i).getmQuestionText();
-              mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId());
+              mListOptions = newDataBase.listQuestions(mListQuestions.get(i).getmQuestionId());
               options = new Options();
               String[] option=new String[mListOptions.size()];
               int [] optionids=new int[mListOptions.size()];

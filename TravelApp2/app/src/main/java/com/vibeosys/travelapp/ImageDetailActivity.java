@@ -60,7 +60,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         NewDataBase newDataBase=new NewDataBase(this);
         Intent intent=new Intent();
         Bundle extras = intent.getExtras();
-       // mDestId= extras.getInt("DestId");
+       //mDestId= extras.getInt("DestId");
         Log.d("PhotosFromOthers", "" + mDestId);
         mPhotoList=newDataBase.Images(mDestId,true);
         setContentView(R.layout.image_detail_pager);

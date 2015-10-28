@@ -18,6 +18,7 @@ import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.Routes;
 import com.vibeosys.travelapp.SendQuestionAnswers;
 import com.vibeosys.travelapp.TempData;
+import com.vibeosys.travelapp.UserDetails;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.Images;
@@ -768,14 +769,18 @@ return listSyncData;
 
     }
 
-    public List<SendQuestionAnswers> mListQuestions() {
+    public List<SendQuestionAnswers> mListQuestions(String destId) {
         List<SendQuestionAnswers> mListQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
             mListQuestions = new ArrayList<>();
-            cursor = sqLiteDatabase.rawQuery("select questionid,questiontext from question", null);
+            String qurey="select  Question.QuestionId, Question.QuestionText, Options.OptionId, Options.OptionText, Answer.AnswerId,Answer.userid " +
+                    " from Question inner join options on Question.questionId=Options.questionId " +
+                    " inner join answer on options.optionid=answer.OptionId " +
+                    " where answer.destid=?";
+            cursor = sqLiteDatabase.rawQuery(qurey,new String[]{destId});
             SendQuestionAnswers sendQuestionAnswers;
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
@@ -794,15 +799,70 @@ return listSyncData;
         return mListQuestions;
     }
 
-    public int CountOfUsers(int cOptionId) {
+    public List<SendQuestionAnswers> listQuestions() {
+        List<SendQuestionAnswers> listQuestions = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            listQuestions = new ArrayList<>();
+            cursor = sqLiteDatabase.rawQuery("select * from Question "
+                    , null);
+            SendQuestionAnswers sendQuestionAnswers;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    sendQuestionAnswers = new SendQuestionAnswers();
+                    sendQuestionAnswers.setmQuestionId(cursor.getInt(cursor.getColumnIndex("QuestionId")));
+                    sendQuestionAnswers.setmQuestionText(cursor.getString(cursor.getColumnIndex("QuestionText")));
+                    listQuestions.add(sendQuestionAnswers);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listQuestions;
+    }
+
+
+    public List<UserDetails> answerlikesUsers(int optionId, String destId) {
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        List<UserDetails> answerUsersList = null;
+        try {
+            answerUsersList = new ArrayList<>();
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select UserName,UserId,DestId from answer natural join user where optionid=? and destid=?",
+                    new String[]{String.valueOf(optionId), destId});
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    UserDetails userDetails = new UserDetails();
+                    userDetails.setUsername(cursor.getString(cursor.getColumnIndex("UserName")));
+                    userDetails.setUserId(cursor.getString(cursor.getColumnIndex("UserId")));
+                    userDetails.setDestId(Integer.parseInt(cursor.getString(cursor.getColumnIndex("DestId"))));
+                    answerUsersList.add(userDetails);
+
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return answerUsersList;
+    }
+
+
+    public int CountOfUsers(int cOptionId, String destId) {
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         int count = 0;
         try {
             sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select * from answer where optionid=?", new String[]{String.valueOf(cOptionId)});
+            cursor = sqLiteDatabase.rawQuery("select * from answer where optionid=? and destid=?", new String[]{String.valueOf(cOptionId), destId});
             if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToFirst();
                 count = cursor.getCount();
             }
             cursor.close();
@@ -814,7 +874,7 @@ return listSyncData;
     }
 
 
-    public List<SendQuestionAnswers> mListOptions(int cQuestionId) {
+    public List<SendQuestionAnswers> listQuestions(int cQuestionId){
         List<SendQuestionAnswers> theListAskQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
@@ -823,7 +883,44 @@ return listSyncData;
             theListAskQuestions = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();
             SendQuestionAnswers sendQuestionAnswers;
-            cursor = sqLiteDatabase.rawQuery("select OpTIONID,optionText from  OPTIONS where questionid=?", new String[]{String.valueOf(cQuestionId)});
+            String qurey="select OptionId, optionText " +
+                    " from  OPTIONS " +
+                    "where questionid = ? ";
+            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{String.valueOf(cQuestionId)});
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    do {
+                        sendQuestionAnswers = new SendQuestionAnswers();
+                        sendQuestionAnswers.setmOptionId(cursor.getInt(0));
+                        sendQuestionAnswers.setmOptionText(cursor.getString(1));
+                        theListAskQuestions.add(sendQuestionAnswers);
+                    } while (cursor.moveToNext());
+                }
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+            Log.d("theListAskQuestions", "" + theListAskQuestions.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return theListAskQuestions;
+    }
+
+
+    public List<SendQuestionAnswers> mListOptions(int cQuestionId,int destId) {
+        List<SendQuestionAnswers> theListAskQuestions = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        int mQuestionId = cQuestionId;
+        try {
+            theListAskQuestions = new ArrayList<>();
+            sqLiteDatabase = getReadableDatabase();
+            SendQuestionAnswers sendQuestionAnswers;
+            String qurey="select distinct options.OptionId, optionText " +
+                    "from  OPTIONS inner join answer  on options.OptionId == answer.OptionId " +
+                    "where questionid = ? and DestId = ?;";
+            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{String.valueOf(cQuestionId),String.valueOf(destId)});
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
