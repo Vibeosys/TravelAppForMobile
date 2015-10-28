@@ -185,7 +185,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             Gson gson = new Gson();
             BufferedReader bufferedReader = null;
             try {
-               /* bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("file.json")));*/
                 Download downloadDTO = gson.fromJson(aData, Download.class);
                 Log.d("TableDataDTO", "" + downloadDTO.toString());
                 Log.d("TableDataDTO Size", "" + downloadDTO.getData().size());

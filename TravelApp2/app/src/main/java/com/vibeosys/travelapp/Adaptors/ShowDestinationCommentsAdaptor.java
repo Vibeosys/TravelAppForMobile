@@ -40,13 +40,18 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
     String UserName;
     public ShowDestinationCommentsAdaptor(Context destinationComments, List<CommentsAndLikes> mListDestination, int destId) {
         this.mContext = destinationComments;
-        this.mListDestinationComments = mListDestination;
         this.DestId = destId;
         sharedPref =  mContext.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         UserId = sharedPref.getString("UserId", null);
         UserName=sharedPref.getString("UserName",null);
+        updateResults(mListDestination);
     }
 
+    public void updateResults(List<CommentsAndLikes> results) {
+        mListDestinationComments = results;
+        //Triggers the list update
+        notifyDataSetChanged();
+    }
 
     @Override
     public boolean areAllItemsEnabled() {
@@ -126,7 +131,6 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
-
     }
 
     @Override

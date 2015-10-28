@@ -45,7 +45,7 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
     int DestId;
     String UserId;
     String UserName;
-
+    ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,11 +63,14 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         mListDestination = new ArrayList<>();
         listComment = new ArrayList<>();
         mListDestination = newDataBase.DestinationComments(DestId);
+
         Log.d("DestinationComment", String.valueOf(mListDestination.size()));
         sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         UserId = sharedPref.getString("UserId", null);
         UserName = sharedPref.getString("UserName", null);
-        mDestinationCommentListView.setAdapter(new ShowDestinationCommentsAdaptor(getApplicationContext(), mListDestination, DestId));
+        showDestinationCommentsAdaptor=new ShowDestinationCommentsAdaptor(getApplicationContext(), mListDestination, DestId);
+        mDestinationCommentListView.setAdapter(showDestinationCommentsAdaptor);
+
 
     }
 
@@ -77,13 +80,18 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
         if (editTextCommentByUser.getText().toString().length() > 0 && editTextCommentByUser.getText().toString() != null) {
             String comment = editTextCommentByUser.getText().toString();
             UploadComment(Destinatinid, UserId, comment);
+
             Comment comment1 = new Comment();
             comment1.setUserId(UserId);
             comment1.setCommentText(comment);
             comment1.setDestId(DestId);
             listComment.add(comment1);
             newDataBase.insertComment(listComment);
-            mDestinationCommentListView.invalidate();
+            mListDestination.clear();
+            mListDestination = newDataBase.DestinationComments(DestId);
+            showDestinationCommentsAdaptor.updateResults(mListDestination);
+            editTextCommentByUser.clearComposingText();
+           editTextCommentByUser.clearFocus();
             // Toast.makeText(getApplicationContext(), "Enterted comement" + editTextCommentByUser.getText().toString(), Toast.LENGTH_SHORT).show();
         } else {
             editTextCommentByUser.setError("Please Enter some Text");

@@ -42,8 +42,11 @@ public class ScreenSlidePage extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     public ScreenSlidePage() {
+
     }
+
     public interface OnDataPass {
         public void onDataPass(String data);
     }

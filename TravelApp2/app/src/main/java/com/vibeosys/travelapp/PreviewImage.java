@@ -59,15 +59,15 @@ public class PreviewImage extends AppCompatActivity {
         uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Gson gson = new Gson();
-                ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
-                imageUploadDTO.setImageData(imageData);
-                String path = getIntent().getExtras().getString("Data");
                 progress = new ProgressDialog(PreviewImage.this);
                 progress.setMessage("Uploading Image...");
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progress.setIndeterminate(true);
                 progress.show();
+                Gson gson = new Gson();
+                ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
+                imageUploadDTO.setImageData(imageData);
+                String path = getIntent().getExtras().getString("Data");
                 Log.d("Path File ", path);
                 String UserId = sharedPref.getString("UserId", null);
                 int DestId = getIntent().getExtras().getInt("DestId");
@@ -147,7 +147,7 @@ public class PreviewImage extends AppCompatActivity {
 
         Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url + "images/upload1", new Response.Listener<String>() {
+                url + "imagesupload", new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {

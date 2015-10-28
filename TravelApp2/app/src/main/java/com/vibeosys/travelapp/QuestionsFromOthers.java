@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
@@ -23,7 +24,7 @@ import java.util.List;
  * Created by mahesh on 10/7/2015.
  */
 
-public class QuestionsFromOthers extends BaseActivity {
+public class QuestionsFromOthers extends BaseActivity implements View.OnClickListener {
 
     ExpandableListView questionslistView;
     NewDataBase newDataBase = null;
@@ -76,9 +77,20 @@ public class QuestionsFromOthers extends BaseActivity {
         });
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.firstquestion:
+
+            case R.id.secondquestion:
+        }
+    }
+
+
     private class OthersQuestionsAdaptor implements ExpandableListAdapter {
         private Context mContext;
         private HashMap<String, Options> mList;
+
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
         ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
 
@@ -160,14 +172,23 @@ public class QuestionsFromOthers extends BaseActivity {
             childPosition = childPosition * 2;
             View aView = getLayoutInflater().inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
+            TextView showText=(TextView)aView.findViewById(R.id.texttodisplay1);
             TextView theCount = (TextView) aView.findViewById(R.id.count);
             TextView theText2 = (TextView) aView.findViewById(R.id.textView);
             TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
+            LinearLayout firstQuestion=(LinearLayout)aView.findViewById(R.id.firstquestion);
+            LinearLayout secondQuestion=(LinearLayout)aView.findViewById(R.id.secondquestion);
+            firstQuestion.setOnClickListener((View.OnClickListener) mContext);
+            secondQuestion.setOnClickListener((View.OnClickListener) mContext);
+            TextView showTextto=(TextView)aView.findViewById(R.id.texttodisplay);
             theText.setText(valueList.get(groupPosition).getmOptionText()[childPosition]);
             theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
+            showText.setText("Says");
+            firstQuestion.setId(valueList.get(groupPosition).getmOptionId());
             if (getChildrenCount(groupPosition) > childPosition) {
                 theText2.setText(valueList.get(groupPosition).getmOptionText()[childPosition + 1]);
                 theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition] + 1));
+            showTextto.setText("Says");
             }
             return aView;
         }
@@ -204,6 +225,7 @@ public class QuestionsFromOthers extends BaseActivity {
         public long getCombinedGroupId(long groupId) {
             return 0;
         }
+
     }
 
 
