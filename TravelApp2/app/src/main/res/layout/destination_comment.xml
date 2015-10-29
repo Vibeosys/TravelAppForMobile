@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"  >
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
    <ImageView
        android:layout_width="50dp"
        android:layout_height="50dp"
        android:id="@+id/userimagedest"
-       android:src="@drawable/beachimg"
+       android:layout_weight="1"
+       android:gravity="center"
+       android:src="@drawable/user_profileimage"
        android:layout_gravity="left"
        android:layout_marginLeft="10dp"/>
-<TextView
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:layout_weight="2">
+        <TextView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/userNametext1"
-    android:gravity="center"
+    android:layout_marginLeft="10dp"
     android:text="Anand"
     android:textStyle="bold"
-    android:textSize="20dp"
-   android:textColor="#000"
-    />
+    android:textAlignment="textStart"
+    android:textSize="20sp"
+   android:textColor="#000"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/userNameComment2"
+            android:layout_marginLeft="10dp"
+            android:text="It was a Good Experience.."
+            android:textAlignment="textStart"
+            android:textColor="#000"/>
+   </LinearLayout>
 
     </LinearLayout>
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/userNameComment2"
-    android:text="It was a Good Experience.."
-    android:gravity="center"
-    android:textColor="#000"/>
-</LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

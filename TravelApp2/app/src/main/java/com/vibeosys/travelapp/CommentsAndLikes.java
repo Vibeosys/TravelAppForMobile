@@ -19,12 +19,14 @@ public class CommentsAndLikes extends UserDetails {
     String mLikeDate;
     String mCommentDate;
     String UserName;
+
     CommentsAndLikes( int cUserId, int cDestId, int cLikeCount, String cCommentText, String cCommentDate) {
 
     }
-    public CommentsAndLikes(String UserId, int DestId, String commentText, String username){
+    public CommentsAndLikes(String UserId, int DestId, String commentText, String username,String photoURL){
         this.UserId=UserId;
         this.DestId=DestId;
+        this.photoURL=photoURL;
         this.mCommentText=commentText;
         this.UserName=username;
     }

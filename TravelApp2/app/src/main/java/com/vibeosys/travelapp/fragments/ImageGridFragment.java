@@ -63,7 +63,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
     private int mImageThumbSpacing;
     private ImageAdapter mAdapter;
     private ImageFetcher mImageFetcher;
-    int mDestId;
+    int destId;
     ListView other_photo_list;
     List<usersImages> mPhotoList = null;
 
@@ -79,8 +79,10 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         setHasOptionsMenu(true);
         mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
         mImageThumbSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
+
+
         NewDataBase newDataBase = new NewDataBase(getActivity());
-        int destId = getActivity().getIntent().getExtras().getInt("DestId");
+         destId = getActivity().getIntent().getExtras().getInt("DestId");
         Log.d("PhotosFromOthers", "" + destId);
         mPhotoList = newDataBase.Images(destId,true);
         Log.d("ImageGridFragment", "" + mPhotoList.size());
@@ -183,6 +185,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         final Intent i = new Intent(getActivity(), ImageDetailActivity.class);
         i.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
+        i.putExtra("DestId",destId);
         if (Utils.hasJellyBean()) {
             // makeThumbnailScaleUpAnimation() looks kind of ugly here as the loading spinner may
             // show plus the thumbnail image in GridView is cropped. so using
@@ -199,7 +202,18 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        Toast.makeText(getActivity(), "" + id, Toast.LENGTH_SHORT).show();
+        final Intent i = new Intent(getActivity(), ImageDetailActivity.class);
+        i.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
+        if (Utils.hasJellyBean()) {
+            // makeThumbnailScaleUpAnimation() looks kind of ugly here as the loading spinner may
+            // show plus the thumbnail image in GridView is cropped. so using
+            // makeScaleUpAnimation() instead.
+            ActivityOptions options =
+                    ActivityOptions.makeScaleUpAnimation(v, 0, 0, v.getWidth(), v.getHeight());
+            getActivity().startActivity(i, options.toBundle());
+        } else {
+            startActivity(i);
+        }
     }
 
     /**

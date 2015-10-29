@@ -14,10 +14,15 @@ import com.vibeosys.travelapp.fragments.ImageGridFragment;
  */
 
 public class DestinationDetailsPagerAdapter extends FragmentPagerAdapter implements PagerSlidingTabStrip.IconTabProvider {
-    private int tabIcons[] = {R.drawable.camera_white, R.drawable.comment_outline, R.drawable.star_outline};
+    private int tabIcons[] = {R.drawable.camera_black, R.drawable.comment_outline, R.drawable.star_outline,R.drawable.camera,R.drawable.comment,R.drawable.star};
 
     public DestinationDetailsPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
     }
 
     @Override
@@ -31,7 +36,6 @@ public class DestinationDetailsPagerAdapter extends FragmentPagerAdapter impleme
             case 0:
                 return new ImageGridFragment();
             case 1:
-
               return  new DestinationComments();
             case 2:
                 return  new QuestionsFromOthers();
@@ -44,4 +48,6 @@ public class DestinationDetailsPagerAdapter extends FragmentPagerAdapter impleme
     public int getPageIconResId(int position) {
         return tabIcons[position];
     }
+
+
 }

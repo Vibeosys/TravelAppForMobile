@@ -47,7 +47,7 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
     int DestId;
     String UserId;
     String UserName;
-List<Sync> syncDataToUpload=null;
+    List<Sync> syncDataToUpload=null;
     ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
 
     @Override
@@ -66,7 +66,7 @@ List<Sync> syncDataToUpload=null;
         submitBtn = (Button) view.findViewById(R.id.submitButton);
         submitBtn.setOnClickListener(this);
         mListDestination = new ArrayList<>();
-        String destName = getActivity().getIntent().getExtras().getString("DestName");
+
         DestId = getActivity().getIntent().getExtras().getInt("DestId");
         Log.d("DestId Comments", "" + DestId);
         editTextCommentByUser = (EditText) view.findViewById(R.id.commnetbyUser);

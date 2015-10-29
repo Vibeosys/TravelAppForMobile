@@ -537,7 +537,8 @@ return syncTableData;
                                 cursor.getString(cursor.getColumnIndex("UserId")),
                                 cursor.getInt(cursor.getColumnIndex("DestId")),
                                 cursor.getString(cursor.getColumnIndex("CommentText")),
-                                cursor.getString(cursor.getColumnIndex("UserName"))
+                                cursor.getString(cursor.getColumnIndex("UserName")),
+                                cursor.getString(cursor.getColumnIndex("PhotoURL"))
                         );
                         DestComments.add(commentsAndLikes);
 

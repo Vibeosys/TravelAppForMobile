@@ -104,6 +104,7 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
             viewHolder.textView = (TextView) viewrow.findViewById(R.id.userNametext1);
             viewHolder.textView1 = (TextView) viewrow.findViewById(R.id.userNameComment2);
             viewHolder.imageView = (ImageView) viewrow.findViewById(R.id.userimagedest);
+
             viewrow.setTag(viewHolder);
         } else viewHolder = (ViewHolder) viewrow.getTag();
         if(mListDestinationComments.get(position).getUserId().equals(UserId)){

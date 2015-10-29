@@ -49,6 +49,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     int mDestId;
     ListView other_photo_list;
     List<usersImages> mPhotoList=null;
+    NewDataBase newDataBase;
     @TargetApi(VERSION_CODES.HONEYCOMB)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,11 +58,11 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         }
 
         super.onCreate(savedInstanceState);
-        NewDataBase newDataBase=new NewDataBase(this);
         Intent intent=new Intent();
         Bundle extras = intent.getExtras();
-       //mDestId= extras.getInt("DestId");
+        mDestId= getIntent().getIntExtra("DestId",-1);
         Log.d("PhotosFromOthers", "" + mDestId);
+        newDataBase=new NewDataBase(getApplicationContext());
         mPhotoList=newDataBase.Images(mDestId,true);
         setContentView(R.layout.image_detail_pager);
         // Fetch screen height and width, to use as our max size when loading images as this

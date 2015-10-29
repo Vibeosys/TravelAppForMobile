@@ -47,8 +47,7 @@ public class QuestionsFromOthers extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String destName = getActivity().getIntent().getExtras().getString("DestName");
-        getActivity().setTitle("Traveller reviews for " + destName);
+
         destId = String.valueOf(getActivity().getIntent().getExtras().getInt("DestId"));
 
     }

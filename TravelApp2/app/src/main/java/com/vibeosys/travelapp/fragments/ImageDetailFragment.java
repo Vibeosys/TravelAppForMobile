@@ -44,6 +44,7 @@ public class ImageDetailFragment extends Fragment {
      * @param imageUrl The image url to load
      * @return A new instance of ImageDetailFragment with imageNum extras
      */
+
     public static ImageDetailFragment newInstance(String imageUrl) {
         final ImageDetailFragment f = new ImageDetailFragment();
 

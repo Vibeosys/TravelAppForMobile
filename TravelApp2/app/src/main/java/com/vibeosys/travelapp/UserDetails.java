@@ -7,6 +7,15 @@ public class UserDetails {
     protected String UserId;
     protected String Username;
     protected int DestId;
+    protected String photoURL;
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
 
     public int getDestId() {
         return DestId;
