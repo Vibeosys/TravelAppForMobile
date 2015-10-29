@@ -111,24 +111,6 @@ return view;
 
     }
 
-    public void LoginDialog() {
-        final Dialog dialog = new Dialog(getActivity());
-        // Include dialog.xml file
-        EditText userNameEditText;
-        EditText emailidEditText;
-        Button loginButton;
-        dialog.setContentView(R.layout.login_layout);
-        // Set dialog title
-        dialog.setTitle("Login");
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.show();
-        userNameEditText = (EditText) dialog.findViewById(R.id.username);
-        emailidEditText = (EditText) dialog.findViewById(R.id.emailid);
-        loginButton = (Button) dialog.findViewById(R.id.btnLogin);
-        loginButton.setOnClickListener(DestinationComments.this);
-    }
-
 
     private void UploadComment(int destinatinid, String userId, String comment) {
         Comment comment1 = new Comment();

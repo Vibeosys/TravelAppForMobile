@@ -43,11 +43,10 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_layout);
-
-
         //Facebook SDK Initialization
         FacebookLoginAPIInit();
+
+        setContentView(R.layout.login_layout);
 
         //Facebook Authentication after clicking button
         Button btn_fb_login = (Button) findViewById(R.id.btn_fbLogin);
@@ -60,6 +59,14 @@ public class LoginActivity extends BaseActivity {
         });
 
 
+    }
+
+    public void OnClickSkipLogin(View view)
+    {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.putExtra("Profiledetails","");
+        intent.putExtra("ProfileImg", "");
+        startActivity(intent);
     }
 
     private void FacebookLogin() {

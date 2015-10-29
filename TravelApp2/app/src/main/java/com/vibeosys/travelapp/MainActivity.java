@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
@@ -115,6 +118,9 @@ public class MainActivity extends BaseActivity
     LayoutInflater layoutInflater;
     SharedPreferences.Editor editor;
 
+    //Facebook User Profile Image
+    ImageView userProfileImage;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -168,6 +174,10 @@ public class MainActivity extends BaseActivity
         }
 
         setContentView(R.layout.activity_main);
+
+        //Facebook Data Integration with UI
+        FacebookData();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
@@ -680,5 +690,65 @@ public class MainActivity extends BaseActivity
                 Toast.LENGTH_SHORT).show();
     }
 
+
+    //-------------Facebook Login----------------------//
+
+    private void FacebookData() {
+        // After successful Loing
+        Intent intent = getIntent();
+        String profileDataJSON = intent.getStringExtra("Profiledetails"); //if it's a string you stored.
+        if (!profileDataJSON.isEmpty()) {
+            try {
+
+                JSONObject obj = new JSONObject(profileDataJSON);
+                TextView userName = (TextView) findViewById(R.id.userName);
+                TextView userEmail = (TextView) findViewById(R.id.userEmailID);
+
+                //Setting values from JSON Object
+                userName.setText(obj.getString("name").toString());
+                userEmail.setText(obj.getString("email").toString());
+
+
+            } catch (JSONException e) {
+                Log.d("Error", e.getMessage());
+            }
+
+
+            String ur = intent.getStringExtra("ProfileImg"); //if it's a string you stored.
+            //Toast.makeText(getApplicationContext(), ur.toString(), Toast.LENGTH_LONG).show();
+            userProfileImage = (ImageView) findViewById(R.id.userProfileImage);
+            downloadAvatar(ur);
+        }
+    }
+
+
+    private synchronized void downloadAvatar(final String url) {
+        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
+
+            @Override
+            public Bitmap doInBackground(Void... params) {
+                URL fbAvatarUrl = null;
+                Bitmap fbAvatarBitmap = null;
+                try {
+                    fbAvatarUrl = new URL(url);
+                    fbAvatarBitmap = BitmapFactory.decodeStream(fbAvatarUrl.openConnection().getInputStream());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return fbAvatarBitmap;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                userProfileImage.setImageBitmap(result);
+            }
+
+        };
+        task.execute();
+    }
+
+    //--------------------------------------------------
 
 }
