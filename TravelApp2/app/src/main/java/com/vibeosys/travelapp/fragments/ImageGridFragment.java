@@ -195,6 +195,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         }
     }
 
+
     @Override
     public void onClick(View v) {
         int id = v.getId();

@@ -45,6 +45,7 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
     int DestId;
     String UserId;
     String UserName;
+
     ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

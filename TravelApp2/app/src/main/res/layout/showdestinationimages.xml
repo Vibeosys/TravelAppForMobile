@@ -18,22 +18,25 @@
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/facebook_like_button" />
+        android:background="@drawable/thumb_up_outline" />
 
     <TextView
-        android:layout_margin="5dp"
-        android:layout_alignParentBottom="true"
         android:id="@+id/usertext"
-        android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:textStyle="bold"
-        android:layout_height="wrap_content" />
+        android:textColor="@color/whilte"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/likebutton" />
 
     <TextView
         android:id="@+id/likecounttext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="25dp"
+        android:textColor="@color/whilte"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true" />
 

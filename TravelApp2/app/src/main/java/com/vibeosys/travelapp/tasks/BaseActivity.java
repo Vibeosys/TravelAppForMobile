@@ -308,6 +308,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
                 Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
             }
         });
+
         RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.mymessages);
         relativeLayout1.setOnClickListener(new View.OnClickListener() {
             @Override

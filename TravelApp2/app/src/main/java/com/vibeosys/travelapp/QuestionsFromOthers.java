@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -39,14 +40,15 @@ public class QuestionsFromOthers extends BaseActivity {
     List<SendQuestionAnswers> mListQuestions = null;
     List<SendQuestionAnswers> mListOptions = null;
     HashMap<String, Options> mListQuestionsAnswers = null;
-    private List<UserDetails> listUsersDetails=new ArrayList<>();
+    private List<UserDetails> listUsersDetails = new ArrayList<>();
     String destId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String destName = getIntent().getExtras().getString("DestName");
         this.setTitle("Traveller reviews for " + destName);
-        destId= String.valueOf(getIntent().getExtras().getInt("DestId"));
+        destId = String.valueOf(getIntent().getExtras().getInt("DestId"));
         setContentView(R.layout.otherquestionlist_layout);
         questionslistView = (ExpandableListView) findViewById(R.id.listView2);
         newDataBase = new NewDataBase(this);
@@ -59,7 +61,7 @@ public class QuestionsFromOthers extends BaseActivity {
             for (int i = 0; i < mListQuestions.size(); i++) {
                 mListOptions = new ArrayList<>();
                 String m = mListQuestions.get(i).getmQuestionText();
-                mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId(),Integer.parseInt(destId));
+                mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId(), Integer.parseInt(destId));
                 options = new Options();
                 String[] option = new String[mListOptions.size()];
                 int[] optionids = new int[mListOptions.size()];
@@ -67,7 +69,7 @@ public class QuestionsFromOthers extends BaseActivity {
                 for (int j = 0; j < mListOptions.size(); j++) {
                     option[j] = mListOptions.get(j).getmOptionText();
                     optionids[j] = mListOptions.get(j).getmOptionId();
-                    UsersCount[j] =newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId(),destId);
+                    UsersCount[j] = newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId(), destId);
                 }
                 options.setmOptionText(option);
                 options.setmOptionIds(optionids);
@@ -81,15 +83,13 @@ public class QuestionsFromOthers extends BaseActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-            //    Toast.makeText(getApplicationContext(), "Clicked On.." + id, Toast.LENGTH_SHORT).show();
+                //    Toast.makeText(getApplicationContext(), "Clicked On.." + id, Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
     }
 
-
-
-    private class OthersQuestionsAdaptor implements ExpandableListAdapter,View.OnClickListener {
+    class OthersQuestionsAdaptor implements ExpandableListAdapter, View.OnClickListener {
         private Context mContext;
         private HashMap<String, Options> mList;
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
@@ -174,27 +174,26 @@ public class QuestionsFromOthers extends BaseActivity {
             childPosition = childPosition * 2;
             View aView = getLayoutInflater().inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
-            TextView showText=(TextView)aView.findViewById(R.id.texttodisplay1);
-            TextView theCount = (TextView) aView.findViewById(R.id.count);
             TextView theText2 = (TextView) aView.findViewById(R.id.textView);
             TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
-            LinearLayout firstQuestion=(LinearLayout)aView.findViewById(R.id.firstquestion);
-            LinearLayout secondQuestion=(LinearLayout)aView.findViewById(R.id.secondquestion);
-            TextView showTextto=(TextView)aView.findViewById(R.id.texttodisplay);
-            SpannableString contentq = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition ]);
+            LinearLayout firstQuestion = (LinearLayout) aView.findViewById(R.id.firstquestion);
+            LinearLayout secondQuestion = (LinearLayout) aView.findViewById(R.id.secondquestion);
+            TextView showTextto = (TextView) aView.findViewById(R.id.texttodisplay);
+            SpannableString contentq = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition]);
             contentq.setSpan(new UnderlineSpan(), 0, contentq.length(), 0);
-
-            theText.setText(contentq);
-            theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
-            showText.setText("Says");
+            String optionText=valueList.get(groupPosition).getmOptionText()[childPosition];
+            String count = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]);
+            // theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
+            //showText.setText("Says");
             firstQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition]);
-
-            if (getChildrenCount(groupPosition) > childPosition+1) {
+            theText.setText(Html.fromHtml("<font color='#00ff00'> "+ count + "</font> Says <font color='#ff0000'>" + optionText + "</font>"));
+            //theText.setTextColor(Color.RED);
+            if (getChildrenCount(groupPosition) > childPosition + 1) {
                 SpannableString content = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition + 1]);
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                 theText2.setText(content);
-                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]+1));
-                  showTextto.setText("Says");
+                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition] + 1));
+                showTextto.setText("Says");
                 secondQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition + 1]);
             }
 
@@ -253,43 +252,45 @@ public class QuestionsFromOthers extends BaseActivity {
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.firstquestion:
                     break;
                 case R.id.secondquestion:
-                    Toast.makeText(getApplicationContext(),"Clicked on"+v.getId(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Clicked on" + v.getId(), Toast.LENGTH_SHORT).show();
                     break;
             }
         }
     }
 
+
     private void showUsersList(int id) {
         userListDialog(id);
     }
 
-   private void userListDialog(int questionId){
-       Log.d("DestId QS", "" + destId);
-       final Dialog dialog = new Dialog(this);
-       dialog.setContentView(R.layout.userlistview);
-       dialog.setTitle("Users List");
-       Window window = dialog.getWindow();
-       window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-       listUsersDetails=newDataBase.answerlikesUsers(questionId,destId);
-       //likeCount=
-       dialog.show();
-       ListView usersListView=(ListView)dialog.findViewById(R.id.userlistview);
-       usersListView.setAdapter(new UserListAdaptor(QuestionsFromOthers.this,listUsersDetails));
+    private void userListDialog(int questionId) {
+        Log.d("DestId QS", "" + destId);
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.userlistview);
+        dialog.setTitle("Users List");
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        listUsersDetails = newDataBase.answerlikesUsers(questionId, destId);
+        //likeCount=
+        dialog.show();
+        ListView usersListView = (ListView) dialog.findViewById(R.id.userlistview);
+        usersListView.setAdapter(new UserListAdaptor(QuestionsFromOthers.this, listUsersDetails));
 
 
-         }
+    }
 
 
     private class UserListAdaptor extends BaseAdapter {
         List<UserDetails> userDetailsList;
         Context mContext;
+
         public UserListAdaptor(QuestionsFromOthers questionsFromOthers, List<UserDetails> listUsersDetails) {
-            userDetailsList=listUsersDetails;
-            mContext=questionsFromOthers;
+            userDetailsList = listUsersDetails;
+            mContext = questionsFromOthers;
         }
 
 
@@ -310,9 +311,9 @@ public class QuestionsFromOthers extends BaseActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater= (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view=inflater.inflate(R.layout.userlikelist,null);
-            TextView usernameText=(TextView)view.findViewById(R.id.userlikesname);
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.userlikelist, null);
+            TextView usernameText = (TextView) view.findViewById(R.id.userlikesname);
             usernameText.setText(userDetailsList.get(position).getUsername());
             return view;
         }
