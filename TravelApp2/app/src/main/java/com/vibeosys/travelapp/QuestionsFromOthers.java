@@ -183,11 +183,9 @@ return view;
             LayoutInflater layoutInflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View aView = layoutInflater.inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
-            TextView theText2 = (TextView) aView.findViewById(R.id.textView);
-            TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
             LinearLayout firstQuestion = (LinearLayout) aView.findViewById(R.id.firstquestion);
             LinearLayout secondQuestion = (LinearLayout) aView.findViewById(R.id.secondquestion);
-            TextView showTextto = (TextView) aView.findViewById(R.id.texttodisplay);
+            TextView showTextto = (TextView) aView.findViewById(R.id.textView);
             SpannableString contentq = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition]);
             contentq.setSpan(new UnderlineSpan(), 0, contentq.length(), 0);
             String optionText=valueList.get(groupPosition).getmOptionText()[childPosition];
@@ -195,14 +193,14 @@ return view;
             // theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
             //showText.setText("Says");
             firstQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition]);
-            theText.setText(Html.fromHtml("<font color='#00ff00'> "+ count + "</font> Says <font color='#ff0000'>" + optionText + "</font>"));
+            theText.setText(Html.fromHtml("<font color='#27ACD4'> "+ count +"  Says  " +"</font>  <font color='#27ACD4'>" + optionText + "</font>"));
             //theText.setTextColor(Color.RED);
             if (getChildrenCount(groupPosition) > childPosition + 1) {
                 SpannableString content = new SpannableString(valueList.get(groupPosition).getmOptionText()[childPosition + 1]);
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                theText2.setText(content);
-                theCount2.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition] + 1));
-                showTextto.setText("Says");
+                String optionTextq=valueList.get(groupPosition).getmOptionText()[childPosition+1];
+                String countq = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition+1]);
+                showTextto.setText(Html.fromHtml("<font color='#27ACD4'> "+ countq +"  Says  "+ "</font> <font color='#27ACD4'>" + optionTextq + "</font>"));
                 secondQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition + 1]);
             }
 

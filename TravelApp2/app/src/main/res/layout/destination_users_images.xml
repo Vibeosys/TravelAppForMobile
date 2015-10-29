@@ -3,8 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
     >
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,10 +13,9 @@
         android:columnWidth="@dimen/image_thumbnail_size"
         android:horizontalSpacing="@dimen/image_thumbnail_spacing"
         android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
+        android:stretchMode="none"
         android:padding="6dp"
-        android:clipToPadding="false"
         android:verticalSpacing="@dimen/image_thumbnail_spacing">
-
     </GridView>
+
 </RelativeLayout>

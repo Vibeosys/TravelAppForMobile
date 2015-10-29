@@ -24,15 +24,20 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
+        android:textColorHint="#ffff"
         android:hint="Enter Your Comment"
-        android:layout_weight="2"
+        android:layout_weight="1"
+        android:layout_margin="12dp"
+        android:background="@android:color/darker_gray"
         android:id="@+id/commnetbyUser" />
 <Button
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="24dp"
     android:text="Submit"
-    android:layout_marginRight="12dp"
-    android:layout_marginLeft="12dp"
+    android:textColor="@android:color/background_light"
+    android:layout_margin="10dp"
+    android:background="@color/colorPrimary"
     android:id="@+id/submitButton"/>
 </LinearLayout>
+
 </LinearLayout>

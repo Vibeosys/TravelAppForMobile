@@ -14,7 +14,7 @@ import com.vibeosys.travelapp.fragments.ImageGridFragment;
  */
 
 public class DestinationDetailsPagerAdapter extends FragmentPagerAdapter implements PagerSlidingTabStrip.IconTabProvider {
-    private int tabIcons[] = {R.drawable.camera_black, R.drawable.comment_outline, R.drawable.star_outline,R.drawable.camera,R.drawable.comment,R.drawable.star};
+    private int tabIcons[] = {R.drawable.camera_black, R.drawable.comment_black, R.drawable.star_black,R.drawable.camera,R.drawable.comment,R.drawable.star};
 
     public DestinationDetailsPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);

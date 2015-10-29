@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by mahesh on 10/13/2015.
@@ -190,9 +191,9 @@ public class PreviewImage extends AppCompatActivity {
         {
             @Override
             protected Map<String, String> getParams() {
-
+                UUID  uuid = UUID.randomUUID();
                 Map<String, String> params = new HashMap<>();
-                params.put("imageId",s);
+                params.put("imageId",uuid.toString());
                 params.put("upload", encodedString);
                 params.put("imagename", filename);
                 params.put("destId", String.valueOf(string));
@@ -200,6 +201,7 @@ public class PreviewImage extends AppCompatActivity {
                 return params;
 
             }
+
 
         };
 
