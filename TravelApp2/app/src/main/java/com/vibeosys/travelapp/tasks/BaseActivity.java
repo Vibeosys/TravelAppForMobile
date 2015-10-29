@@ -29,7 +29,6 @@ import com.vibeosys.travelapp.QuestionSlidingView;
 import com.vibeosys.travelapp.QuestionsFromOthers;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.activities.DestinationComments;
-import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.data.*;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
@@ -332,14 +331,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
                 startActivity(theIntent);
             }
         });
-        Button moredetails=(Button)dialog.findViewById(R.id.moredetails);
-        moredetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
-                startActivity(theIntent);
-            }
-        });
+
         sendmsg_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

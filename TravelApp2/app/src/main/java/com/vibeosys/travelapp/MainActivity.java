@@ -6,6 +6,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -27,7 +28,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -321,16 +321,63 @@ public class MainActivity extends BaseActivity
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
             mMap.animateCamera(zoom);
             mMap.moveCamera(center);
-            /*
+
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    Intent theIntent = new Intent(MainActivity.this, LocationDetailsActivity.class);
-                    startActivity(theIntent);
+                    final Dialog dlg = new Dialog(MainActivity.this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+                    View view = getLayoutInflater().inflate(R.layout.activity_location_details, null);
+                    dlg.setContentView(view);
+                    dlg.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    //view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
+                    //view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
+                    //View phtotosView = view.findViewById(R.id.item_title);
+                    final int mDestId = mDestinationNames.get(marker.getTitle());
+                    TextView photoLabel = (TextView) view.findViewById(R.id.photo_label);
+                    TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
+                    TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
+                    int count = newDataBase.Images(mDestId,false).size();
+                    int count1 = newDataBase.MsgCount(mDestId);
+                    photoLabel.setText(String.valueOf(count1)+" Photos uploaded");
+                    commentsLabel.setText(String.valueOf(count)+" Peoples are talking about it.");
+                    rattingsLabel.setText("Rated 2034 times");
+                    view.findViewById(R.id.overlay).setOnClickListener(new View.OnClickListener(){
+
+                        @Override
+                        public void onClick(View aView) {
+                            dlg.dismiss();
+                        }
+                    });
+
+                    view.findViewById(R.id.send_photos).setOnClickListener(new View.OnClickListener(){
+
+                        @Override
+                        public void onClick(View v) {
+                            Intent theIntent = new Intent(MainActivity.this, GridViewPhotos.class);
+                            theIntent.putExtra("DestId", mDestId);
+                            startActivity(theIntent);
+                        }
+                                                                           }
+                    );
+
+                    /*
+                    phtotosView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
+                                }
+                    });
+                    view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));*/
+                    TextView title = (TextView) view.findViewById(R.id.dlg_title);
+                    title.setText(marker.getTitle());
+                    dlg.show();
                     return false;
                 }
+
             });
-            */
+
+            /*
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 View view = null;
                 @Override
@@ -374,6 +421,8 @@ public class MainActivity extends BaseActivity
                     showDestinationInfoDialog (mark.getTitle(), mDestId);
                 }
             });
+
+            */
 
         } catch (Exception e) {
             e.printStackTrace();

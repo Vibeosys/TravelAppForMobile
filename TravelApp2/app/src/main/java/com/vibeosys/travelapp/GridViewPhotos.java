@@ -22,7 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -77,12 +77,12 @@ SharedPreferences sharedPreferences;
         setTitle("Choose Photos");
         mGridViewPhotos = (GridView) findViewById(R.id.showgridphotos);
         DestId = getIntent().getExtras().getInt("DestId");
-        //String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+        String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
         cc = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null,
                 null,
                 null,
-                null);
+                orderBy);
 
         if (cc != null) {
 
@@ -115,16 +115,16 @@ SharedPreferences sharedPreferences;
 
             }
 
-            /*GalleryAdapter theAdapter = new GalleryAdapter(this, cc);
+            GalleryAdapter theAdapter = new GalleryAdapter(this, cc);
             mGridViewPhotos.setAdapter(theAdapter);
             mGridViewPhotos.setOnItemClickListener(theAdapter);
-            */
+
             sharedPreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
             mGridViewPhotos.invalidate();
 
         }
 
-        mGridViewPhotos.setAdapter(new ShowImages(this));
+        /*mGridViewPhotos.setAdapter(new ShowImages(this));
         mGridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -138,7 +138,7 @@ SharedPreferences sharedPreferences;
                 startActivity(theIntent);
 
             }
-        });
+        });*/
 
     }
 
@@ -355,7 +355,7 @@ SharedPreferences sharedPreferences;
         }
     }*/
 
-    /*
+
     private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener{
 
         public GalleryAdapter(Context context, Cursor aCur) {
@@ -412,8 +412,8 @@ SharedPreferences sharedPreferences;
         }
     }
 
-    */
 
+    /*
     private class ShowImages extends BaseAdapter {
 
         Context theContext;
@@ -459,7 +459,7 @@ SharedPreferences sharedPreferences;
         }
 
     }
-
+    */
     static class ViewHolder {
         LoaderImageView image;
     }

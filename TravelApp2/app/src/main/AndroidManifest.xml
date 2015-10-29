@@ -129,8 +129,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibeosys.travelapp.MainActivity" />
         </activity>
-        <activity android:name=".activities.LocationDetailsActivity" >
-        </activity>
     </application>
 
 </manifest>

@@ -30,6 +30,14 @@
         <item name="android:layout_margin">5dp</item>
     </style>
 
+    <style name="dlg_row">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
 
 </resources>
 
