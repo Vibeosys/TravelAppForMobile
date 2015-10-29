@@ -100,8 +100,10 @@ return view;
             mListDestination.clear();
             mListDestination = newDataBase.DestinationComments(DestId);
             showDestinationCommentsAdaptor.updateResults(mListDestination);
-            editTextCommentByUser.clearComposingText();
+            editTextCommentByUser.setText("");
+            editTextCommentByUser.clearAnimation();
             editTextCommentByUser.clearFocus();
+
             // Toast.makeText(getApplicationContext(), "Enterted comement" + editTextCommentByUser.getText().toString(), Toast.LENGTH_SHORT).show();
         } else {
             editTextCommentByUser.setError("Please Enter some Text");
