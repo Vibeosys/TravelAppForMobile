@@ -44,7 +44,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
-import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
@@ -355,30 +354,30 @@ public class MainActivity extends BaseActivity
                     sendPhotos.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startPhotosActivitty = new Intent(getApplicationContext(), DestinationUsersImages.class);
+                /*            Intent startPhotosActivitty = new Intent(getApplicationContext(), DestinationUsersImages.class);
                             startPhotosActivitty.putExtra("DestId", mDestId);
                             startPhotosActivitty.putExtra("DestName", marker.getTitle());
                             startActivity(startPhotosActivitty);
-                        }
+                */        }
                     });
                     sendReviews.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startReviewsActivitty = new Intent(getApplicationContext(), QuestionsFromOthers.class);
+                  /*          Intent startReviewsActivitty = new Intent(getApplicationContext(), QuestionsFromOthers.class);
                             startReviewsActivitty.putExtra("DestId", mDestId);
                             startReviewsActivitty.putExtra("DestName", marker.getTitle());
                             startActivity(startReviewsActivitty);
-                        }
+                  */      }
                     });
 
                     commentsrowLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startCommentActivitty=new Intent(getApplicationContext() ,DestinationComments.class);
+                    /*        Intent startCommentActivitty=new Intent(getApplicationContext() ,DestinationComments.class);
                             startCommentActivitty.putExtra("DestId",mDestId);
                             startCommentActivitty.putExtra("DestName", marker.getTitle());
                             startActivity(startCommentActivitty);
-                        }
+                    */    }
                     });
 
 

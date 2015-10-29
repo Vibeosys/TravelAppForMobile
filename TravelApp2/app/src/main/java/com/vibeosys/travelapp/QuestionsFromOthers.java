@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -22,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
-import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +34,7 @@ import java.util.List;
  * Created by mahesh on 10/7/2015.
  */
 
-public class QuestionsFromOthers extends BaseActivity {
+public class QuestionsFromOthers extends Fragment {
 
     ExpandableListView questionslistView;
     NewDataBase newDataBase = null;
@@ -44,16 +45,23 @@ public class QuestionsFromOthers extends BaseActivity {
     String destId;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String destName = getIntent().getExtras().getString("DestName");
-        this.setTitle("Traveller reviews for " + destName);
-        destId = String.valueOf(getIntent().getExtras().getInt("DestId"));
-        setContentView(R.layout.otherquestionlist_layout);
-        questionslistView = (ExpandableListView) findViewById(R.id.listView2);
-        newDataBase = new NewDataBase(this);
-        mListQuestions = newDataBase.mListQuestions(destId);
+        String destName = getActivity().getIntent().getExtras().getString("DestName");
+        getActivity().setTitle("Traveller reviews for " + destName);
+        destId = String.valueOf(getActivity().getIntent().getExtras().getInt("DestId"));
 
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        LayoutInflater layoutInflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view=layoutInflater.inflate(R.layout.otherquestionlist_layout,null);
+        questionslistView = (ExpandableListView) view.findViewById(R.id.listView2);
+        newDataBase = new NewDataBase(getActivity());
+        mListQuestions = newDataBase.mListQuestions(destId);
         if (mListQuestions != null && mListQuestions.size() > 0) {
             Log.d("Questions", "" + mListQuestions.size());
             Options options = null;
@@ -78,7 +86,7 @@ public class QuestionsFromOthers extends BaseActivity {
             }
 
         }
-        questionslistView.setAdapter(new OthersQuestionsAdaptor(this, mListQuestionsAnswers));
+        questionslistView.setAdapter(new OthersQuestionsAdaptor(getActivity(), mListQuestionsAnswers));
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
@@ -87,6 +95,7 @@ public class QuestionsFromOthers extends BaseActivity {
                 return false;
             }
         });
+return view;
     }
 
     class OthersQuestionsAdaptor implements ExpandableListAdapter, View.OnClickListener {
@@ -172,7 +181,8 @@ public class QuestionsFromOthers extends BaseActivity {
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             childPosition = childPosition * 2;
-            View aView = getLayoutInflater().inflate(R.layout.answer, null);
+            LayoutInflater layoutInflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View aView = layoutInflater.inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
             TextView theText2 = (TextView) aView.findViewById(R.id.textView);
             TextView theCount2 = (TextView) aView.findViewById(R.id.countview);
@@ -202,7 +212,7 @@ public class QuestionsFromOthers extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     showUsersList(v.getId());
-                    Toast.makeText(getApplicationContext(), "Clicked on first" + v.getId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Clicked on first" + v.getId(), Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -210,7 +220,7 @@ public class QuestionsFromOthers extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     showUsersList(v.getId());
-                    Toast.makeText(getApplicationContext(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -256,7 +266,7 @@ public class QuestionsFromOthers extends BaseActivity {
                 case R.id.firstquestion:
                     break;
                 case R.id.secondquestion:
-                    Toast.makeText(getApplicationContext(), "Clicked on" + v.getId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Clicked on" + v.getId(), Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -269,7 +279,7 @@ public class QuestionsFromOthers extends BaseActivity {
 
     private void userListDialog(int questionId) {
         Log.d("DestId QS", "" + destId);
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.userlistview);
         dialog.setTitle("Users List");
         Window window = dialog.getWindow();
@@ -290,7 +300,7 @@ public class QuestionsFromOthers extends BaseActivity {
 
         public UserListAdaptor(QuestionsFromOthers questionsFromOthers, List<UserDetails> listUsersDetails) {
             userDetailsList = listUsersDetails;
-            mContext = questionsFromOthers;
+            mContext = getActivity();
         }
 
 

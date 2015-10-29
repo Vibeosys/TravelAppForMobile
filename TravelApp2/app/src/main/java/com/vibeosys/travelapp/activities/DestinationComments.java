@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,11 +21,12 @@ import com.vibeosys.travelapp.Adaptors.ShowDestinationCommentsAdaptor;
 import com.vibeosys.travelapp.CommentsAndLikes;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.Comment;
+import com.vibeosys.travelapp.data.Sync;
 import com.vibeosys.travelapp.data.TableDataDTO;
 import com.vibeosys.travelapp.data.Upload;
 import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
-import com.vibeosys.travelapp.tasks.BaseActivity;
+import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.util.NetworkUtils;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ import java.util.List;
 /**
  * Created by mahesh on 10/15/2015.
  */
-public class DestinationComments extends BaseActivity implements View.OnClickListener {
+public class DestinationComments extends BaseFragment implements View.OnClickListener {
     ListView mDestinationCommentListView;
     public static final String MyPREFERENCES = "MyPrefs";
     List<CommentsAndLikes> mListDestination = null;
@@ -45,34 +47,41 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
     int DestId;
     String UserId;
     String UserName;
-
+List<Sync> syncDataToUpload=null;
     ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.destination_comment_listview);
-        mDestinationCommentListView = (ListView) findViewById(R.id.commenntlistview);
-        submitBtn = (Button) findViewById(R.id.submitButton);
+
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.destination_comment_listview, null);
+        mDestinationCommentListView = (ListView) view.findViewById(R.id.commenntlistview);
+        submitBtn = (Button) view.findViewById(R.id.submitButton);
         submitBtn.setOnClickListener(this);
         mListDestination = new ArrayList<>();
-        String destName = getIntent().getExtras().getString("DestName");
-        setTitle("Comments about " + destName + " by travellers");
-        DestId = getIntent().getExtras().getInt("DestId");
+        String destName = getActivity().getIntent().getExtras().getString("DestName");
+        DestId = getActivity().getIntent().getExtras().getInt("DestId");
         Log.d("DestId Comments", "" + DestId);
-        editTextCommentByUser = (EditText) findViewById(R.id.commnetbyUser);
-        newDataBase = new NewDataBase(this);
+        editTextCommentByUser = (EditText) view.findViewById(R.id.commnetbyUser);
+        newDataBase = new NewDataBase(getActivity());
         mListDestination = new ArrayList<>();
         listComment = new ArrayList<>();
         mListDestination = newDataBase.DestinationComments(DestId);
 
         Log.d("DestinationComment", String.valueOf(mListDestination.size()));
-        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedPref = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         UserId = sharedPref.getString("UserId", null);
         UserName = sharedPref.getString("UserName", null);
-        showDestinationCommentsAdaptor=new ShowDestinationCommentsAdaptor(getApplicationContext(), mListDestination, DestId);
+        showDestinationCommentsAdaptor = new ShowDestinationCommentsAdaptor(getActivity(), mListDestination, DestId);
         mDestinationCommentListView.setAdapter(showDestinationCommentsAdaptor);
-
-
+return view;
     }
 
     @Override
@@ -92,7 +101,7 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
             mListDestination = newDataBase.DestinationComments(DestId);
             showDestinationCommentsAdaptor.updateResults(mListDestination);
             editTextCommentByUser.clearComposingText();
-           editTextCommentByUser.clearFocus();
+            editTextCommentByUser.clearFocus();
             // Toast.makeText(getApplicationContext(), "Enterted comement" + editTextCommentByUser.getText().toString(), Toast.LENGTH_SHORT).show();
         } else {
             editTextCommentByUser.setError("Please Enter some Text");
@@ -101,7 +110,7 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
     }
 
     public void LoginDialog() {
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(getActivity());
         // Include dialog.xml file
         EditText userNameEditText;
         EditText emailidEditText;
@@ -137,23 +146,23 @@ public class DestinationComments extends BaseActivity implements View.OnClickLis
 
         Log.d("Uploading", uploadData.toString());
 
-        if (NetworkUtils.isActiveNetworkAvailable(this)) {
-            super.UploadUserDetails();
-            String url = getResources().getString(R.string.URL);
-            super.uploadToServer(url + "upload", uploadData, DestinationComments.this);//id 1=>download 2=>upload
-            Log.d("Download Calling..", "DownloadUrl:-" + url);
+        if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
+
+                    super.UploadUserDetails();
+            newDataBase.getFromSync();
+                   String url = getResources().getString(R.string.URL);
+                    super.uploadToServer(url + "upload", uploadData, getActivity());
 
         } else {
-            newDataBase.addDataToSync("Comment_and_like", userId, SerializedJsonString);
+            newDataBase.addDataToSync("Comment_and_like", userId, uploadData);
             LayoutInflater
-                    layoutInflater = getLayoutInflater();
+                    layoutInflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);
-            Toast toast = new Toast(this);
+            Toast toast = new Toast(getActivity());
             toast.setDuration(Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.setView(view);//setting the view of custom toast layout
             toast.show();
-
         }
 
     }

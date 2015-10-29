@@ -24,6 +24,7 @@ import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.Option;
+import com.vibeosys.travelapp.data.Sync;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.usersImages;
 
@@ -210,6 +211,31 @@ return listSyncData;
 
 }*/
 
+public List<Sync> getFromSync(){
+    SQLiteDatabase sqLiteDatabase=null;
+    Cursor cursor=null;
+    List<Sync> syncTableData=null;
+    try {
+         sqLiteDatabase=getReadableDatabase();
+        cursor=sqLiteDatabase.rawQuery("select * from Sync ", null);
+        syncTableData=new ArrayList<>();
+        if(cursor!=null){
+            if(cursor.getCount()>0){
+                do{
+                    Sync sync=new Sync();
+                    sync.setJsonSync(cursor.getString(cursor.getColumnIndex("JsonSync")));
+                    syncTableData.add(sync);
+                }while (cursor.moveToNext());
+
+            }
+        }
+
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+return syncTableData;
+}
+
     public boolean addDataToSync(String tableName, String UserId, String JsonSync) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
@@ -344,6 +370,9 @@ return listSyncData;
 
         return false;
     }
+
+
+
 
     public boolean insertUsers(List<User> UsersList) {
         List<User> musersList = null;
