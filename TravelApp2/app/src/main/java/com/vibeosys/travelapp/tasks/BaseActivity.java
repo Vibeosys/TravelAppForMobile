@@ -31,6 +31,7 @@ import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.data.*;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     List<Option> optionsList = null;
     SharedPreferences sharedPref;
     public static final String MyPREFERENCES = "MyPrefs";
-
+    protected SessionManager mSessionManager = null;
 
     public void UploadUserDetails() {
         Gson gson = new Gson();
@@ -288,7 +289,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         dialog.setTitle(title);
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        newDataBase=new NewDataBase(getApplicationContext());
+        newDataBase = new NewDataBase(getApplicationContext());
         int imageCount = this.newDataBase.Images(cDestId, false).size();
         int msgCount = this.newDataBase.MsgCount(cDestId);
         dialog.show();

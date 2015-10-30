@@ -52,6 +52,7 @@ import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,7 +84,7 @@ public class MainActivity extends BaseActivity
     public void onFailure(String aData, int id) {
         super.onFailure(aData, id);
         try {
-         //   Log.d("Failed to Load", "Data" + aData.toString());
+            //   Log.d("Failed to Load", "Data" + aData.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,7 +146,12 @@ public class MainActivity extends BaseActivity
         editor = sharedPref.edit();
         Gson gson = new Gson();
         newDataBase = new NewDataBase(getApplicationContext());
-       //  newDataBase.insertComment(commentList);
+        //  newDataBase.insertComment(commentList);
+
+        //Sample of USAGE of session manager
+        mSessionManager = SessionManager.getInstance(getBaseContext());
+        String downloadUrl = mSessionManager.getDownloadDbUrl("anand");
+        String uploadUrl = mSessionManager.getDownloadDbUrl("anand");
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
@@ -348,7 +354,7 @@ public class MainActivity extends BaseActivity
                     //View phtotosView = view.findViewById(R.id.item_title);
                     final int mDestId = mDestinationNames.get(marker.getTitle());
                     TextView photoLabel = (TextView) view.findViewById(R.id.photo_label);
-                    TextView detailsLable=(TextView) view.findViewById(R.id.details_label);
+                    TextView detailsLable = (TextView) view.findViewById(R.id.details_label);
                     detailsLable.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -359,9 +365,9 @@ public class MainActivity extends BaseActivity
                         }
                     });
 
-                    LinearLayout commentsrowLayout=(LinearLayout)view.findViewById(R.id.comments_row);
-                    LinearLayout sendPhotos=(LinearLayout)view.findViewById(R.id.photos_row);
-                    LinearLayout sendReviews=(LinearLayout)view.findViewById(R.id.rating);
+                    LinearLayout commentsrowLayout = (LinearLayout) view.findViewById(R.id.comments_row);
+                    LinearLayout sendPhotos = (LinearLayout) view.findViewById(R.id.photos_row);
+                    LinearLayout sendReviews = (LinearLayout) view.findViewById(R.id.rating);
                     sendPhotos.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -371,7 +377,7 @@ public class MainActivity extends BaseActivity
                             startActivity(startPhotosActivitty);
                         }
                     });
-                    ImageView sendMessages=(ImageView)view.findViewById(R.id.sendDestinatiomMessages);
+                    ImageView sendMessages = (ImageView) view.findViewById(R.id.sendDestinatiomMessages);
                     sendMessages.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -384,18 +390,18 @@ public class MainActivity extends BaseActivity
                     sendReviews.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           Intent startReviewsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                            Intent startReviewsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
                             startReviewsActivitty.putExtra("DestId", mDestId);
                             startReviewsActivitty.putExtra("DestName", marker.getTitle());
                             startActivity(startReviewsActivitty);
-                       }
+                        }
                     });
 
                     commentsrowLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startCommentActivitty=new Intent(getApplicationContext() ,ShowDestinationDetailsMain.class);
-                            startCommentActivitty.putExtra("DestId",mDestId);
+                            Intent startCommentActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                            startCommentActivitty.putExtra("DestId", mDestId);
                             startCommentActivitty.putExtra("DestName", marker.getTitle());
                             startActivity(startCommentActivitty);
                         }
@@ -404,13 +410,13 @@ public class MainActivity extends BaseActivity
 
                     TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                     TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
-                    int count = newDataBase.Images(mDestId,false).size();
+                    int count = newDataBase.Images(mDestId, false).size();
                     int count1 = newDataBase.MsgCount(mDestId);
-                    photoLabel.setText(String.valueOf(count1)+" Photos uploaded");
-                    commentsLabel.setText(String.valueOf(count)+" Peoples are talking about it.");
+                    photoLabel.setText(String.valueOf(count1) + " Photos uploaded");
+                    commentsLabel.setText(String.valueOf(count) + " Peoples are talking about it.");
                     rattingsLabel.setText("Rated 2034 times");
 
-                    view.findViewById(R.id.overlay).setOnClickListener(new View.OnClickListener(){
+                    view.findViewById(R.id.overlay).setOnClickListener(new View.OnClickListener() {
 
                         @Override
                         public void onClick(View aView) {
@@ -418,14 +424,14 @@ public class MainActivity extends BaseActivity
                         }
                     });
 
-                    view.findViewById(R.id.send_photos).setOnClickListener(new View.OnClickListener(){
+                    view.findViewById(R.id.send_photos).setOnClickListener(new View.OnClickListener() {
 
-                        @Override
-                        public void onClick(View v) {
-                            Intent theIntent = new Intent(MainActivity.this, GridViewPhotos.class);
-                            theIntent.putExtra("DestId", mDestId);
-                            startActivity(theIntent);
-                        }
+                                                                               @Override
+                                                                               public void onClick(View v) {
+                                                                                   Intent theIntent = new Intent(MainActivity.this, GridViewPhotos.class);
+                                                                                   theIntent.putExtra("DestId", mDestId);
+                                                                                   startActivity(theIntent);
+                                                                               }
                                                                            }
                     );
 
@@ -510,10 +516,10 @@ public class MainActivity extends BaseActivity
                 uuid = UUID.randomUUID();
                 String data = "userid"
                         + "=" + String.valueOf(uuid);
-                Log.d("UUId",data);
+                Log.d("UUId", data);
                 String callurl = getResources().getString(R.string.URL);
-                Log.d("called Url", callurl +"downloadDb"+ "?" + data);
-                url = new URL(callurl +"downloadDb"+ "?" + data);
+                Log.d("called Url", callurl + "downloadDb" + "?" + data);
+                url = new URL(callurl + "downloadDb" + "?" + data);
                 editor.putString("UserId", String.valueOf(uuid));
 
                 editor.putString("UserName", "abc");
@@ -593,8 +599,6 @@ public class MainActivity extends BaseActivity
             }
 */
     }
-
-
 
 
     @Override
