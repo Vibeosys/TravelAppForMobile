@@ -1,8 +1,6 @@
 package com.vibeosys.travelapp.activities;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -10,7 +8,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -37,19 +34,18 @@ import java.util.List;
  */
 public class DestinationComments extends BaseFragment implements View.OnClickListener {
     ListView mDestinationCommentListView;
-    public static final String MyPREFERENCES = "MyPrefs";
     List<CommentsAndLikes> mListDestination = null;
     NewDataBase newDataBase = null;
     EditText editTextCommentByUser;
     Button submitBtn;
-    SharedPreferences sharedPref;
     List<Comment> listComment;
     int DestId;
     String UserId;
     String UserName;
-    List<Sync> syncDataToUpload=null;
+    List<Sync> syncDataToUpload = null;
     ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
 
+    //protected SessionManager sessionManager=SessionManager.Instance();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,12 +72,11 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
         mListDestination = newDataBase.DestinationComments(DestId);
 
         Log.d("DestinationComment", String.valueOf(mListDestination.size()));
-        sharedPref = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        UserId = sharedPref.getString("UserId", null);
-        UserName = sharedPref.getString("UserName", null);
+        UserId = mSessionManager.getUserId();
+        UserName = mSessionManager.getUserName();
         showDestinationCommentsAdaptor = new ShowDestinationCommentsAdaptor(getActivity(), mListDestination, DestId);
         mDestinationCommentListView.setAdapter(showDestinationCommentsAdaptor);
-return view;
+        return view;
     }
 
     @Override
@@ -124,7 +119,7 @@ return view;
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
 
         tableDataList.add(new TableDataDTO("comment", SerializedJsonString));
-        String EmailId = sharedPref.getString("EmailId", null);
+        String EmailId = mSessionManager.getUserEmailId();
         Log.d("EmailId", "" + EmailId);
         String uploadData = gson.toJson(new Upload(new UploadUser(userId, EmailId), tableDataList));
 
@@ -132,15 +127,14 @@ return view;
 
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
 
-                    super.UploadUserDetails();
+            super.UploadUserDetails();
             newDataBase.getFromSync();
-                   String url = getResources().getString(R.string.URL);
-                    super.uploadToServer(url + "upload", uploadData, getActivity());
+            super.uploadToServer(uploadData, getActivity());
 
         } else {
             newDataBase.addDataToSync("Comment_and_like", userId, uploadData);
             LayoutInflater
-                    layoutInflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);
             Toast toast = new Toast(getActivity());
             toast.setDuration(Toast.LENGTH_SHORT);

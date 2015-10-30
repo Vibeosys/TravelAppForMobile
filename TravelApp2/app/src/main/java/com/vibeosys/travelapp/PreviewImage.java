@@ -1,8 +1,6 @@
 package com.vibeosys.travelapp;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -26,6 +24,7 @@ import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,12 +39,11 @@ import java.util.UUID;
 
 public class PreviewImage extends AppCompatActivity {
 
-    private SharedPreferences sharedPref;
     private NewDataBase newDataBase = null;
     private String imageData = null;
     public static final String MyPREFERENCES = "MyPrefs";
     private ProgressDialog progress;
-
+    SessionManager mSessionManager;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +52,16 @@ public class PreviewImage extends AppCompatActivity {
         // Selected image id
         newDataBase = new NewDataBase(getApplicationContext());
         final String path = getIntent().getExtras().getString("Data");
-        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         Log.d("PreviewImage ImagePath", path);
+
         //Toast.makeText(getApplicationContext(), "" + path, Toast.LENGTH_SHORT).show();
+        Button cancelButton=(Button) findViewById(R.id.cancelBtn);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         Button uploadImageButton = (Button) findViewById(R.id.uploadImageBtu);
         uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,13 +77,12 @@ public class PreviewImage extends AppCompatActivity {
                 imageUploadDTO.setImageData(imageData);
                 String path = getIntent().getExtras().getString("Data");
                 Log.d("Path File ", path);
-                String UserId = sharedPref.getString("UserId", null);
+                String UserId = mSessionManager.Instance().getUserId();
                 int DestId = getIntent().getExtras().getInt("DestId");
                 imageUploadDTO.setImageName(path);
                 String SerializedJsonString = gson.toJson(imageUploadDTO);
                 if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
-                    String url = getResources().getString(R.string.URL);
-                    Log.d("UserId", UserId);
+
                     String filename = path.substring(path.lastIndexOf("/") + 1);
 
                     Bitmap myImg = BitmapFactory.decodeFile(path);
@@ -141,8 +145,6 @@ public class PreviewImage extends AppCompatActivity {
 
     public void uploadImage(final String encodedString, final String filename, final int string, final String s) {
         RequestQueue rq = Volley.newRequestQueue(this);
-        final String url = getResources().getString(R.string.URL);
-        Log.d("URL", url);
         Log.d("PreviewImage Destid", "" + string);
         Log.d("PreviewImage UserId", "" + s);
 
@@ -150,7 +152,7 @@ public class PreviewImage extends AppCompatActivity {
 
         Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url + "imagesupload", new Response.Listener<String>() {
+               mSessionManager.Instance().getUploadImagesUrl(), new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -178,7 +180,7 @@ public class PreviewImage extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("ERROR", "Error [" + error + "]");
-                Log.e("URL Called", url);
+
 
                 progress.dismiss();
                 Toast.makeText(getBaseContext(),

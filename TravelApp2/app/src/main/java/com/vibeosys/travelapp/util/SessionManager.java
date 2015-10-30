@@ -19,9 +19,11 @@ public class SessionManager {
 
     /**
      * Method is supposed to called once at beginning of the APP.
-     * @param context  Context of any base or current activity, Needs to be called at only once.
+     *
+     * @param context Context of any base or current activity, Needs to be called at only once.
      * @return
      */
+
     public static SessionManager getInstance(Context context) {
         if (mSessionManager != null)
             return mSessionManager;
@@ -36,8 +38,10 @@ public class SessionManager {
 
     /**
      * Gets singleton instance of session manager class
+     *
      * @return Singleton Instance of Session Manager
      */
+
     public static SessionManager Instance() {
         if (mSessionManager != null)
             return mSessionManager;
@@ -49,13 +53,16 @@ public class SessionManager {
      * Loads all the App.Properties file values into shared preferences.
      * In case of version upgrade, replaces all the values in the shared preferences.
      */
+
     private static void loadProjectSharedPreferences() {
         if (mProjectSharedPref == null) {
             mProjectSharedPref = mContext.getSharedPreferences(PROJECT_PREFERENCES, Context.MODE_PRIVATE);
         }
 
-        float version = Float.valueOf(mProjectSharedPref.getString(PropertyTypeConstants.VERSION_NUMBER, null));
-        if (mPropertyFileReader.getVersion() > version) {
+        String versionNumber = mProjectSharedPref.getString(PropertyTypeConstants.VERSION_NUMBER, null);
+        Float versionNoValue =  versionNumber == null ? 0 : Float.valueOf(versionNumber);
+
+        if (mPropertyFileReader.getVersion() > versionNoValue) {
             boolean sharedPrefChange = addOrUdateSharedPreferences();
             if (!sharedPrefChange)
                 Log.e("SharedPref", "No shared preferences are changed");
@@ -64,15 +71,18 @@ public class SessionManager {
 
     /**
      * Adds or updates entries into shared preferences.
+     *
      * @return true or false based upon the update in shared preferences.
      */
     private static boolean addOrUdateSharedPreferences() {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();
         editor.putString(PropertyTypeConstants.API_DOWNLOAD_DB_URI, mPropertyFileReader.getDownloadDbUrl());
         editor.putString(PropertyTypeConstants.API_DOWNLOAD_URI, mPropertyFileReader.getDownloadUrl());
-        editor.putString(PropertyTypeConstants.API_UPLOAD_URI, mPropertyFileReader.getUploadUrl());
+        editor.putString(PropertyTypeConstants.API_UPLOAD_URL, mPropertyFileReader.getUploadUrl());
         editor.putString(PropertyTypeConstants.DATABASE_NAME, mPropertyFileReader.getDatabaseName());
         editor.putString(PropertyTypeConstants.VERSION_NUMBER, String.valueOf(mPropertyFileReader.getVersion()));
+        editor.putString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, mPropertyFileReader.getImageUploadUrl());
+        editor.putString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, mPropertyFileReader.getUploadUserDetails());
         editor.commit();
         return true;
     }
@@ -97,8 +107,16 @@ public class SessionManager {
         return downloadUrl + userId;
     }
 
+    public String getUploadImagesUrl() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, null);
+    }
+
+    public String getUpdateUserDetails() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, null);
+    }
+
     public String getUploadUrl() {
-        return mProjectSharedPref.getString(PropertyTypeConstants.API_UPLOAD_URI, null);
+        return mProjectSharedPref.getString(PropertyTypeConstants.API_UPLOAD_URL, null);
     }
 
     public String getDatabaseName() {
@@ -129,8 +147,8 @@ public class SessionManager {
         setValuesInSharedPrefs(PropertyTypeConstants.USER_EMAIL_ID, userEmailId);
     }
 
-    private static void setValuesInSharedPrefs(String sharedPrefKey, String sharedPrefValue)
-    {
+
+    private static void setValuesInSharedPrefs(String sharedPrefKey, String sharedPrefValue) {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();
         editor.putString(sharedPrefKey, sharedPrefValue);
         editor.commit();

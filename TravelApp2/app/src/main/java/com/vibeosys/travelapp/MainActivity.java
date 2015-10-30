@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -47,7 +46,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.gson.Gson;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
@@ -58,7 +56,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -114,10 +111,7 @@ public class MainActivity extends BaseActivity
     NewDataBase newDataBase;
     List<GetTemp> mTempDataShowList;
     List<MyDestination> mDestinationList;
-    SharedPreferences sharedPref;
-    public static final String MyPREFERENCES = "MyPrefs";
     LayoutInflater layoutInflater;
-    SharedPreferences.Editor editor;
 
     //Facebook User Profile Image
     ImageView userProfileImage;
@@ -142,32 +136,26 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        editor = sharedPref.edit();
-        Gson gson = new Gson();
+        mSessionManager = SessionManager.getInstance(getBaseContext());
+        setTitle(null);
+
         newDataBase = new NewDataBase(getApplicationContext());
         //  newDataBase.insertComment(commentList);
 
         //Sample of USAGE of session manager
-        mSessionManager = SessionManager.getInstance(getBaseContext());
-        String downloadUrl = mSessionManager.getDownloadDbUrl("anand");
-        String uploadUrl = mSessionManager.getDownloadDbUrl("anand");
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
             File directory = ctw.getDir(DB_PATH, Context.MODE_PRIVATE);
             File internalfile = new File(directory, DB_NAME);
             if (!internalfile.exists()) {
-                copyDatabase(internalfile);
+                downloadDatabase(internalfile);
             }
 
-            String url = getResources().getString(R.string.URL);
-            String UserId = sharedPref.getString("UserId", null);
-            Log.d("UserId", UserId);
-            super.fetchData(url + "download?userid=" + UserId, true, 1);//id 1=>download 2=>upload
-            Log.d("Download Calling..", "DownloadUrl:-" + url + "download");
+            String UserId = mSessionManager.getUserId();
+            //Log.d("UserId", UserId);
+            super.fetchData(UserId, true, 1);//id 1=>download 2=>upload
             newDataBase.updateUserInfo(String.valueOf(UserId));
-            newDataBase.updateUser("abc", "abc@abc.com", String.valueOf(UserId));
         } else {
 
             layoutInflater = getLayoutInflater();
@@ -182,8 +170,11 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
 
         //Facebook Data Integration with UI
-        FacebookData();
-
+        try {
+            FacebookData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
@@ -374,6 +365,7 @@ public class MainActivity extends BaseActivity
                             Intent startPhotosActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
                             startPhotosActivitty.putExtra("DestId", mDestId);
                             startPhotosActivitty.putExtra("DestName", marker.getTitle());
+                            startPhotosActivitty.putExtra("Id", 0);
                             startActivity(startPhotosActivitty);
                         }
                     });
@@ -383,6 +375,7 @@ public class MainActivity extends BaseActivity
                         public void onClick(View v) {
                             Intent startSendMessagesActivitty = new Intent(getApplicationContext(), QuestionSlidingView.class);
                             startSendMessagesActivitty.putExtra("DestId", mDestId);
+                            startSendMessagesActivitty.putExtra("DestName", marker.getTitle());
                             startActivity(startSendMessagesActivitty);
 
                         }
@@ -393,6 +386,7 @@ public class MainActivity extends BaseActivity
                             Intent startReviewsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
                             startReviewsActivitty.putExtra("DestId", mDestId);
                             startReviewsActivitty.putExtra("DestName", marker.getTitle());
+                            startReviewsActivitty.putExtra("Id", 3);
                             startActivity(startReviewsActivitty);
                         }
                     });
@@ -403,6 +397,7 @@ public class MainActivity extends BaseActivity
                             Intent startCommentActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
                             startCommentActivitty.putExtra("DestId", mDestId);
                             startCommentActivitty.putExtra("DestName", marker.getTitle());
+                            startCommentActivitty.putExtra("Id", 1);
                             startActivity(startCommentActivitty);
                         }
                     });
@@ -410,11 +405,17 @@ public class MainActivity extends BaseActivity
 
                     TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                     TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
-                    int count = newDataBase.Images(mDestId, false).size();
-                    int count1 = newDataBase.MsgCount(mDestId);
-                    photoLabel.setText(String.valueOf(count1) + " Photos uploaded");
-                    commentsLabel.setText(String.valueOf(count) + " Peoples are talking about it.");
-                    rattingsLabel.setText("Rated 2034 times");
+                    int imagesCount = newDataBase.Images(mDestId, false).size();
+                    List<SendQuestionAnswers> listofQuestion = newDataBase.mListQuestions(String.valueOf(mDestId));
+                    int msgCount = 0;
+                    int destCommentcount = 0;
+                    List<CommentsAndLikes> destinationComment = newDataBase.DestinationComments(mDestId);
+                    if (destinationComment != null) destCommentcount = destinationComment.size();
+                    if (listofQuestion != null) msgCount = listofQuestion.size();
+
+                    photoLabel.setText(String.valueOf(imagesCount) + " Photos uploaded");
+                    commentsLabel.setText(destCommentcount + " People have commented about the place.");
+                    rattingsLabel.setText(String.valueOf(msgCount) + " Reviews for this place");
 
                     view.findViewById(R.id.overlay).setOnClickListener(new View.OnClickListener() {
 
@@ -451,137 +452,61 @@ public class MainActivity extends BaseActivity
 
             });
 
-            /*
-            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-                View view = null;
-                @Override
-                public View getInfoWindow(Marker mark) {
-                    //if (view == null) {
-                        view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
-                        view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
-                        View phtotosView = view.findViewById(R.id.item_title);
-                        int mDestId = mDestinationNames.get(mark.getTitle());
-                        TextView countimages = (TextView) view.findViewById(R.id.item_counter);
-                        TextView countmsgs = (TextView) view.findViewById(R.id.countmsgs);
-                        int count = newDataBase.Images(mDestId,false).size();
-                        int count1 = newDataBase.MsgCount(mDestId);
-                        countimages.setText(String.valueOf(count1));
-                        countmsgs.setText(String.valueOf(count));
-                        phtotosView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                            view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
-                        TextView title = (TextView) view.findViewById(R.id.textView3);
-                        title.setText(mark.getTitle());
-
-                    //}
-                    return view;
-                }
-
-                @Override
-                public View getInfoContents(Marker marker) {
-                    return null;
-                }
-            });
-
-            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-
-                public void onInfoWindowClick(Marker mark) {
-                    int mDestId = mDestinationNames.get(mark.getTitle());
-                    Log.d("MainActivityMarker", "" + mDestId);
-                    showDestinationInfoDialog (mark.getTitle(), mDestId);
-                }
-            });
-
-            */
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void copyDatabase(File internalfile) {
+    private void downloadDatabase(File internalfile) {
         NetworkUtils n = new NetworkUtils();
         java.net.URL url = null;
         HttpURLConnection urlConnection = null;
         OutputStream myOutput = null;
         byte[] buffer = null;
         InputStream inputStream = null;
-        BufferedReader bufferedReader;
+
+        if (!n.isActiveNetworkAvailable(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), "Could not connect to Internet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        uuid = UUID.randomUUID();
+        mSessionManager.setUserId(uuid.toString());
+        String downloadDBURL = mSessionManager.getDownloadDbUrl(mSessionManager.getUserId());
+
         try {
-            if (n.isActiveNetworkAvailable(getApplicationContext())) {
-                uuid = UUID.randomUUID();
-                String data = "userid"
-                        + "=" + String.valueOf(uuid);
-                Log.d("UUId", data);
-                String callurl = getResources().getString(R.string.URL);
-                Log.d("called Url", callurl + "downloadDb" + "?" + data);
-                url = new URL(callurl + "downloadDb" + "?" + data);
-                editor.putString("UserId", String.valueOf(uuid));
-
-                editor.putString("UserName", "abc");
-                editor.putString("EmailId", "abc@abc.com");
-
-                editor.commit();
-                urlConnection = (HttpURLConnection) url.openConnection();
-                Log.d("STATUS", "Request Sended...");
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-                urlConnection.setDoOutput(true);
-                urlConnection.setUseCaches(false);
-                urlConnection.setConnectTimeout(20000);
-                urlConnection.setReadTimeout(10000);
-                urlConnection.connect();
+            url = new URL(downloadDBURL);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            Log.d("STATUS", "Request Sended...");
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            urlConnection.setDoOutput(true);
+            urlConnection.setUseCaches(false);
+            urlConnection.setConnectTimeout(20000);
+            urlConnection.setReadTimeout(10000);
+            urlConnection.connect();
 
                /* OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
                 wr.write(data);
                 wr.flush();
                */
-                int Http_Result = urlConnection.getResponseCode();
-                String res = urlConnection.getResponseMessage().toString();
-                Log.d("ResponseMessage", res);
-                Log.d("RESPONSE CODE", String.valueOf(Http_Result));
-                switch (Http_Result) {
-                    case HttpURLConnection.HTTP_OK:
-                        inputStream = urlConnection.getInputStream();
-                        buffer = new byte[1024];
-                        myOutput = new FileOutputStream(internalfile);
-                        int length;
-                        while ((length = inputStream.read(buffer)) > 0) {
-                            myOutput.write(buffer, 0, length);
-                        }
-                        myOutput.flush();
-                        myOutput.close();
-                        inputStream.close();
-                        break;
-                    case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-                        Log.d("STATUS ", "Time Out Occours During Connecting to server..");
-                        break;
-                    case HttpURLConnection.HTTP_BAD_GATEWAY:
-                        Log.d("STATUS ", "BAD GATEWAY REQUEST ...");
-                        break;
-                    case HttpURLConnection.HTTP_INTERNAL_ERROR:
-                        Log.d("STATUS ", "HTTP INTERNAL ERROR");
-                        break;
-                    case HttpURLConnection.HTTP_UNAUTHORIZED:
-                        Log.d("STATUS ", "HTTP UNAUTHORIZED.");
-                        break;
-                    case HttpURLConnection.HTTP_NOT_FOUND:
-                        Log.d("STATUS", "HTTP NOT FOUND..");
-                        break;
-                    case HttpURLConnection.HTTP_BAD_METHOD:
-                        Log.d("STATUS", "HTTP_BAD_METHOD");
-                        break;
-
+            int Http_Result = urlConnection.getResponseCode();
+            String res = urlConnection.getResponseMessage().toString();
+            Log.d("ResponseMessage", res);
+            Log.e("RESPONSE CODE", String.valueOf(Http_Result));
+            if (Http_Result == HttpURLConnection.HTTP_OK) {
+                inputStream = urlConnection.getInputStream();
+                buffer = new byte[1024];
+                myOutput = new FileOutputStream(internalfile);
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    myOutput.write(buffer, 0, length);
                 }
-                //  content=stringBuilder.toString();
-
-            } else {
-                Toast.makeText(getApplicationContext(), "Please Connect to Internet", Toast.LENGTH_SHORT).show();
+                myOutput.flush();
+                myOutput.close();
+                inputStream.close();
             }
+
         } catch (ConnectException e) {
             e.printStackTrace();
         } catch (MalformedURLException e1) {
@@ -677,7 +602,11 @@ public class MainActivity extends BaseActivity
             Intent intent2 = new Intent(getApplicationContext(), ShowMyPhotos.class);
             startActivity(intent2);
 
+        } else if (id == R.id.userprofile) {
+            Intent userprofile = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(userprofile);
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

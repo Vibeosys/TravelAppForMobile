@@ -3,7 +3,6 @@ package com.vibeosys.travelapp;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -36,6 +35,7 @@ import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.view.LoaderImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -68,13 +68,15 @@ public class GridViewPhotos extends AppCompatActivity {
     private Uri imageUri;
     private NewDataBase newDataBase;
     int DestId;
-SharedPreferences sharedPreferences;
-    public static final String MyPREFERENCES = "MyPrefs";
+    SessionManager mSessionManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gridviewphotos);
         setTitle("Choose Photos");
+        SessionManager.Instance();
+        SessionManager.getInstance(getApplicationContext());
         mGridViewPhotos = (GridView) findViewById(R.id.showgridphotos);
         DestId = getIntent().getExtras().getInt("DestId");
         String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
@@ -118,27 +120,10 @@ SharedPreferences sharedPreferences;
             GalleryAdapter theAdapter = new GalleryAdapter(this, cc);
             mGridViewPhotos.setAdapter(theAdapter);
             mGridViewPhotos.setOnItemClickListener(theAdapter);
-
-            sharedPreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
             mGridViewPhotos.invalidate();
 
         }
 
-        /*mGridViewPhotos.setAdapter(new ShowImages(this));
-        mGridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long aId) {
-
-                Intent theIntent = new Intent(getApplicationContext(), PreviewImage.class);
-                theIntent.putExtra("Data", mUrls[position].getPath());
-                theIntent.putExtra("id", position);
-                theIntent.putExtra("DestId", DestId);
-                Log.d("GridViewPhotos DestId", "" + DestId);
-                startActivity(theIntent);
-
-            }
-        });*/
 
     }
 
@@ -161,7 +146,6 @@ SharedPreferences sharedPreferences;
     private void captureImage() {
         Intent takephoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
-
         takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(takephoto, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
         Toast.makeText(GridViewPhotos.this, "", Toast.LENGTH_SHORT).show();
@@ -203,17 +187,14 @@ SharedPreferences sharedPreferences;
                 Gson gson = new Gson();
                 ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
                 imageUploadDTO.setImageData(imageUri.getPath());
-               ProgressDialog progress = new ProgressDialog(GridViewPhotos.this);
+                ProgressDialog progress = new ProgressDialog(GridViewPhotos.this);
                 progress.setMessage("Uploading Image...");
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progress.setIndeterminate(true);
                 progress.show();
-                String UserId = sharedPreferences.getString("UserId", null);
                 imageUploadDTO.setImageName(imageUri.getPath());
                 String SerializedJsonString = gson.toJson(imageUploadDTO);
                 if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
-                    String url = getResources().getString(R.string.URL);
-                    Log.d("UserId", UserId);
                     String filename = imageUri.getPath().substring(imageUri.getPath().lastIndexOf("/") + 1);
                     Bitmap myImg = BitmapFactory.decodeFile(imageUri.getPath());
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -222,11 +203,12 @@ SharedPreferences sharedPreferences;
                     byte[] byte_arr = stream.toByteArray();
                     // Encode Image to String
                     String encodedString = Base64.encodeToString(byte_arr, 0);
-                    uploadImage(encodedString, filename, DestId, UserId);
+
+                    uploadImage(encodedString, filename, DestId, mSessionManager.getUserId());
 
                 } else {
                     try {
-                        newDataBase.addDataToSync("MyImages", UserId, SerializedJsonString);
+                        newDataBase.addDataToSync("MyImages", mSessionManager.getUserId(), SerializedJsonString);
                         LayoutInflater layoutInflater = getLayoutInflater();
                         View view = layoutInflater.inflate(R.layout.cust_toast, null);
                         Toast toast = new Toast(getApplicationContext());
@@ -259,13 +241,11 @@ SharedPreferences sharedPreferences;
     private void uploadImage(final String encodedString, final String filename, int destId, final String userId) {
 
         RequestQueue rq = Volley.newRequestQueue(this);
-        final String url = getResources().getString(R.string.URL);
-
         // final String fileName = filename.replaceAll(" ", "");
-
+        String imageUplaodURL = mSessionManager.getUploadImagesUrl();
         Log.d("FileName", filename);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url + "images/upload1", new Response.Listener<String>() {
+                imageUplaodURL, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -291,7 +271,6 @@ SharedPreferences sharedPreferences;
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("ERROR", "Error [" + error + "]");
-                Log.e("URL Called", url);
                 Toast.makeText(getBaseContext(),
                         "Cannot connect to server", Toast.LENGTH_LONG)
                         .show();
@@ -356,7 +335,7 @@ SharedPreferences sharedPreferences;
     }*/
 
 
-    private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener{
+    private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
 
         public GalleryAdapter(Context context, Cursor aCur) {
             super(context, aCur, true);

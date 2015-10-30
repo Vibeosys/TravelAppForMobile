@@ -1,6 +1,5 @@
 package com.vibeosys.travelapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -28,6 +27,7 @@ import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +47,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     String EmailId;
     SharedPreferences sharedPreferences;
     List<String> mListOptions;
+    SessionManager mSessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +62,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         DestId = getIntent().getExtras().getInt("DestId");
         mListOptions = new ArrayList<>();
-        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        UserId = sharedPreferences.getString("UserId", null);
-        EmailId = sharedPreferences.getString("EmailId", null);
+        UserId = mSessionManager.Instance().getUserId();
+        EmailId = mSessionManager.Instance().getUserEmailId();
         newDataBase = new NewDataBase(this);
         int pages = newDataBase.Questions(DestId);
         NUM_PAGES = pages;
@@ -106,11 +106,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
                         Log.d("Like Data to Uplaod", uploadData);
 
                         if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
-                            String url = getResources().getString(R.string.URL);
-
-                            Upload(url, uploadData);
-                            Log.d("Download Calling..", "DownloadUrl:-" + url);
-
+                            Upload(uploadData);
                         } else {
                             newDataBase.addDataToSync("answer", UserId, uploadData);
                             LayoutInflater
@@ -142,9 +138,9 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         });
     }
 
-    void Upload(String url, String uploadData) {
+    void Upload(String uploadData) {
         super.UploadUserDetails();
-        super.uploadToServer(url + "upload", uploadData, QuestionSlidingView.this);//id 1=>download 2=>upload
+        super.uploadToServer(uploadData, QuestionSlidingView.this);//id 1=>download 2=>upload
     }
 
     @Override

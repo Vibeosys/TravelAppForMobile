@@ -211,30 +211,30 @@ return listSyncData;
 
 }*/
 
-public List<Sync> getFromSync(){
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    List<Sync> syncTableData=null;
-    try {
-         sqLiteDatabase=getReadableDatabase();
-        cursor=sqLiteDatabase.rawQuery("select * from Sync ", null);
-        syncTableData=new ArrayList<>();
-        if(cursor!=null){
-            if(cursor.getCount()>0){
-                do{
-                    Sync sync=new Sync();
-                    sync.setJsonSync(cursor.getString(cursor.getColumnIndex("JsonSync")));
-                    syncTableData.add(sync);
-                }while (cursor.moveToNext());
+    public List<Sync> getFromSync() {
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        List<Sync> syncTableData = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            cursor = sqLiteDatabase.rawQuery("select * from Sync ", null);
+            syncTableData = new ArrayList<>();
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    do {
+                        Sync sync = new Sync();
+                        sync.setJsonSync(cursor.getString(cursor.getColumnIndex("JsonSync")));
+                        syncTableData.add(sync);
+                    } while (cursor.moveToNext());
 
+                }
             }
-        }
 
-    }catch (Exception e){
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return syncTableData;
     }
-return syncTableData;
-}
 
     public boolean addDataToSync(String tableName, String UserId, String JsonSync) {
         SQLiteDatabase sqLiteDatabase = null;
@@ -370,8 +370,6 @@ return syncTableData;
 
         return false;
     }
-
-
 
 
     public boolean insertUsers(List<User> UsersList) {
@@ -590,6 +588,7 @@ return syncTableData;
         } else return false;
     }
 
+
     public boolean updateUserInfo(String userId) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
@@ -806,11 +805,11 @@ return syncTableData;
         try {
             sqLiteDatabase = getReadableDatabase();
             mListQuestions = new ArrayList<>();
-            String qurey="select  Question.QuestionId, Question.QuestionText, Options.OptionId, Options.OptionText, Answer.AnswerId,Answer.userid " +
+            String qurey = "select distinct Question.QuestionId, Question.QuestionText" +
                     " from Question inner join options on Question.questionId=Options.questionId " +
                     " inner join answer on options.optionid=answer.OptionId " +
                     " where answer.destid=?";
-            cursor = sqLiteDatabase.rawQuery(qurey,new String[]{destId});
+            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{destId});
             SendQuestionAnswers sendQuestionAnswers;
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
@@ -904,7 +903,7 @@ return syncTableData;
     }
 
 
-    public List<SendQuestionAnswers> listQuestions(int cQuestionId){
+    public List<SendQuestionAnswers> listQuestions(int cQuestionId) {
         List<SendQuestionAnswers> theListAskQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
@@ -913,7 +912,7 @@ return syncTableData;
             theListAskQuestions = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();
             SendQuestionAnswers sendQuestionAnswers;
-            String qurey="select OptionId, optionText " +
+            String qurey = "select OptionId, optionText " +
                     " from  OPTIONS " +
                     "where questionid = ? ";
             cursor = sqLiteDatabase.rawQuery(qurey, new String[]{String.valueOf(cQuestionId)});
@@ -938,7 +937,7 @@ return syncTableData;
     }
 
 
-    public List<SendQuestionAnswers> mListOptions(int cQuestionId,int destId) {
+    public List<SendQuestionAnswers> mListOptions(int cQuestionId, int destId) {
         List<SendQuestionAnswers> theListAskQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
@@ -947,10 +946,10 @@ return syncTableData;
             theListAskQuestions = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();
             SendQuestionAnswers sendQuestionAnswers;
-            String qurey="select distinct options.OptionId, optionText " +
+            String qurey = "select distinct options.OptionId, optionText " +
                     "from  OPTIONS inner join answer  on options.OptionId == answer.OptionId " +
                     "where questionid = ? and DestId = ?;";
-            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{String.valueOf(cQuestionId),String.valueOf(destId)});
+            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{String.valueOf(cQuestionId), String.valueOf(destId)});
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();

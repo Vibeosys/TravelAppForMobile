@@ -67,6 +67,7 @@ public class RecyclingBitmapDrawable extends BitmapDrawable {
      *
      * @param isCached - Whether the drawable is being cached or not
      */
+
     public void setIsCached(boolean isCached) {
         //BEGIN_INCLUDE(set_is_cached)
         synchronized (this) {

@@ -36,7 +36,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vibeosys.travelapp.BuildConfig;
 import com.vibeosys.travelapp.ImageDetailActivity;
@@ -307,20 +306,8 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
             layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.showdestinationimages, null);
             imageView = (ImageView) view.findViewById(R.id.userimages);
-            likeBtn = (ImageView) view.findViewById(R.id.likebutton);
-            userNameTxt = (TextView) view.findViewById(R.id.usertext);
-            likecountText=(TextView)view.findViewById(R.id.likecounttext);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             // imageView.setLayoutParams(mImageViewLayoutParams);
-            likeBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int id = v.getId();
-                    Toast.makeText(getActivity(), "" + id, Toast.LENGTH_SHORT).show();
-                }
-
-            });
-            likeBtn.setId(position);
             /*// Check the height matches our calculated column width
             if (imageView.getLayoutParams().height != mItemHeight) {
                 imageView.setLayoutParams(mImageViewLayoutParams);
@@ -328,8 +315,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
             // Finally load the image asynchronously into the ImageView, this also takes care of
             // setting a placeholder image while the background thread runs
             mImageFetcher.loadImage(mPhotoList.get(position - mNumColumns).getmImagePaths(), imageView);
-            userNameTxt.setText("By  " + mPhotoList.get(position - mNumColumns).getUsername());
-            Log.d("UserName",""+mPhotoList.get(position - mNumColumns).getUsername());
+            //Log.d("UserName",""+mPhotoList.get(position - mNumColumns).getUsername());
             return view;
             //END_INCLUDE(load_gridview_item)
         }

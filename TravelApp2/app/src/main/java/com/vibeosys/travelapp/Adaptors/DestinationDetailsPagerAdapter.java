@@ -20,6 +20,8 @@ public class DestinationDetailsPagerAdapter extends FragmentPagerAdapter impleme
         super(supportFragmentManager);
     }
 
+
+
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
@@ -32,9 +34,11 @@ public class DestinationDetailsPagerAdapter extends FragmentPagerAdapter impleme
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
+
         switch (position) {
             case 0:
                 return new ImageGridFragment();
+
             case 1:
               return  new DestinationComments();
             case 2:

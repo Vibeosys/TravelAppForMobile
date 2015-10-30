@@ -51,7 +51,7 @@ public class PropertyFileReader {
     }
 
     public String getUploadUrl() {
-        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPLOAD_URI);
+        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPLOAD_URL);
     }
 
     public String getDatabaseName() {
@@ -63,4 +63,10 @@ public class PropertyFileReader {
         return Float.valueOf(versionNumber);
     }
 
+    public String getImageUploadUrl() {
+        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPLOAD_IMAGE_URL);
+    }
+    public String getUploadUserDetails() {
+        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPDATE_USERS_DETAILS);
+    }
 }

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,7 +28,15 @@ import com.vibeosys.travelapp.QuestionSlidingView;
 import com.vibeosys.travelapp.QuestionsFromOthers;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.activities.DestinationComments;
-import com.vibeosys.travelapp.data.*;
+import com.vibeosys.travelapp.data.Answer;
+import com.vibeosys.travelapp.data.Comment;
+import com.vibeosys.travelapp.data.Destination;
+import com.vibeosys.travelapp.data.Download;
+import com.vibeosys.travelapp.data.Images;
+import com.vibeosys.travelapp.data.Like;
+import com.vibeosys.travelapp.data.Option;
+import com.vibeosys.travelapp.data.UploadUser;
+import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.SessionManager;
 
@@ -60,24 +67,22 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     List<Images> imagesList = null;
     List<com.vibeosys.travelapp.data.Question> questionsList = null;
     List<Option> optionsList = null;
-    SharedPreferences sharedPref;
-    public static final String MyPREFERENCES = "MyPrefs";
-    protected SessionManager mSessionManager = null;
+    protected static SessionManager mSessionManager = null;
 
     public void UploadUserDetails() {
         Gson gson = new Gson();
-        sharedPref = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
-        String EmailId = sharedPref.getString("EmailId", null);
-        String UserId = sharedPref.getString("UserId", null);
-        String UserName = sharedPref.getString("UserName", null);
+        String UserId = mSessionManager.getUserId();
+        String EmailId = mSessionManager.getUserEmailId();
+
+        String UserName = mSessionManager.getUserName();
         UploadUser uploadUser = new UploadUser(UserId, EmailId, UserName);
         final String encodedString = gson.toJson(uploadUser);
         RequestQueue rq = Volley.newRequestQueue(this);
-        final String url = getResources().getString(R.string.URL);
+        String updateUsersDetailsUrl = mSessionManager.getUpdateUserDetails();
         Log.d("Encoded String", encodedString);
         rq = Volley.newRequestQueue(this);
         JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-                url + "updateuser", encodedString, new Response.Listener<JSONObject>() {
+                updateUsersDetailsUrl, encodedString, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
@@ -105,10 +110,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
 
                 } catch (JSONException e) {
-                    Log.d("JSON Exception", e.toString());
-                    Toast.makeText(getBaseContext(),
-                            "Error while loadin data!",
-                            Toast.LENGTH_LONG).show();
+                    Log.e("JSON Exception", e.toString());
+
                 }
 
             }
@@ -116,10 +119,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("ERROR", "Error [" + error.getMessage() + "]");
-                Toast.makeText(getBaseContext(),
-                        "Cannot connect to server", Toast.LENGTH_LONG)
-                        .show();
+                Log.e("UPLOADUSERDETAILSERROR", "Error [" + error.getMessage() + "]");
             }
 
         });
@@ -128,13 +128,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     }
 
 
-    public void fetchData(final String aServiceUrl, final boolean aShowProgressDlg, int id) {
+    public void fetchData(String userId, final boolean aShowProgressDlg, int id) {
         Log.d("BaseActivity", "IN Base");
+        String downloadUrl = mSessionManager.getDownloadUrl(userId);
         this.id = id;
-        new BackgroundTask(aShowProgressDlg).execute(aServiceUrl, String.valueOf(id));
+        new BackgroundTask(aShowProgressDlg).execute(downloadUrl, String.valueOf(id));
     }
 
-    public void uploadToServer(final String aServiceUrl, String uploadData, Context context) {
+    public void uploadToServer(String uploadData, Context context) {
         final ProgressDialog progress = new ProgressDialog(context);
         progress.setMessage("Please Wait ...");
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -142,9 +143,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         Log.d("Upload To Server", "");
         progress.show();
         RequestQueue rq = Volley.newRequestQueue(this);
-
+        String uploadURL = mSessionManager.getUploadUrl();
         JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-                aServiceUrl, uploadData, new Response.Listener<JSONObject>() {
+                uploadURL, uploadData, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
@@ -155,10 +156,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
                     } else {
                         //Toast.makeText(getApplicationContext(),"Error Occoured Please try again",Toast.LENGTH_SHORT).show();
                     }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progress.dismiss();
+
 
 
             }
@@ -166,11 +168,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("ERROR", "Error [" + error.getMessage() + "]");
+                Log.e("UPLOADERROR", "Error [" + error.getMessage() + "]");
                 progress.dismiss();
-                Toast.makeText(getBaseContext(),
-                        "Cannot connect to server", Toast.LENGTH_LONG)
-                        .show();
+
             }
 
         });
