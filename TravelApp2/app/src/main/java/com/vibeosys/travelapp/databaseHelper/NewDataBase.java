@@ -481,6 +481,40 @@ return listSyncData;
         return false;
     }
 
+    public List<Images> imageUserLikeCount(String imageId) {
+        SQLiteDatabase sqLiteDatabase = null;
+        Cursor cursor = null;
+        List<Images> imagesList=null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            String qurey="select UserName, comment_and_like.LikeCount " +
+                    " from Images inner join comment_and_like on images.DestId = comment_and_like.DestId " +
+                    " and images.UserId = comment_and_like.UserId " +
+                    " inner join user on images.UserId = user.UserId" +
+                    " where images.ImageId = ?";
+            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{imageId});
+            imagesList=new ArrayList<>();
+            if (cursor != null) {
+                if (cursor.getCount() > 0) {
+
+                cursor.moveToFirst();
+                    do{
+                        Images images=new Images(cursor.getString(cursor.getColumnIndex("UserName")),cursor.getInt(cursor.getColumnIndex("LikeCount")));
+                         imagesList.add(images);
+                    }while (cursor.moveToNext());
+
+                }
+
+            }
+        cursor.close();
+sqLiteDatabase.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    return imagesList;
+    }
+
     public List<usersImages> Images(int cDestId, Boolean showSeenImages) {
         List<usersImages> cImagePaths = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = null;
@@ -526,7 +560,8 @@ return listSyncData;
         try {
             sqLiteDatabase = getReadableDatabase();
             DestComments = new ArrayList<>();
-            cursor = sqLiteDatabase.rawQuery("select * from comment_and_like NATURAL JOIN user where destid=? and user.userid=comment_and_like.userid;", new String[]{String.valueOf(DestId)});
+            cursor = sqLiteDatabase.rawQuery("select * " +
+                    "from comment_and_like NATURAL JOIN user where destid=? and user.userid=comment_and_like.userid;", new String[]{String.valueOf(DestId)});
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();

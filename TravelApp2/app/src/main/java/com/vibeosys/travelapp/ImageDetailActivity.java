@@ -32,12 +32,14 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ListView;
 
+import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.fragments.ImageDetailFragment;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageDetailActivity extends FragmentActivity implements OnClickListener {
@@ -47,9 +49,11 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     private ImageFetcher mImageFetcher;
     private ViewPager mPager;
     int mDestId;
+    String imageId;
     ListView other_photo_list;
     List<usersImages> mPhotoList=null;
     NewDataBase newDataBase;
+    List<Images> listImages;
     @TargetApi(VERSION_CODES.HONEYCOMB)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,11 +63,14 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 
         super.onCreate(savedInstanceState);
         Intent intent=new Intent();
+        listImages=new ArrayList<>();
         Bundle extras = intent.getExtras();
         mDestId= getIntent().getIntExtra("DestId",-1);
         Log.d("PhotosFromOthers", "" + mDestId);
+        imageId=getIntent().getStringExtra("ImageId");
+        Log.d("PhotosFromOthers", "" + imageId);
         newDataBase=new NewDataBase(getApplicationContext());
-        mPhotoList=newDataBase.Images(mDestId,true);
+        mPhotoList=newDataBase.Images(mDestId, true);
         setContentView(R.layout.image_detail_pager);
         // Fetch screen height and width, to use as our max size when loading images as this
         // activity runs full screen
@@ -178,7 +185,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 
         @Override
         public Fragment getItem(int position) {
-            return ImageDetailFragment.newInstance(mPhotoList.get(position).getmImagePaths());
+            return ImageDetailFragment.newInstance(mPhotoList.get(position).getmImagePaths(),imageId);
         }
     }
 

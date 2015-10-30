@@ -14,9 +14,14 @@ public class Comment {
     private String userId;
     private int destId;
     private String commentText;
+
 public Comment(){
 
 }
+
+
+
+
     public String getUserId() {
         return userId;
     }

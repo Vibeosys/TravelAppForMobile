@@ -1,6 +1,7 @@
 package com.vibeosys.travelapp.data;
 
 import com.google.gson.Gson;
+import com.vibeosys.travelapp.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +9,32 @@ import java.util.List;
 /**
  * Created by mahesh on 10/20/2015.
  */
-public class Images {
+public class Images extends UserDetails{
 String ImageId;
 String ImagePath;
 String UserId;
 int DestId;
 Boolean ImageSeen;
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    int likeCount;
+Images(){
+
+}
+
+
+
+    public Images(String userName, int likeCount){
+        this.Username=userName;
+        this.likeCount=likeCount;
+    }
 
     public Boolean getImageSeen() {
         return ImageSeen;

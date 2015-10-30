@@ -18,17 +18,25 @@ package com.vibeosys.travelapp.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.vibeosys.travelapp.ImageDetailActivity;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.data.Images;
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.ImageWorker;
 import com.vibeosys.travelapp.util.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This fragment will populate the children of the ViewPager from {@link ImageDetailActivity}.
  */
@@ -37,19 +45,23 @@ public class ImageDetailFragment extends Fragment {
     private String mImageUrl;
     private ImageView mImageView;
     private ImageFetcher mImageFetcher;
+    private String ImageId;
+    private List<Images> listImages;
+    private NewDataBase newDataBase;
 
     /**
      * Factory method to generate a new instance of the fragment given an image number.
      *
      * @param imageUrl The image url to load
+     * @param imageId
      * @return A new instance of ImageDetailFragment with imageNum extras
      */
 
-    public static ImageDetailFragment newInstance(String imageUrl) {
+    public static ImageDetailFragment newInstance(String imageUrl, String imageId) {
         final ImageDetailFragment f = new ImageDetailFragment();
-
         final Bundle args = new Bundle();
         args.putString(IMAGE_DATA_EXTRA, imageUrl);
+        args.putString("ImageId", imageId);
         f.setArguments(args);
 
         return f;
@@ -58,24 +70,39 @@ public class ImageDetailFragment extends Fragment {
     /**
      * Empty constructor as per the Fragment documentation
      */
-    public ImageDetailFragment() {}
+    public ImageDetailFragment() {
+    }
 
     /**
      * Populate image using a url from extras, use the convenience factory method
-     * {@link ImageDetailFragment#newInstance(String)} to create this fragment.
+     * {@link ImageDetailFragment#(String, int)} to create this fragment.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        newDataBase = new NewDataBase(getActivity());
+        listImages = new ArrayList<>();
+        ImageId = getArguments() != null ? getArguments().getString("ImageId") : null;
+        Log.d("ImageDetails",""+ImageId);
         mImageUrl = getArguments() != null ? getArguments().getString(IMAGE_DATA_EXTRA) : null;
+        listImages = newDataBase.imageUserLikeCount(ImageId);
+        //Log.e("ListImagesSize",""+listImages.size());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate and locate the main ImageView
         final View v = inflater.inflate(R.layout.image_detail_fragment, container, false);
+        TextView usernameText = (TextView) v.findViewById(R.id.usernaemimagetext);
+        TextView likeCountText = (TextView) v.findViewById(R.id.likecounttext);
+        if (listImages != null) {
+            usernameText.setText(""+listImages.get(0).getUsername());
+            likeCountText.setText(""+listImages.get(0).getLikeCount() + "  Likes  ");
+        }
+
         mImageView = (ImageView) v.findViewById(R.id.usersimageView);
+
         return v;
     }
 
