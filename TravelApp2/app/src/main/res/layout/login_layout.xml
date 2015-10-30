@@ -3,23 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dip">
-
-        <!-- Link to Facebook Login -->
-
-    </LinearLayout>
+      <!-- Link to Facebook Login -->
 
     <Button android:id="@+id/btn_fbLogin"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:background="#283593"
-        android:text="Login in with facebook"
+        android:text="Log in with facebook"
         android:layout_gravity="center_horizontal"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
