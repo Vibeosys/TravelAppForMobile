@@ -12,6 +12,7 @@
         android:background="#283593"
         android:text="Log in with facebook"
         android:layout_gravity="center_horizontal"
+        android:drawableLeft="@drawable/fbbtn_logo"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
