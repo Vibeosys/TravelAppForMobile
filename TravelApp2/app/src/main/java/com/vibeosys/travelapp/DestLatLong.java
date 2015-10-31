@@ -4,7 +4,7 @@ package com.vibeosys.travelapp;
  * Created by mahesh on 10/3/2015.
  */
 public class DestLatLong {
-private String mDestName;
+    private String mDestName;
 
     public String getmDestName() {
         return mDestName;
@@ -15,13 +15,15 @@ private String mDestName;
     }
 
     private double latitude;
-private double longitude;
-DestLatLong(){
+    private double longitude;
 
-}
-    DestLatLong(double lat,double longi){
-        latitude=lat;
-        longitude=longi;
+    DestLatLong() {
+
+    }
+
+    DestLatLong(double lat, double longi) {
+        latitude = lat;
+        longitude = longi;
     }
 
 
@@ -40,8 +42,6 @@ DestLatLong(){
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-
-
 
 
 }

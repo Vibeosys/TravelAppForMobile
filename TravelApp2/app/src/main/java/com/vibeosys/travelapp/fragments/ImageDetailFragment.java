@@ -157,7 +157,7 @@ public class ImageDetailFragment extends BaseFragment {
             super.uploadToServer(uploadData, getActivity());
             String UserId = mSessionManager.getUserId();
             //Log.d("UserId", UserId);
-            super.fetchData(UserId, true, 1);//id 1=>download 2=>upload
+            super.fetchData(UserId, true);//id 1=>download 2=>upload
             return true;
         } else {
             newDataBase.addDataToSync("Comment_and_like", userID, uploadData);

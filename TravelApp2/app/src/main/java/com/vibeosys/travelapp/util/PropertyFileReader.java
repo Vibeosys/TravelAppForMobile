@@ -54,8 +54,8 @@ public class PropertyFileReader {
         return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPLOAD_URL);
     }
 
-    public String getDatabaseName() {
-        return mProperties.getProperty(PropertyTypeConstants.DATABASE_NAME);
+    public String getDatabaseDeviceFullPath() {
+        return mProperties.getProperty(PropertyTypeConstants.DATABASE_DEVICE_FULLPATH);
     }
 
     public float getVersion() {
@@ -71,8 +71,12 @@ public class PropertyFileReader {
         return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPDATE_USERS_DETAILS);
     }
 
-    public String getDatabasePath()
-    {
-        return mProperties.getProperty(PropertyTypeConstants.DATABASE_PATH);
+    public String getDatabaseDirPath() {
+        return mProperties.getProperty(PropertyTypeConstants.DATABASE_DIR_PATH);
     }
+
+    public String getDatabaseFileName() {
+        return mProperties.getProperty(PropertyTypeConstants.DATABASE_FILE_NAME);
+    }
+
 }

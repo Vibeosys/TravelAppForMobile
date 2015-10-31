@@ -137,8 +137,8 @@ public class MainActivity extends BaseActivity
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
-            File directory = ctw.getDir(mSessionManager.getDatabaseName(), Context.MODE_PRIVATE);
-            File internalfile = new File(directory, mSessionManager.getDatabaseName());
+            File directory = ctw.getDir(mSessionManager.getDatabaseDirPath(), Context.MODE_PRIVATE);
+            File internalfile = new File(directory, mSessionManager.getDatabaseFileName());
             if (!internalfile.exists()) {
                 downloadDatabase(internalfile);
             }

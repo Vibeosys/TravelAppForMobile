@@ -76,14 +76,15 @@ public class SessionManager {
      */
     private static boolean addOrUdateSharedPreferences() {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();
+        editor.putString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, mPropertyFileReader.getImageUploadUrl());
+        editor.putString(PropertyTypeConstants.API_UPLOAD_URL, mPropertyFileReader.getUploadUrl());
+        editor.putString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, mPropertyFileReader.getUploadUserDetails());
         editor.putString(PropertyTypeConstants.API_DOWNLOAD_DB_URI, mPropertyFileReader.getDownloadDbUrl());
         editor.putString(PropertyTypeConstants.API_DOWNLOAD_URI, mPropertyFileReader.getDownloadUrl());
-        editor.putString(PropertyTypeConstants.API_UPLOAD_URL, mPropertyFileReader.getUploadUrl());
-        editor.putString(PropertyTypeConstants.DATABASE_NAME, mPropertyFileReader.getDatabaseName());
+        editor.putString(PropertyTypeConstants.DATABASE_DEVICE_FULLPATH, mPropertyFileReader.getDatabaseDeviceFullPath());
+        editor.putString(PropertyTypeConstants.DATABASE_DIR_PATH, mPropertyFileReader.getDatabaseDirPath());
+        editor.putString(PropertyTypeConstants.DATABASE_FILE_NAME, mPropertyFileReader.getDatabaseFileName());
         editor.putString(PropertyTypeConstants.VERSION_NUMBER, String.valueOf(mPropertyFileReader.getVersion()));
-        editor.putString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, mPropertyFileReader.getImageUploadUrl());
-        editor.putString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, mPropertyFileReader.getUploadUserDetails());
-        editor.putString(PropertyTypeConstants.DATABASE_PATH, mPropertyFileReader.getDatabasePath());
         editor.commit();
         return true;
     }
@@ -120,8 +121,8 @@ public class SessionManager {
         return mProjectSharedPref.getString(PropertyTypeConstants.API_UPLOAD_URL, null);
     }
 
-    public String getDatabaseName() {
-        return mProjectSharedPref.getString(PropertyTypeConstants.DATABASE_NAME, null);
+    public String getDatabaseDeviceFullPath() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.DATABASE_DEVICE_FULLPATH, null);
     }
 
     public String getUserId() {
@@ -148,6 +149,13 @@ public class SessionManager {
         setValuesInSharedPrefs(PropertyTypeConstants.USER_EMAIL_ID, userEmailId);
     }
 
+    public String getDatabaseDirPath() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.DATABASE_DIR_PATH, null);
+    }
+
+    public String getDatabaseFileName() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.DATABASE_FILE_NAME, null);
+    }
 
     private static void setValuesInSharedPrefs(String sharedPrefKey, String sharedPrefValue) {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();

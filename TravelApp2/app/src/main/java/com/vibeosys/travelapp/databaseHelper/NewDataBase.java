@@ -44,7 +44,7 @@ public class NewDataBase extends SQLiteOpenHelper {
 
     public NewDataBase(Context context) {
 
-        super(context, SessionManager.getInstance(context).getDatabaseName(), null, 1);
+        super(context, SessionManager.getInstance(context).getDatabaseDeviceFullPath(), null, 1);
         this.mContext = context;
     }
 
@@ -1054,5 +1054,18 @@ sqLiteDatabase.close();
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP DATABASE IF EXISTS Answer");
+        db.execSQL("DROP DATABASE IF EXISTS CommentAndLike");
+        db.execSQL("DROP DATABASE IF EXISTS Config");
+        db.execSQL("DROP DATABASE IF EXISTS  Destination");
+        db.execSQL("DROP DATABASE IF EXISTS usersImages");
+        db.execSQL("DROP DATABASE IF EXISTS MyMap");
+        db.execSQL("DROP DATABASE IF EXISTS My_Images");
+        db.execSQL("DROP DATABASE IF EXISTS Option");
+        db.execSQL("DROP DATABASE IF EXISTS Question");
+        db.execSQL("DROP DATABASE IF EXISTS  Sync");
+        db.execSQL("DROP DATABASE IF EXISTS  TempData");
+        db.execSQL("DROP DATABASE IF EXISTS  User");
+        db.execSQL("DROP DATABASE IF EXISTS myUser");
     }
 }
