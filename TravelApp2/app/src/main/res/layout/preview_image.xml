@@ -8,7 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/preview_image_dialog"
-        android:src="@drawable/beachimg"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/button3"
         android:layout_alignParentTop="true" />
