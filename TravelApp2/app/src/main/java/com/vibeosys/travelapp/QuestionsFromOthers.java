@@ -6,9 +6,9 @@ import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +16,22 @@ import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.vibeosys.travelapp.data.Like;
+import com.vibeosys.travelapp.data.TableDataDTO;
+import com.vibeosys.travelapp.data.Upload;
+import com.vibeosys.travelapp.data.UploadUser;
+import com.vibeosys.travelapp.data.UserLikeDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseFragment;
+import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,16 +42,16 @@ import java.util.List;
  * Created by mahesh on 10/7/2015.
  */
 
-public class QuestionsFromOthers extends Fragment {
+public class QuestionsFromOthers extends BaseFragment {
 
     ExpandableListView questionslistView;
     NewDataBase newDataBase = null;
     List<SendQuestionAnswers> mListQuestions = null;
     List<SendQuestionAnswers> mListOptions = null;
     HashMap<String, Options> mListQuestionsAnswers = null;
-    private List<UserDetails> listUsersDetails = new ArrayList<>();
+    private List<UserLikeDTO> listUsersDetails = new ArrayList<>();
     String destId;
-
+    SessionManager sessionManager=SessionManager.Instance();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +64,8 @@ public class QuestionsFromOthers extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        LayoutInflater layoutInflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view=layoutInflater.inflate(R.layout.otherquestionlist_layout,null);
+        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.otherquestionlist_layout, null);
         questionslistView = (ExpandableListView) view.findViewById(R.id.listView2);
         newDataBase = new NewDataBase(getActivity());
         mListQuestions = newDataBase.mListQuestions(destId);
@@ -83,7 +93,9 @@ public class QuestionsFromOthers extends Fragment {
             }
 
         }
-        questionslistView.setAdapter(new OthersQuestionsAdaptor(getActivity(), mListQuestionsAnswers));
+        if(mListOptions!=null) {
+            questionslistView.setAdapter(new OthersQuestionsAdaptor(getActivity(), mListQuestionsAnswers));
+        }
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
@@ -92,7 +104,7 @@ public class QuestionsFromOthers extends Fragment {
                 return false;
             }
         });
-return view;
+        return view;
     }
 
     class OthersQuestionsAdaptor implements ExpandableListAdapter, View.OnClickListener {
@@ -100,6 +112,7 @@ return view;
         private HashMap<String, Options> mList;
         List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));
         ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));
+
 
         OthersQuestionsAdaptor(Context aContext, HashMap<String, Options> aList) {
             mContext = aContext;
@@ -178,23 +191,23 @@ return view;
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             childPosition = childPosition * 2;
-            LayoutInflater layoutInflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View aView = layoutInflater.inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
             LinearLayout firstQuestion = (LinearLayout) aView.findViewById(R.id.firstquestion);
             LinearLayout secondQuestion = (LinearLayout) aView.findViewById(R.id.secondquestion);
             TextView showTextto = (TextView) aView.findViewById(R.id.textView);
-            String optionText=valueList.get(groupPosition).getmOptionText()[childPosition];
+            String optionText = valueList.get(groupPosition).getmOptionText()[childPosition];
             String count = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]);
             // theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
             //showText.setText("Says");
             firstQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition]);
-            theText.setText(Html.fromHtml("<font color='#27ACD4'> "+ count +"  Says  " +"</font>  <font color='#27ACD4'>" + optionText + "</font>"));
+            theText.setText(Html.fromHtml("<font color='#27ACD4'> " + count + "  Says  " + "</font>  <font color='#27ACD4'>" + optionText + "</font>"));
             //theText.setTextColor(Color.RED);
             if (getChildrenCount(groupPosition) > childPosition + 1) {
-                String optionTextq=valueList.get(groupPosition).getmOptionText()[childPosition+1];
-                String countq = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition+1]);
-                showTextto.setText(Html.fromHtml("<font color='#27ACD4'> "+ countq +"  Says  "+ "</font> <font color='#27ACD4'>" + optionTextq + "</font>"));
+                String optionTextq = valueList.get(groupPosition).getmOptionText()[childPosition + 1];
+                String countq = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition + 1]);
+                showTextto.setText(Html.fromHtml("<font color='#27ACD4'> " + countq + "  Says  " + "</font> <font color='#27ACD4'>" + optionTextq + "</font>"));
                 secondQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition + 1]);
             }
 
@@ -253,13 +266,7 @@ return view;
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.firstquestion:
-                    break;
-                case R.id.secondquestion:
-                    Toast.makeText(getActivity(), "Clicked on" + v.getId(), Toast.LENGTH_SHORT).show();
-                    break;
-            }
+
         }
     }
 
@@ -272,7 +279,7 @@ return view;
         Log.d("DestId QS", "" + destId);
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.userlistview);
-        dialog.setTitle("Users List");
+        dialog.setTitle("Reviews from users");
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         listUsersDetails = newDataBase.answerlikesUsers(questionId, destId);
@@ -281,15 +288,14 @@ return view;
         ListView usersListView = (ListView) dialog.findViewById(R.id.userlistview);
         usersListView.setAdapter(new UserListAdaptor(QuestionsFromOthers.this, listUsersDetails));
 
-
     }
 
 
     private class UserListAdaptor extends BaseAdapter {
-        List<UserDetails> userDetailsList;
+        List<UserLikeDTO> userDetailsList;
         Context mContext;
 
-        public UserListAdaptor(QuestionsFromOthers questionsFromOthers, List<UserDetails> listUsersDetails) {
+        public UserListAdaptor(QuestionsFromOthers questionsFromOthers, List<UserLikeDTO> listUsersDetails) {
             userDetailsList = listUsersDetails;
             mContext = getActivity();
         }
@@ -311,12 +317,60 @@ return view;
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.userlikelist, null);
             TextView usernameText = (TextView) view.findViewById(R.id.userlikesname);
-            usernameText.setText(userDetailsList.get(position).getUsername());
+            usernameText.setText(userDetailsList.get(position).getUserName());
+            final TextView userLikeCount=(TextView) view.findViewById(R.id.userlikecountText);
+            ImageView userLikeImage=(ImageView) view.findViewById(R.id.likebutton);
+            userLikeImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                updateLike(userDetailsList.get(position).getUserId(),userDetailsList.get(position).getUserLikeCount());
+                userLikeCount.setText(userDetailsList.get(position).getUserLikeCount()+1+" Likes");
+                }
+            });
+
+            userLikeCount.setText(userDetailsList.get(position).getUserLikeCount()+"  Likes");
             return view;
         }
     }
+
+    private boolean updateLike(String imageUserId,int userLikeCount) {
+        Like like = new Like();
+        like.setUserId(imageUserId);
+        like.setDestId(Integer.parseInt(destId));
+        Gson gson = new Gson();
+        String SerializedJsonString = gson.toJson(like);
+        ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
+        tableDataList.add(new TableDataDTO("like", SerializedJsonString));
+        String currentUserID = sessionManager.getUserId();
+        String EmailId = sessionManager.getUserEmailId();
+        Log.d("EmailId", "" + EmailId);
+        String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
+        Log.d("UploadingLike", uploadData.toString());
+        newDataBase.updateLikeCount(imageUserId,Integer.parseInt(destId),userLikeCount);
+        if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
+            newDataBase.getFromSync();
+            super.uploadToServer(uploadData, getActivity());
+            String UserId = mSessionManager.getUserId();
+            //Log.d("UserId", UserId);
+            super.fetchData(UserId, true);//id 1=>download 2=>upload
+            return true;
+        } else {
+            newDataBase.addDataToSync("Comment_and_like", currentUserID, uploadData);
+            LayoutInflater
+                    layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = layoutInflater.inflate(R.layout.cust_toast, null);
+            Toast toast = new Toast(getActivity());
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+            toast.setView(view);//setting the view of custom toast layout
+            toast.show();
+            return false;
+        }
+
+    }
+
 }

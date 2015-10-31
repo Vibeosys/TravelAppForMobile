@@ -127,7 +127,6 @@ public class ImageDetailFragment extends BaseFragment {
         like.setOnClickListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getActivity(), "Liked", Toast.LENGTH_SHORT).show();
                                         updateLike(images.getUserId());
                                         likeCountText.setText(images.getLikeCount() + 1 + "  Likes  ");
                                     }
@@ -138,20 +137,20 @@ public class ImageDetailFragment extends BaseFragment {
         return v;
     }
 
-    private boolean updateLike(String userId) {
+    private boolean updateLike(String imageUserId) {
         Like like = new Like();
-        like.setUserId(userId);
+        like.setUserId(imageUserId);
         like.setDestId(images.getDestId());
         Gson gson = new Gson();
         String SerializedJsonString = gson.toJson(like);
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
         tableDataList.add(new TableDataDTO("like", SerializedJsonString));
-        String userID = mSessionManager.getUserId();
+        String currentUserID = mSessionManager.getUserId();
         String EmailId = mSessionManager.getUserEmailId();
         Log.d("EmailId", "" + EmailId);
-        String uploadData = gson.toJson(new Upload(new UploadUser(userID, EmailId), tableDataList));
+        String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
         Log.d("UploadingLike", uploadData.toString());
-
+        newDataBase.updateLikeCount(imageUserId,images.getDestId(),images.getLikeCount());
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
             newDataBase.getFromSync();
             super.uploadToServer(uploadData, getActivity());
@@ -160,7 +159,7 @@ public class ImageDetailFragment extends BaseFragment {
             super.fetchData(UserId, true);//id 1=>download 2=>upload
             return true;
         } else {
-            newDataBase.addDataToSync("Comment_and_like", userID, uploadData);
+            newDataBase.addDataToSync("Comment_and_like", currentUserID, uploadData);
             LayoutInflater
                     layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);
@@ -169,8 +168,8 @@ public class ImageDetailFragment extends BaseFragment {
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.setView(view);//setting the view of custom toast layout
             toast.show();
-
             return false;
+
         }
 
     }

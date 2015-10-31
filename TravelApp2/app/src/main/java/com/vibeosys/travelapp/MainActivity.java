@@ -681,6 +681,5 @@ public class MainActivity extends BaseActivity
         task.execute();
     }
 
-    //--------------------------------------------------
 
 }

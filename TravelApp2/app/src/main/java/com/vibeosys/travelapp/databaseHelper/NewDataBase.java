@@ -18,7 +18,6 @@ import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.Routes;
 import com.vibeosys.travelapp.SendQuestionAnswers;
 import com.vibeosys.travelapp.TempData;
-import com.vibeosys.travelapp.UserDetails;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.Images;
@@ -26,6 +25,7 @@ import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.data.Sync;
 import com.vibeosys.travelapp.data.User;
+import com.vibeosys.travelapp.data.UserLikeDTO;
 import com.vibeosys.travelapp.usersImages;
 import com.vibeosys.travelapp.util.SessionManager;
 
@@ -354,14 +354,31 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
+    public boolean updateLikeCount(String userId, int destId,int previousLikeCount) {
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        int rows = 0;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("LikeCount", previousLikeCount+1);
+            rows = sqLiteDatabase.update("comment_and_like", contentValues, "userid=? and destid=?", new String[]{userId, String.valueOf(destId)});
+
+            sqLiteDatabase.close();
+        } catch (Exception e) {
+           Log.e("UPDATELIKECOUNTEx", e.toString());
+        }
+        if (rows > 0) return true;
+        return false;
+    }
 
     public Images imageUserLikeCount(String imageId) {
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
-        Images images=null;
+        Images images = null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            String qurey="select UserName, comment_and_like.LikeCount,user.userid, comment_and_like.destid " +
+            String qurey = "select UserName, comment_and_like.LikeCount,user.userid, comment_and_like.destid " +
                     " from Images inner join comment_and_like on images.DestId = comment_and_like.DestId " +
                     " and images.UserId = comment_and_like.UserId " +
                     " inner join user on images.UserId = user.UserId" +
@@ -371,22 +388,22 @@ public class NewDataBase extends SQLiteOpenHelper {
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
 
-                cursor.moveToFirst();
-                    do{
-                        images=new Images(cursor.getString(cursor.getColumnIndex("UserName")),
+                    cursor.moveToFirst();
+                    do {
+                        images = new Images(cursor.getString(cursor.getColumnIndex("UserName")),
                                 cursor.getInt(cursor.getColumnIndex("LikeCount")), cursor.getInt(cursor.getColumnIndex("DestId")), cursor.getString(cursor.getColumnIndex("UserId")));
-                    }while (cursor.moveToNext());
+                    } while (cursor.moveToNext());
 
                 }
 
             }
-        cursor.close();
-sqLiteDatabase.close();
+            cursor.close();
+            sqLiteDatabase.close();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    return images;
+        return images;
     }
 
     public List<usersImages> Images(int cDestId, Boolean showSeenImages) {
@@ -407,7 +424,7 @@ sqLiteDatabase.close();
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     do {
-                                usersImages theUsersImages = new usersImages(
+                        usersImages theUsersImages = new usersImages(
                                 cursor.getString(cursor.getColumnIndex("ImageId")),
                                 cursor.getString(cursor.getColumnIndex("ImagePath")),
                                 cursor.getInt(cursor.getColumnIndex("DestId")),
@@ -765,23 +782,26 @@ sqLiteDatabase.close();
     }
 
 
-    public List<UserDetails> answerlikesUsers(int optionId, String destId) {
+    public List<UserLikeDTO> answerlikesUsers(int optionId, String destId) {
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
-        List<UserDetails> answerUsersList = null;
+        List<UserLikeDTO> answerUsersList = null;
         try {
             answerUsersList = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select UserName,UserId,DestId from answer natural join user where optionid=? and destid=?",
+            cursor = sqLiteDatabase.rawQuery("select distinct user.UserName, user.UserId, LikeCount " +
+                            "from  answer inner join user on user.userid=answer.userid  " +
+                            "inner join comment_and_like  on comment_and_like.DestId=answer.DestId and comment_and_like.UserId = answer.UserId " +
+                            "where optionid=? and answer.destid=? ",
                     new String[]{String.valueOf(optionId), destId});
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
-                    UserDetails userDetails = new UserDetails();
-                    userDetails.setUsername(cursor.getString(cursor.getColumnIndex("UserName")));
-                    userDetails.setUserId(cursor.getString(cursor.getColumnIndex("UserId")));
-                    userDetails.setDestId(Integer.parseInt(cursor.getString(cursor.getColumnIndex("DestId"))));
-                    answerUsersList.add(userDetails);
+                    UserLikeDTO userLikes = new UserLikeDTO();
+                    userLikes.setUserName(cursor.getString(cursor.getColumnIndex("UserName")));
+                    userLikes.setUserId(cursor.getString(cursor.getColumnIndex("UserId")));
+                    userLikes.setUserLikeCount(cursor.getInt(cursor.getColumnIndex("LikeCount")));
+                    answerUsersList.add(userLikes);
 
                 }
             }
