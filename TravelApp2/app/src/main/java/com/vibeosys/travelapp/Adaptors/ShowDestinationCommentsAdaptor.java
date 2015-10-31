@@ -1,7 +1,6 @@
 package com.vibeosys.travelapp.Adaptors;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 import com.vibeosys.travelapp.CommentsAndLikes;
 import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +34,15 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
     List<MyImageDB> mUserImagesList = null;
     int DestId;
     List<CommentsAndLikes> mListDestinationComments = new ArrayList<>();
-    SharedPreferences sharedPref;
-    public static final String MyPREFERENCES = "MyPrefs";
+    //SharedPreferences sharedPref;
+    //public static final String MyPREFERENCES = "MyPrefs";
     String UserId;
     String UserName;
     public ShowDestinationCommentsAdaptor(Context destinationComments, List<CommentsAndLikes> mListDestination, int destId) {
         this.mContext = destinationComments;
         this.DestId = destId;
-        sharedPref =  mContext.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        UserId = sharedPref.getString("UserId", null);
-        UserName=sharedPref.getString("UserName",null);
+        UserId = SessionManager.Instance().getUserId();
+        UserName=SessionManager.Instance().getUserName();
         updateResults(mListDestination);
     }
 

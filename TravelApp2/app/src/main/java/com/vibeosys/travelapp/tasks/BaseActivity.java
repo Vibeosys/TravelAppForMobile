@@ -57,17 +57,19 @@ import java.util.Map;
  * Base Activity will give the basic implementation with async task support and other things
  */
 public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback {
-    int id;
-    NewDataBase newDataBase = null;
-    List<Comment> commentList = null;
-    List<Like> likeList = null;
-    List<Destination> destinationList = null;
-    List<User> usersList = null;
-    List<Answer> answerList = null;
-    List<Images> imagesList = null;
-    List<com.vibeosys.travelapp.data.Question> questionsList = null;
-    List<Option> optionsList = null;
+
+    protected NewDataBase newDataBase = null;
     protected static SessionManager mSessionManager = null;
+
+    private List<Comment> commentList = null;
+    private List<Like> likeList = null;
+    private List<Destination> destinationList = null;
+    private List<User> usersList = null;
+    private List<Answer> answerList = null;
+    private List<Images> imagesList = null;
+    private List<com.vibeosys.travelapp.data.Question> questionsList = null;
+    private List<Option> optionsList = null;
+    //private int id;
 
     public void UploadUserDetails() {
         Gson gson = new Gson();
@@ -129,11 +131,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     }
 
 
-    public void fetchData(String userId, final boolean aShowProgressDlg, int id) {
+    public void fetchData(String userId, final boolean aShowProgressDlg) {
         Log.d("BaseActivity", "IN Base");
         String downloadUrl = mSessionManager.getDownloadUrl(userId);
-        this.id = id;
-        new BackgroundTask(aShowProgressDlg).execute(downloadUrl, String.valueOf(id));
+        //this.id = id;
+        new BackgroundTask(aShowProgressDlg).execute(downloadUrl);
     }
 
     public void uploadToServer(String uploadData, Context context) {
@@ -163,7 +165,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
                 }
 
 
-
             }
 
         }, new Response.ErrorListener() {
@@ -180,104 +181,100 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     }
 
     @Override
-    public void onSuccess(String aData, int id) {
+    public void onSuccess(String aData) {
         newDataBase = new NewDataBase(getApplicationContext());
-        if (id == 1) {
-            Log.d("Calling Downloading", "" + aData);
-            Gson gson = new Gson();
-            BufferedReader bufferedReader = null;
-            try {
-                Download downloadDTO = gson.fromJson(aData, Download.class);
-                Log.d("TableDataDTO", "" + downloadDTO.toString());
-                Log.d("TableDataDTO Size", "" + downloadDTO.getData().size());
-                HashMap<String, ArrayList<String>> theTableData = new HashMap<>();
-                for (int i = 0; i < downloadDTO.getData().size(); i++) {
-                    String theTableName = downloadDTO.getData().get(i).getTableName();
-                    String theTableValue = downloadDTO.getData().get(i).getTableData().replaceAll("\\\\", "");
-                    if (!theTableData.containsKey(theTableName))
-                        theTableData.put(theTableName, new ArrayList<>(Arrays.asList(theTableValue)));
-                    else {
-                        theTableData.get(theTableName).add(theTableValue);
-                    }
-                }
-                commentList = new ArrayList<>();
-                likeList = new ArrayList<>();
-                destinationList = new ArrayList<>();
-                usersList = new ArrayList<>();
-                answerList = new ArrayList<>();
-                imagesList = new ArrayList<>();
-                questionsList = new ArrayList<>();
-                optionsList = new ArrayList<>();
-                for (Map.Entry<String, ArrayList<String>> entry : theTableData.entrySet()) {
-                    String tableName = entry.getKey();
 
-                    if (entry.getKey().equals("Comment")) {
-                        Log.d("Comment Found", "");
-                        commentList = Comment.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("Like")) {
-                        Log.d("Like Found", "");
-                        likeList = Like.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("Images")) {
-                        Log.d("images Found", "");
-                        imagesList = Images.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("Option")) {
-                        Log.d("Optons Found", "");
-                        optionsList = Option.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("Answer")) {
-                        Log.d("Answers Found", "");
-                        answerList = Answer.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("Destination")) {
-                        Log.d("Destination Found", "");
-                        destinationList = Destination.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("Question")) {
-                        Log.d("Question Found", "");
-                        questionsList = com.vibeosys.travelapp.data.Question.deserializeSting(entry.getValue());
-                    }
-                    if (entry.getKey().equals("User")) {
-                        Log.d("User Found", "");
-                        usersList = User.deserializeSting(entry.getValue());
-                    }
+        //if (activityStatusType == ActivityStatusTypes.DOWNLOAD_ACTIVITY_STATUS) {
+        Log.d("Calling Downloading", "" + aData);
+        Gson gson = new Gson();
+        BufferedReader bufferedReader = null;
+        try {
+            Download downloadDTO = gson.fromJson(aData, Download.class);
+            Log.d("TableDataDTO", "" + downloadDTO.toString());
+            Log.d("TableDataDTO Size", "" + downloadDTO.getData().size());
+            HashMap<String, ArrayList<String>> theTableData = new HashMap<>();
+            for (int i = 0; i < downloadDTO.getData().size(); i++) {
+                String theTableName = downloadDTO.getData().get(i).getTableName();
+                String theTableValue = downloadDTO.getData().get(i).getTableData().replaceAll("\\\\", "");
+                if (!theTableData.containsKey(theTableName))
+                    theTableData.put(theTableName, new ArrayList<>(Arrays.asList(theTableValue)));
+                else {
+                    theTableData.get(theTableName).add(theTableValue);
                 }
+            }
+            commentList = new ArrayList<>();
+            likeList = new ArrayList<>();
+            destinationList = new ArrayList<>();
+            usersList = new ArrayList<>();
+            answerList = new ArrayList<>();
+            imagesList = new ArrayList<>();
+            questionsList = new ArrayList<>();
+            optionsList = new ArrayList<>();
+            for (Map.Entry<String, ArrayList<String>> entry : theTableData.entrySet()) {
+                String tableName = entry.getKey();
 
-                if (!commentList.isEmpty()) {
-                    newDataBase.insertComment(commentList);
+                if (entry.getKey().equals("Comment")) {
+                    Log.d("Comment Found", "");
+                    commentList = Comment.deserializeSting(entry.getValue());
                 }
-                if (!likeList.isEmpty()) {
-                    newDataBase.insertLikes(likeList);
+                if (entry.getKey().equals("Like")) {
+                    Log.d("Like Found", "");
+                    likeList = Like.deserializeSting(entry.getValue());
                 }
-                if (!destinationList.isEmpty()) {
-                    newDataBase.insertDestination(destinationList);
+                if (entry.getKey().equals("Images")) {
+                    Log.d("images Found", "");
+                    imagesList = Images.deserializeSting(entry.getValue());
                 }
-                if (!usersList.isEmpty()) {
-                    newDataBase.insertUsers(usersList);
+                if (entry.getKey().equals("Option")) {
+                    Log.d("Optons Found", "");
+                    optionsList = Option.deserializeSting(entry.getValue());
                 }
-                if (!answerList.isEmpty()) {
-                    newDataBase.insertAnswers(answerList);
+                if (entry.getKey().equals("Answer")) {
+                    Log.d("Answers Found", "");
+                    answerList = Answer.deserializeSting(entry.getValue());
                 }
-                if (!imagesList.isEmpty()) {
-                    newDataBase.insertImages(imagesList);
+                if (entry.getKey().equals("Destination")) {
+                    Log.d("Destination Found", "");
+                    destinationList = Destination.deserializeSting(entry.getValue());
                 }
-                if (!questionsList.isEmpty()) {
-                    newDataBase.insertQuestions(questionsList);
+                if (entry.getKey().equals("Question")) {
+                    Log.d("Question Found", "");
+                    questionsList = com.vibeosys.travelapp.data.Question.deserializeSting(entry.getValue());
                 }
-                if (!optionsList.isEmpty()) {
-                    newDataBase.insertOptions(optionsList);
+                if (entry.getKey().equals("User")) {
+                    Log.d("User Found", "");
+                    usersList = User.deserializeSting(entry.getValue());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
 
-
+            if (!commentList.isEmpty()) {
+                newDataBase.insertComment(commentList);
+            }
+            if (!likeList.isEmpty()) {
+                newDataBase.insertLikes(likeList);
+            }
+            if (!destinationList.isEmpty()) {
+                newDataBase.insertDestination(destinationList);
+            }
+            if (!usersList.isEmpty()) {
+                newDataBase.insertUsers(usersList);
+            }
+            if (!answerList.isEmpty()) {
+                newDataBase.insertAnswers(answerList);
+            }
+            if (!imagesList.isEmpty()) {
+                newDataBase.insertImages(imagesList);
+            }
+            if (!questionsList.isEmpty()) {
+                newDataBase.insertQuestions(questionsList);
+            }
+            if (!optionsList.isEmpty()) {
+                newDataBase.insertOptions(optionsList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (id == 2) {
 
-        }
     }
 
     protected void showDestinationInfoDialog(String title, final int cDestId) {
@@ -357,7 +354,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     }
 
     @Override
-    public void onFailure(String aData, int id) {
+    public void onFailure(String aData) {
         Log.d("BaseActivity", "IN Base");
     }
 
@@ -379,9 +376,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             }
 
             if (s != null) {
-                onSuccess(s, id);
+                onSuccess(s);
             } else {
-                onFailure(null, id);
+                onFailure(null);
             }
 
         }

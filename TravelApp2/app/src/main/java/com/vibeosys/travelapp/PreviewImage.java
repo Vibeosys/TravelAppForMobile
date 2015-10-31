@@ -41,7 +41,6 @@ public class PreviewImage extends AppCompatActivity {
 
     private NewDataBase newDataBase = null;
     private String imageData = null;
-    public static final String MyPREFERENCES = "MyPrefs";
     private ProgressDialog progress;
     SessionManager mSessionManager;
     @Override

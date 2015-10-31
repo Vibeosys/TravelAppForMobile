@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -77,9 +76,24 @@ import java.util.UUID;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleMapOptions googleMapOptions;
+    private Marker myMarker;
+    private UUID uuid;
+    private AutoCompleteTextView text_dest;
+    private List<Destination> mDestList;
+    private HashMap<String, Integer> mDestinationNames = new HashMap<>();
+    private List<GetTemp> mTempDataList;
+    private List<MyDestination> mDestinationList;
+    private LayoutInflater layoutInflater;
+
+    //Facebook User Profile Image
+    private ImageView userProfileImage;
+
+
     @Override
-    public void onFailure(String aData, int id) {
-        super.onFailure(aData, id);
+    public void onFailure(String aData) {
+        super.onFailure(aData);
         try {
             //   Log.d("Failed to Load", "Data" + aData.toString());
         } catch (Exception e) {
@@ -88,38 +102,15 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void onSuccess(String aData, int id) {
-        super.onSuccess(aData, id);
+    public void onSuccess(String aData) {
+        super.onSuccess(aData);
 
     }
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private GoogleMapOptions googleMapOptions;
-    private Marker myMarker;
-    UUID uuid;
-    AutoCompleteTextView text_dest;
-    Uri imageURI;
-    private static final int IMAGE_CAPTURE_CODE = 100;
-    private static final int CAMERA_CAPTURE_REQUEST_CODE = 100;
-    private static final int MEDIA_IMAGE = 1;
-    private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
-    List<Destination> mDestList;
-    protected static String DB_NAME = "TravelApp";
-    static final String DB_PATH = "databases";
-    HashMap<String, Integer> mDestinationNames = new HashMap<>();
-    List<GetTemp> mTempDataList;
-    NewDataBase newDataBase;
-    List<GetTemp> mTempDataShowList;
-    List<MyDestination> mDestinationList;
-    LayoutInflater layoutInflater;
-
-    //Facebook User Profile Image
-    ImageView userProfileImage;
 
     @Override
     protected void onResume() {
         super.onResume();
-        List<GetTemp> mList = new ArrayList<>();
+        List<GetTemp> mList = null;
         mList = newDataBase.GetFromTemp();
         if (!mList.isEmpty()) {
             for (int i = 0; i < mList.size(); i++) {
@@ -146,15 +137,15 @@ public class MainActivity extends BaseActivity
 
         if (NetworkUtils.isActiveNetworkAvailable(this)) {
             ContextWrapper ctw = new ContextWrapper(getApplicationContext());
-            File directory = ctw.getDir(DB_PATH, Context.MODE_PRIVATE);
-            File internalfile = new File(directory, DB_NAME);
+            File directory = ctw.getDir(mSessionManager.getDatabaseName(), Context.MODE_PRIVATE);
+            File internalfile = new File(directory, mSessionManager.getDatabaseName());
             if (!internalfile.exists()) {
                 downloadDatabase(internalfile);
             }
 
             String UserId = mSessionManager.getUserId();
             //Log.d("UserId", UserId);
-            super.fetchData(UserId, true, 1);//id 1=>download 2=>upload
+            super.fetchData(UserId, true);//id 1=>download 2=>upload
             newDataBase.updateUserInfo(String.valueOf(UserId));
         } else {
 
@@ -196,7 +187,8 @@ public class MainActivity extends BaseActivity
 
         ArrayAdapter<String> arrayAdapter = null;
         try {
-            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, Collections.list(Collections.enumeration(mDestinationNames.keySet())));
+            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                    Collections.list(Collections.enumeration(mDestinationNames.keySet())));
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -218,14 +210,19 @@ public class MainActivity extends BaseActivity
                 Log.d("MainActivity", String.valueOf(mDestId));
                 mCurrentDestinationData = newDataBase.GetLatLong(mDestId);//Get Lat Long of DestName
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
-                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong())).title(mDestName));
+                mMap.addMarker(new MarkerOptions().position(
+                        new LatLng(mCurrentDestinationData.get(0).getmLat(),
+                                mCurrentDestinationData.get(0).getmLong())).title(mDestName));
                 Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
 
 
                 newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
 
-                destinationTempData = newDataBase.mGetLatLongFromTemp(mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
-                final CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()));
+                destinationTempData = newDataBase.mGetLatLongFromTemp(
+                        mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
+                final CameraUpdate center = CameraUpdateFactory.newLatLng(
+                        new LatLng(mCurrentDestinationData.get(0).getmLat(),
+                                mCurrentDestinationData.get(0).getmLong()));
                 mMap.moveCamera(center);
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
                 mMap.animateCamera(zoom);
@@ -233,8 +230,10 @@ public class MainActivity extends BaseActivity
                 if (destinationTempData != null) {
 
                     mMap.addPolyline(new PolylineOptions().geodesic(true)
-                                    .add(new LatLng(mCurrentDestinationData.get(0).getmLat(), mCurrentDestinationData.get(0).getmLong()))
-                                    .add(new LatLng(destinationTempData.getmLat(), destinationTempData.getmLong())).width(5).color(Color.BLACK)
+                                    .add(new LatLng(mCurrentDestinationData.get(0).getmLat(),
+                                            mCurrentDestinationData.get(0).getmLong()))
+                                    .add(new LatLng(destinationTempData.getmLat(),
+                                            destinationTempData.getmLong())).width(5).color(Color.BLACK)
                     );
                 }
 

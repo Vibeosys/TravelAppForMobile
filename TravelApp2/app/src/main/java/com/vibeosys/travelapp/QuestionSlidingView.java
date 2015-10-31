@@ -1,7 +1,6 @@
 package com.vibeosys.travelapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -41,11 +40,9 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     private PagerAdapter mPagerAdapter;
     Button mPrevButton, mNextButton;
     NewDataBase newDataBase = null;
-    public static final String MyPREFERENCES = "MyPrefs";
     String UserId;
     int DestId;
     String EmailId;
-    SharedPreferences sharedPreferences;
     List<String> mListOptions;
     SessionManager mSessionManager;
 
@@ -55,7 +52,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         setContentView(R.layout.questionslidingview);
         String destName = getIntent().getExtras().getString("DestName");
 
-        this.setTitle("Your feedback about " + destName);
+        this.setTitle("Feedback about " + destName);
+
         mViewPager = (ViewPager) findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -69,7 +67,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         NUM_PAGES = pages;
 
         // ...but notify us that it happened.
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mPrevButton = (Button) findViewById(R.id.prevButton);

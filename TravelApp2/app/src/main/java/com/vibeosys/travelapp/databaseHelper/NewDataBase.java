@@ -27,6 +27,7 @@ import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.data.Sync;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.usersImages;
+import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,126 +38,20 @@ import java.util.List;
  */
 
 public class NewDataBase extends SQLiteOpenHelper {
-    private static final String DB_NAME = "/data/data/com.vibeosys.travelapp/app_databases/TravelApp";
+    //private static final String DB_NAME = "/data/data/com.vibeosys.travelapp/app_databases/TravelApp";
 
     private final Context mContext;
 
     public NewDataBase(Context context) {
 
-        super(context, DB_NAME, null, 1);
+        super(context, SessionManager.getInstance(context).getDatabaseName(), null, 1);
         this.mContext = context;
     }
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        String CREATE_ANSWERS_TABLE = "CREATE TABLE Answer(" +
-                "   AnswerId INT PRIMARY KEY     NOT NULL," +
-                "   UserId                TEXT    NOT NULL," +
-                "   DestId                INT    NOT NULL," +
-                "   OptionId              INT    NOT NULL," +
-                "   CreatedDate           DATETIME   NOT NULL" +
-                " )";
-        String CREATE_COMMENTSANDLIKES = "CREATE TABLE CommentAndLike(" +
-                "   UserId       TEXT            NOT NULL," +
-                "   DestId       INT            NOT NULL," +
-                "   LIkeCount          INT     NOT NULL," +
-                "   CommentText        TEXT    NULL," +
-                "   UpdatedDate        DATETIME    NOT NULL" +
-                ")";
-        String CREATE_CONFIG_TABLE = "CREATE TABLE Config(" +
-                "Key  TEXT PRIMARY KEY NOT NULL," +
-                "Value     TEXT NOT NULL" +
-                ")";
-        String CREATE_DESTINATION_TABLE = "CREATE TABLE Destination(\n" +
-                "   DestId INT PRIMARY KEY     NOT NULL," +
-                "   DestName           TEXT    NOT NULL," +
-                "   Lat              DOUBLE    NOT NULL," +
-                "   Long             DOUBLE    NOT NULL" +
-                " )";
-        String CREATE_IMAGES_TABLE = "CREATE TABLE usersImages(" +
-                "   ImageId INTEGER PRIMARY KEY    AUTOINCREMENT," +
-                "   ImagePath           TEXT    NOT NULL," +
-                "   UserId              TEXT     NOT NULL," +
-                "   DestId              INT     NOT NULL," +
-                "   ImageSeen           BOOLEAN NOT NULL" +
-                ")";
-        String CREATE_MYMAP_TABLE = "CREATE TABLE MyMap(" +
-                "MapId    INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "RouteName     TEXT NOT NULL," +
-                "RouteJson     TEXT NOT NULL," +
-                "CreatedDate   DATETIME NOT NULL" +
-                ")";
-        String CREATE_MYIMAGES_TABLE = "CREATE TABLE My_Images(" +
-                "   ImageId INTEGER PRIMARY KEY  AUTOINCREMENT," +
-                "   ImagePath           TEXT   NOT NULL," +
-                "   CreateDate          DATETIME   NOT NULL" +
-                "    )";
-        String CREATE_OPTION_TABLE = "CREATE TABLE Option(" +
-                "   OptionId INT PRIMARY KEY     NOT NULL," +
-                "      OptionText         TEXT   NOT NULL," +
-                "   QuestionId         INT   NOT NULL" +
-                "    )";
-        String CREATE_QUESTION_TABLE = "CREATE TABLE Question(" +
-                "QuestionId INT PRIMARY KEY NOT NULL," +
-                "QuestionText  TeXT NOT NULL" +
-                ")";
-        String CREATE_SYNC_TABLE = "CREATE TABLE Sync(" +
-                "SyncAutoNo INT PRIMARY KEY NOT NULL," +
-                "UserId     TEXT NOT NULL," +
-                "JsonSync   TEXT NOT NULL," +
-                "TableName  TEXT NOT NULL      " +
-                ")";
-        String CREATE_TEMPDATA_TABLE = "CREATE TABLE TempData(\n" +
-                "   Id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-                "   DestId           INT   NOT NULL,\n" +
-                "   DestName         TEXT   NOT NULL,\n" +
-                "   Lat              DOUBLE NOT NULL,\n" +
-                "   Long             DOUBLE NOT NULL\n" +
-                "    )";
-        String CREATE_USER_DATA = "CREATE TABLE User(" +
-                "UserId    TEXT PRIMARY KEY NOT NULL," +
-                "UserName     TEXT NOT NULL" +
-                ")";
-
-        String CREATE_MYUSER_TABLE = "CREATE TABLE myUser(" +
-                "UserId    TEXT PRIMARY KEY NOT NULL," +
-                "UserName     TEXT NOT NULL," +
-                "MobileNo     TEXT NOT NULL," +
-                "Active       BOOLEAN NOT NULL" +
-                ")";
-        /*db.execSQL(CREATE_ANSWERS_TABLE);
-        db.execSQL(CREATE_COMMENTSANDLIKES);
-        db.execSQL(CREATE_CONFIG_TABLE);
-        db.execSQL(CREATE_DESTINATION_TABLE);
-        db.execSQL(CREATE_IMAGES_TABLE);
-        db.execSQL(CREATE_MYMAP_TABLE);
-        db.execSQL(CREATE_MYIMAGES_TABLE);
-        db.execSQL(CREATE_OPTION_TABLE);
-        db.execSQL(CREATE_QUESTION_TABLE);
-        db.execSQL(CREATE_SYNC_TABLE);
-        db.execSQL(CREATE_TEMPDATA_TABLE);
-        db.execSQL(CREATE_USER_DATA);
-        db.execSQL(CREATE_MYUSER_TABLE);*/
-
-        Log.d("CREATED", "SUCCESS");
     }
-
-    public void AddUser(String cUserId, String cUserName) {
-        String Username = cUserName;
-        String UserId = cUserId;
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("UserId", UserId);
-        values.put("UserName", Username);
-        Log.d("ADDED", "SUCCESS");
-        // Inserting Row
-        db.insert("Destination", null, values);
-        //2nd argument is String containing nullColumnHack
-        db.close(); // Closing database connection
-    }
-
 
     public boolean insertComment(List<Comment> listComment) {
         List<Comment> mListComment = null;
@@ -187,29 +82,6 @@ public class NewDataBase extends SQLiteOpenHelper {
         }
         return false;
     }
-
-/*
-public List<Sync> dataFromSync(){
-    SQLiteDatabase sqLiteDatabase=null;
-    Cursor cursor=null;
-    List<Sync> listSyncData;
-    try {
-    sqLiteDatabase=getReadableDatabase();
-    cursor=sqLiteDatabase.rawQuery("select * from Sync",null);
-    if(cursor!=null){
-        if(cursor.getCount()>0){
-
-
-        }
-    }
-    }
-    catch (Exception e){
-        e.printStackTrace();
-    }
-
-return listSyncData;
-
-}*/
 
     public List<Sync> getFromSync() {
         SQLiteDatabase sqLiteDatabase = null;
@@ -1182,20 +1054,5 @@ sqLiteDatabase.close();
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP DATABASE IF EXISTS Answer");
-        db.execSQL("DROP DATABASE IF EXISTS CommentAndLike");
-        db.execSQL("DROP DATABASE IF EXISTS Config");
-        db.execSQL("DROP DATABASE IF EXISTS  Destination");
-        db.execSQL("DROP DATABASE IF EXISTS usersImages");
-        db.execSQL("DROP DATABASE IF EXISTS MyMap");
-        db.execSQL("DROP DATABASE IF EXISTS My_Images");
-        db.execSQL("DROP DATABASE IF EXISTS Option");
-        db.execSQL("DROP DATABASE IF EXISTS Question");
-        db.execSQL("DROP DATABASE IF EXISTS  Sync");
-        db.execSQL("DROP DATABASE IF EXISTS  TempData");
-        db.execSQL("DROP DATABASE IF EXISTS  User");
-        db.execSQL("DROP DATABASE IF EXISTS myUser");
-        // Create tables again
-        onCreate(db);
     }
 }

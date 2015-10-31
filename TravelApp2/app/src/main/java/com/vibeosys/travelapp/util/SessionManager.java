@@ -60,7 +60,7 @@ public class SessionManager {
         }
 
         String versionNumber = mProjectSharedPref.getString(PropertyTypeConstants.VERSION_NUMBER, null);
-        Float versionNoValue =  versionNumber == null ? 0 : Float.valueOf(versionNumber);
+        Float versionNoValue = versionNumber == null ? 0 : Float.valueOf(versionNumber);
 
         if (mPropertyFileReader.getVersion() > versionNoValue) {
             boolean sharedPrefChange = addOrUdateSharedPreferences();
@@ -83,6 +83,7 @@ public class SessionManager {
         editor.putString(PropertyTypeConstants.VERSION_NUMBER, String.valueOf(mPropertyFileReader.getVersion()));
         editor.putString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, mPropertyFileReader.getImageUploadUrl());
         editor.putString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, mPropertyFileReader.getUploadUserDetails());
+        editor.putString(PropertyTypeConstants.DATABASE_PATH, mPropertyFileReader.getDatabasePath());
         editor.commit();
         return true;
     }

@@ -66,7 +66,13 @@ public class PropertyFileReader {
     public String getImageUploadUrl() {
         return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPLOAD_IMAGE_URL);
     }
+
     public String getUploadUserDetails() {
         return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPDATE_USERS_DETAILS);
+    }
+
+    public String getDatabasePath()
+    {
+        return mProperties.getProperty(PropertyTypeConstants.DATABASE_PATH);
     }
 }
