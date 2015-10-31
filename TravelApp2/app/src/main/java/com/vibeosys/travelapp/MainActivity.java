@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity
         if (!mList.isEmpty()) {
             for (int i = 0; i < mList.size(); i++) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mList.get(i).getLat(), mList.get(i).getLong())).title(mList.get(i).getDestName()));
-                if (i > mList.size() - 1) {
+                if (i < mList.size() - 1) {
                     mMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(mList.get(i).getLat(), mList.get(i).getLong()))
                             .add(new LatLng(mList.get(i + 1).getLat(), mList.get(i + 1).getLong())).width(5).color(Color.BLACK));

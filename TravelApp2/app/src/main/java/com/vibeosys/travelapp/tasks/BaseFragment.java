@@ -123,12 +123,13 @@ public class BaseFragment extends Fragment implements BackgroundTaskCallback {
         rq.add(jsonArrayRequest);
     }
 
-
-    public void fetchData(final String aServiceUrl, final boolean aShowProgressDlg, int id) {
+    public void fetchData(String userId, final boolean aShowProgressDlg, int id) {
         Log.d("BaseActivity", "IN Base");
+        String downloadUrl = mSessionManager.getDownloadUrl(userId);
         this.id = id;
-        new BackgroundTask(aShowProgressDlg).execute(aServiceUrl, String.valueOf(id));
+        new BackgroundTask(aShowProgressDlg).execute(downloadUrl, String.valueOf(id));
     }
+
 
     public void uploadToServer(String uploadData, Context context) {
         final ProgressDialog progress = new ProgressDialog(context);

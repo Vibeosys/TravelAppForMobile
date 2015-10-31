@@ -11,23 +11,23 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Like {
-    private String UserId;
-    private int DestId;
+    private String userId;
+    private int destId;
 
     public String getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(String userId) {
-        this.UserId = userId;
+        this.userId = userId;
     }
 
     public int getDestId() {
-        return DestId;
+        return destId;
     }
 
     public void setDestId(int destId) {
-        this.DestId = destId;
+        this.destId = destId;
     }
 
     public static List<Like> deserializeSting(ArrayList<String> serializedStringList) {

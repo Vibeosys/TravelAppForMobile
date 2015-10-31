@@ -51,9 +51,11 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     int mDestId;
     String imageId;
     ListView other_photo_list;
-    List<usersImages> mPhotoList=null;
+    List<usersImages> mPhotoList = null;
     NewDataBase newDataBase;
     List<Images> listImages;
+
+
     @TargetApi(VERSION_CODES.HONEYCOMB)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,15 +64,15 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         }
 
         super.onCreate(savedInstanceState);
-        Intent intent=new Intent();
-        listImages=new ArrayList<>();
+        Intent intent = new Intent();
+        listImages = new ArrayList<>();
         Bundle extras = intent.getExtras();
-        mDestId= getIntent().getIntExtra("DestId",-1);
+        mDestId = getIntent().getIntExtra("DestId", -1);
         Log.d("PhotosFromOthers", "" + mDestId);
-        imageId=getIntent().getStringExtra("ImageId");
+        imageId = getIntent().getStringExtra("ImageId");
         Log.d("PhotosFromOthers", "" + imageId);
-        newDataBase=new NewDataBase(getApplicationContext());
-        mPhotoList=newDataBase.Images(mDestId, true);
+        newDataBase = new NewDataBase(getApplicationContext());
+        mPhotoList = newDataBase.Images(mDestId, true);
         setContentView(R.layout.image_detail_pager);
         // Fetch screen height and width, to use as our max size when loading images as this
         // activity runs full screen
@@ -104,32 +106,6 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         // Set up activity to go full screen
         getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
 
-        // Enable some additional newer visibility and ActionBar features to create a more
-        // immersive photo viewing experience
-       /* if (Utils.hasHoneycomb()) {
-            final ActionBar actionBar = getActionBar();
-
-            // Hide title text and set home as up
-
-
-            // Hide and show the ActionBar as the visibility changes
-            mPager.setOnSystemUiVisibilityChangeListener(
-                    new View.OnSystemUiVisibilityChangeListener() {
-                        @Override
-                        public void onSystemUiVisibilityChange(int vis) {
-                            if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
-                                actionBar.hide();
-                            } else {
-                                actionBar.show();
-                            }
-                        }
-                    });
-
-            // Start low profile mode and hide ActionBar
-            mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-            actionBar.hide();
-        }*/
-
         // Set the current item based on the extra passed in to this activity
         final int extraCurrentItem = getIntent().getIntExtra(EXTRA_IMAGE, -1);
         if (extraCurrentItem != -1) {
@@ -157,13 +133,13 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     }
 
 
-
     /**
      * Called by the ViewPager child fragments to load images via the one ImageFetcher
      */
     public ImageFetcher getImageFetcher() {
         return mImageFetcher;
     }
+
 
     /**
      * The main adapter that backs the ViewPager. A subclass of FragmentStatePagerAdapter as there
@@ -185,7 +161,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 
         @Override
         public Fragment getItem(int position) {
-            return ImageDetailFragment.newInstance(mPhotoList.get(position).getmImagePaths(),imageId);
+            return ImageDetailFragment.newInstance(mPhotoList.get(position).getmImagePaths(), imageId);
         }
     }
 

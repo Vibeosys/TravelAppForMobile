@@ -1,12 +1,18 @@
 package com.vibeosys.travelapp;
 
+import android.app.Dialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 
@@ -124,19 +131,126 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
 
         }
 
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                int mDestId = mDestinationNames.get(marker.getTitle());
-                Log.d("MainActivityMarker", "" + mDestId);
-                mDestId = mDestinationNames.get(marker.getTitle());
-                final int finalMDestId = mDestId;
-                final Marker tempMarker=marker;
-                showDestinationInfoDialog(marker.getTitle(), mDestId);
+      googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
-                return true;
+            @Override
+            public boolean onMarkerClick(final Marker marker) {
+                final Dialog dlg = new Dialog(ShowRoutesOnMap.this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+                View view = getLayoutInflater().inflate(R.layout.activity_location_details, null);
+                dlg.setContentView(view);
+                dlg.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                //view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
+                //view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
+                //View phtotosView = view.findViewById(R.id.item_title);
+                final int mDestId = mDestinationNames.get(marker.getTitle());
+                TextView photoLabel = (TextView) view.findViewById(R.id.photo_label);
+                TextView detailsLable = (TextView) view.findViewById(R.id.details_label);
+                detailsLable.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent startMoreDetailsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        startMoreDetailsActivitty.putExtra("DestId", mDestId);
+                        startMoreDetailsActivitty.putExtra("DestName", marker.getTitle());
+                        startActivity(startMoreDetailsActivitty);
+                    }
+                });
+
+                LinearLayout commentsrowLayout = (LinearLayout) view.findViewById(R.id.comments_row);
+                LinearLayout sendPhotos = (LinearLayout) view.findViewById(R.id.photos_row);
+                LinearLayout sendReviews = (LinearLayout) view.findViewById(R.id.rating);
+                sendPhotos.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent startPhotosActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        startPhotosActivitty.putExtra("DestId", mDestId);
+                        startPhotosActivitty.putExtra("DestName", marker.getTitle());
+                        startPhotosActivitty.putExtra("Id", 0);
+                        startActivity(startPhotosActivitty);
+                    }
+                });
+                ImageView sendMessages = (ImageView) view.findViewById(R.id.sendDestinatiomMessages);
+                sendMessages.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent startSendMessagesActivitty = new Intent(getApplicationContext(), QuestionSlidingView.class);
+                        startSendMessagesActivitty.putExtra("DestId", mDestId);
+                        startSendMessagesActivitty.putExtra("DestName", marker.getTitle());
+                        startActivity(startSendMessagesActivitty);
+
+                    }
+                });
+                sendReviews.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent startReviewsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        startReviewsActivitty.putExtra("DestId", mDestId);
+                        startReviewsActivitty.putExtra("DestName", marker.getTitle());
+                        startReviewsActivitty.putExtra("Id", 3);
+                        startActivity(startReviewsActivitty);
+                    }
+                });
+
+                commentsrowLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent startCommentActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        startCommentActivitty.putExtra("DestId", mDestId);
+                        startCommentActivitty.putExtra("DestName", marker.getTitle());
+                        startCommentActivitty.putExtra("Id", 1);
+                        startActivity(startCommentActivitty);
+                    }
+                });
+
+
+                TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
+                TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
+                int imagesCount = newDataBase.Images(mDestId, false).size();
+                List<SendQuestionAnswers> listofQuestion = newDataBase.mListQuestions(String.valueOf(mDestId));
+                int msgCount = 0;
+                int destCommentcount = 0;
+                List<CommentsAndLikes> destinationComment = newDataBase.DestinationComments(mDestId);
+                if (destinationComment != null) destCommentcount = destinationComment.size();
+                if (listofQuestion != null) msgCount = listofQuestion.size();
+
+                photoLabel.setText(String.valueOf(imagesCount) + " Photos uploaded");
+                commentsLabel.setText(destCommentcount + " People have commented about the place.");
+                rattingsLabel.setText(String.valueOf(msgCount) + " Reviews for this place");
+
+                view.findViewById(R.id.overlay).setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View aView) {
+                        dlg.dismiss();
+                    }
+                });
+
+                view.findViewById(R.id.send_photos).setOnClickListener(new View.OnClickListener() {
+
+                                                                           @Override
+                                                                           public void onClick(View v) {
+                                                                               Intent theIntent = new Intent(ShowRoutesOnMap.this, GridViewPhotos.class);
+                                                                               theIntent.putExtra("DestId", mDestId);
+                                                                               startActivity(theIntent);
+                                                                           }
+                                                                       }
+                );
+
+                    /*
+                    phtotosView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
+                                }
+                    });
+                    view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));*/
+                TextView title = (TextView) view.findViewById(R.id.dlg_title);
+                title.setText(marker.getTitle());
+                dlg.show();
+                return false;
             }
+
         });
+
     }
 
     @Override

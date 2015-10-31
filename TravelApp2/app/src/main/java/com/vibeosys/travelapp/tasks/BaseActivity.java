@@ -76,6 +76,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
         String UserName = mSessionManager.getUserName();
         UploadUser uploadUser = new UploadUser(UserId, EmailId, UserName);
+
         final String encodedString = gson.toJson(uploadUser);
         RequestQueue rq = Volley.newRequestQueue(this);
         String updateUsersDetailsUrl = mSessionManager.getUpdateUserDetails();

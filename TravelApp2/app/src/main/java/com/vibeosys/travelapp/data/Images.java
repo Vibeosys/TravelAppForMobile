@@ -12,7 +12,6 @@ import java.util.List;
 public class Images extends UserDetails{
 String ImageId;
 String ImagePath;
-String UserId;
 int DestId;
 Boolean ImageSeen;
 
@@ -31,9 +30,11 @@ Images(){
 
 
 
-    public Images(String userName, int likeCount){
+    public Images(String userName, int likeCount,int destId,String userId){
         this.Username=userName;
         this.likeCount=likeCount;
+        this.UserId=userId;
+        this.DestId=destId;
     }
 
     public Boolean getImageSeen() {
@@ -58,14 +59,6 @@ Images(){
 
     public void setImagePath(String imagePath) {
         this.ImagePath = imagePath;
-    }
-
-    public String getUserId() {
-        return UserId;
-    }
-
-    public void setUserId(String userId) {
-        this.UserId = userId;
     }
 
     public int getDestId() {

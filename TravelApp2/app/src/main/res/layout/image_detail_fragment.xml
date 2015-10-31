@@ -41,7 +41,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="4dp"
+        android:layout_height="1dp"
         android:layout_below="@+id/firstactive"
         android:background="#ffffff" />
 
@@ -52,42 +52,44 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:paddingTop="10dp"
-        android:background="#66FFFFFF">
+        android:background="#66FFFFFF"
+        android:paddingTop="10dp">
 
         <ImageView
             android:id="@+id/likebutton"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_margin="5dp"
             android:background="@drawable/thumb_up_outline" />
 
-        <TextView
-            android:id="@+id/usernaemimagetext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/likebutton"
-            android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:text="Likes"
-            android:textColor="@color/whilte"
-            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/likecounttext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:text="5"
+            android:layout_marginLeft="8dp"
             android:textColor="@color/whilte" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/usernaemimagetext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/whilte" />
+        </RelativeLayout>
     </LinearLayout>
 
 

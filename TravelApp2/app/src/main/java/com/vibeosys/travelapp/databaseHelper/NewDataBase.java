@@ -481,26 +481,28 @@ return listSyncData;
         return false;
     }
 
-    public List<Images> imageUserLikeCount(String imageId) {
+
+
+    public Images imageUserLikeCount(String imageId) {
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
-        List<Images> imagesList=null;
+        Images images=null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            String qurey="select UserName, comment_and_like.LikeCount " +
+            String qurey="select UserName, comment_and_like.LikeCount,user.userid, comment_and_like.destid " +
                     " from Images inner join comment_and_like on images.DestId = comment_and_like.DestId " +
                     " and images.UserId = comment_and_like.UserId " +
                     " inner join user on images.UserId = user.UserId" +
                     " where images.ImageId = ?";
             cursor = sqLiteDatabase.rawQuery(qurey, new String[]{imageId});
-            imagesList=new ArrayList<>();
+
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
 
                 cursor.moveToFirst();
                     do{
-                        Images images=new Images(cursor.getString(cursor.getColumnIndex("UserName")),cursor.getInt(cursor.getColumnIndex("LikeCount")));
-                         imagesList.add(images);
+                        images=new Images(cursor.getString(cursor.getColumnIndex("UserName")),
+                                cursor.getInt(cursor.getColumnIndex("LikeCount")), cursor.getInt(cursor.getColumnIndex("DestId")), cursor.getString(cursor.getColumnIndex("UserId")));
                     }while (cursor.moveToNext());
 
                 }
@@ -512,7 +514,7 @@ sqLiteDatabase.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    return imagesList;
+    return images;
     }
 
     public List<usersImages> Images(int cDestId, Boolean showSeenImages) {
@@ -533,7 +535,7 @@ sqLiteDatabase.close();
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     do {
-                        usersImages theUsersImages = new usersImages(
+                                usersImages theUsersImages = new usersImages(
                                 cursor.getString(cursor.getColumnIndex("ImageId")),
                                 cursor.getString(cursor.getColumnIndex("ImagePath")),
                                 cursor.getInt(cursor.getColumnIndex("DestId")),
