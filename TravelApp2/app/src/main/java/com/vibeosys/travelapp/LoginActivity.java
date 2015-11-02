@@ -42,11 +42,19 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         //Facebook SDK Initialization
         FacebookLoginAPIInit(LoginActivity.this);
+        GooglePlusAPIInit();
 
         setContentView(R.layout.login_layout);
 
         //Facebook Authentication after clicking button
         Button btn_fb_login = (Button) findViewById(R.id.btn_fbLogin);
+
+        findViewById(R.id.btn_GPLogin).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              GooglePlusLogin(LoginActivity.this);
+            }
+        });
 
         btn_fb_login.setOnClickListener(new View.OnClickListener() {
             @Override

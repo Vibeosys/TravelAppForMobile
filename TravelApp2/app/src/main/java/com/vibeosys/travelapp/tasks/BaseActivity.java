@@ -1,14 +1,22 @@
 package com.vibeosys.travelapp.tasks;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -27,8 +35,20 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 import com.google.gson.Gson;
+import com.vibeosys.travelapp.DestinationUsersImages;
+import com.vibeosys.travelapp.GridViewPhotos;
 import com.vibeosys.travelapp.MainActivity;
+import com.vibeosys.travelapp.QuestionSlidingView;
+import com.vibeosys.travelapp.QuestionsFromOthers;
+import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.Destination;
@@ -46,6 +66,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,7 +78,7 @@ import java.util.Map;
 /**
  * Base Activity will give the basic implementation with async task support and other things
  */
-public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback {
+public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     protected NewDataBase newDataBase = null;
     protected static SessionManager mSessionManager = null;
@@ -73,6 +94,16 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     //private int id;
     //Facebook
     protected CallbackManager callbackManager;
+
+    //Google Plus
+    GoogleApiClient mGoogleApiClient;
+    private boolean mIsResolving = false;
+    private boolean mShouldResolve = false;
+    private static final int RC_SIGN_IN = 1;
+    final static String TAG = "com.vibeosys";
+    private Activity mFromactivitycall;
+
+
 
     public void UploadUserDetails() {
         Gson gson = new Gson();
@@ -286,9 +317,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     }
 
 
+    //-------------Facebook API calls--------------------------------//
     public void FacebookLogin(final Activity act) {
         //Facebook call authentication
         LoginManager.getInstance().logInWithReadPermissions(act, Arrays.asList("public_profile", "user_friends", "email"));
+    }
+
+    public void FacebookLogout()
+    {
+
     }
 
 
@@ -349,12 +386,157 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         });
     }
 
+    //-------------Google API Call----------------------------------//
+
+    protected void GooglePlusLogin(Activity act) {
+        // User clicked the sign-in button, so begin the sign-in process and automatically
+        // attempt to resolve any errors that occur.
+        mShouldResolve = true;
+        mGoogleApiClient.connect();
+        mFromactivitycall =act;
+
+        // Show a message to the user that we are signing in.
+        Toast.makeText(this, "Signing in", Toast.LENGTH_SHORT).show();
+    }
+
+    protected void GooglePlusLogout() {
+        // Clear the default account so that GoogleApiClient will not automatically
+        // connect in the future.
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            mGoogleApiClient.disconnect();
+        }
+
+
+        // Show a message to the user that we are signing in.
+        Toast.makeText(this, "Sign out", Toast.LENGTH_SHORT).show();
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        // onConnected indicates that an account was selected on the device, that the selected
+        // account has granted any requested permissions to our app and that we were able to
+        // establish a service connection to Google Play services.
+        Log.d(TAG, "onConnected:" + bundle);
+        mShouldResolve = false;
+
+
+        Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        String name = currentPerson.getDisplayName();
+        String imageURL = currentPerson.getImage().getUrl();
+
+        //changing the default size of image which API return i.e 50 X 50
+        imageURL = imageURL.substring(0,
+                imageURL.length() - 2)
+                + 150;
+
+        String emailID =  Plus.AccountApi.getAccountName(mGoogleApiClient);
+
+        JSONObject object = new JSONObject();
+        try
+        {
+
+            object.put("name", name);
+            object.put("imageURL",imageURL);
+            object.put("emailID",emailID);
+
+            Log.d(TAG, ":" + name);
+            Log.d(TAG, ":" + imageURL);
+
+            //Redirect to Page once Authenticatied
+
+            Intent intent = new Intent(mFromactivitycall, MainActivity.class);
+            //Send Data or Save Data
+            //intent.putExtra("Profiledetails", object.toString());
+
+            startActivity(intent);
+
+        }
+        catch (JSONException ex)
+        {
+            Log.d(TAG, "Error:" + ex.getMessage());
+        }
+
+
+
+        // Show a message to the user that we are signing in.
+        //Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+        // Could not connect to Google Play Services.  The user needs to select an account,
+        // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
+        // ConnectionResult to see possible error codes.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+
+        if (!mIsResolving && mShouldResolve) {
+            if (connectionResult.hasResolution()) {
+                try {
+                    connectionResult.startResolutionForResult(this, RC_SIGN_IN);
+                    mIsResolving = true;
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e(TAG, "Could not resolve ConnectionResult.", e);
+                    mIsResolving = false;
+                    mGoogleApiClient.connect();
+                }
+            } else {
+                // Could not resolve the connection result, show the user an
+                // error dialog.
+                Toast.makeText(this, connectionResult.toString(), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Show the signed-out UI
+            Toast.makeText(this, "Signout", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    //------------------------------------------------------------------------//
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
+        //Facebook call to get Data
         callbackManager.onActivityResult(requestCode, resultCode, data);
+
+
+        //Google-Plus login Data
+        if (requestCode == RC_SIGN_IN) {
+            // If the error resolution was not successful we should not resolve further.
+            if (resultCode != RESULT_OK) {
+                mShouldResolve = false;
+            }
+
+            mIsResolving = false;
+            mGoogleApiClient.connect();
+        }
+
         Log.d("Vibeosys", "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+
     }
+
+    public void GooglePlusAPIInit()
+    {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API)
+                .addScope(new Scope(Scopes.PROFILE))
+                .addScope(new Scope(Scopes.EMAIL))
+                .build();
+    }
+
 
     class BackgroundTask extends AsyncTask<String, Void, String> {
 

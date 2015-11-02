@@ -16,15 +16,26 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/btn_GPLogin"
+
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_above="@+id/btn_fbLogin"
+        android:layout_alignStart="@+id/btn_fbLogin"
+        android:layout_marginBottom="38dp" />
+
     <Button android:id="@+id/btn_skip"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:background="#3b579d"
         android:text="Skip Login"
+        android:layout_marginTop="32dp"
+        android:onClick="OnClickSkipLogin"
         android:layout_below="@+id/btn_fbLogin"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="48dp"
-        android:onClick="OnClickSkipLogin" />
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
