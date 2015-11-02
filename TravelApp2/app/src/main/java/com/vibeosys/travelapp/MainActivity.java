@@ -160,12 +160,13 @@ public class MainActivity extends BaseActivity
 
         setContentView(R.layout.activity_main);
 
-        //Facebook Data Integration with UI
+        //Login Profile Data Integration with UI
         try {
-            FacebookData();
+            ProfileLoginData();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
@@ -623,9 +624,9 @@ public class MainActivity extends BaseActivity
     }
 
 
-    //-------------Facebook Login----------------------//
+    //-------------Login----------------------//
 
-    private void FacebookData() {
+    private void ProfileLoginData() {
         // After successful Loing
         Intent intent = getIntent();
         String profileDataJSON = intent.getStringExtra("Profiledetails"); //if it's a string you stored.
@@ -652,7 +653,6 @@ public class MainActivity extends BaseActivity
             downloadAvatar(ur);
         }
     }
-
 
     private synchronized void downloadAvatar(final String url) {
         AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {

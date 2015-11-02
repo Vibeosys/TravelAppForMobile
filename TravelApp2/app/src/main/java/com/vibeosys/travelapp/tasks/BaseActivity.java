@@ -438,8 +438,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         {
 
             object.put("name", name);
-            object.put("imageURL",imageURL);
-            object.put("emailID",emailID);
+            object.put("email",emailID);
+
 
             Log.d(TAG, ":" + name);
             Log.d(TAG, ":" + imageURL);
@@ -448,7 +448,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
             Intent intent = new Intent(mFromactivitycall, MainActivity.class);
             //Send Data or Save Data
-            //intent.putExtra("Profiledetails", object.toString());
+            intent.putExtra("Profiledetails", object.toString());
+            intent.putExtra("ProfileImg",imageURL);
 
             startActivity(intent);
 
