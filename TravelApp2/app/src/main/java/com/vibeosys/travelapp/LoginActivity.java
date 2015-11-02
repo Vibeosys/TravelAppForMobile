@@ -31,10 +31,7 @@ import java.util.Arrays;
  */
 public class LoginActivity extends BaseActivity {
 
-    //Facebook
-    CallbackManager callbackManager;
-
-    public LoginActivity() {
+     public LoginActivity() {
         // Required empty public constructor
 
     }
@@ -44,7 +41,7 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Facebook SDK Initialization
-        FacebookLoginAPIInit();
+        FacebookLoginAPIInit(LoginActivity.this);
 
         setContentView(R.layout.login_layout);
 
@@ -54,7 +51,7 @@ public class LoginActivity extends BaseActivity {
         btn_fb_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FacebookLogin();
+                FacebookLogin(LoginActivity.this);
             }
         });
 
@@ -64,79 +61,9 @@ public class LoginActivity extends BaseActivity {
     public void OnClickSkipLogin(View view)
     {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.putExtra("Profiledetails","");
+        intent.putExtra("Profiledetails", "");
         intent.putExtra("ProfileImg", "");
         startActivity(intent);
     }
 
-    private void FacebookLogin() {
-        //Facebook call authentication
-        LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends", "email"));
-    }
-
-
-    private void FacebookLoginAPIInit() {
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-
-        // Callback registration
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-
-
-                AccessToken at = loginResult.getAccessToken();
-
-                Profile pf = Profile.getCurrentProfile();
-                final Uri ur = pf.getProfilePictureUri(150, 150);
-
-                //Getting all details in one short, no need to call individual methods to get details from Facebook
-                GraphRequest request = GraphRequest.newMeRequest(at, new GraphRequest.GraphJSONObjectCallback() {
-
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-
-                        //Toast.makeText(getApplicationContext(), "Welcome " + pf.getName(), Toast.LENGTH_LONG).show();
-
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("Profiledetails", object.toString());
-                        intent.putExtra("ProfileImg", ur.toString());
-                        startActivity(intent);
-
-                        Log.d("JSON Data", object.toString());
-
-
-                    }
-                });
-
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,link,gender,birthday,email,first_name,last_name");
-                request.setParameters(parameters);
-                request.executeAsync();
-
-            }
-
-            @Override
-            public void onCancel() {
-                // App code
-                Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                // App code
-                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        Log.d("Vibeosys", "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
-    }
 }

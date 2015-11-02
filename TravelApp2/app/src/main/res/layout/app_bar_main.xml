@@ -30,10 +30,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:background="?attr/colorPrimary"
                     android:drawableLeft="@drawable/search"
                     android:hint=" Search Destination"
                     android:inputType="textFilter"
+                    android:popupBackground="#ffffff"
                     android:textSize="14dp" />
 
             </LinearLayout>

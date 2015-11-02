@@ -1,10 +1,13 @@
 package com.vibeosys.travelapp.tasks;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,9 +24,20 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.DestinationUsersImages;
 import com.vibeosys.travelapp.GridViewPhotos;
+import com.vibeosys.travelapp.MainActivity;
 import com.vibeosys.travelapp.QuestionSlidingView;
 import com.vibeosys.travelapp.QuestionsFromOthers;
 import com.vibeosys.travelapp.R;
@@ -60,6 +74,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
     protected NewDataBase newDataBase = null;
     protected static SessionManager mSessionManager = null;
+
+    //Facebook
+    protected  CallbackManager callbackManager;
 
     private List<Comment> commentList = null;
     private List<Like> likeList = null;
@@ -414,4 +431,75 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             }
         }
     }
+
+    public void FacebookLogin(final Activity act) {
+        //Facebook call authentication
+        LoginManager.getInstance().logInWithReadPermissions(act, Arrays.asList("public_profile", "user_friends", "email"));
+    }
+
+
+    public void FacebookLoginAPIInit(final Context cx) {
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+
+        // Callback registration
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+
+
+                AccessToken at = loginResult.getAccessToken();
+
+                Profile pf = Profile.getCurrentProfile();
+                final Uri ur = pf.getProfilePictureUri(150, 150);
+
+                //Getting all details in one short, no need to call individual methods to get details from Facebook
+                GraphRequest request = GraphRequest.newMeRequest(at, new GraphRequest.GraphJSONObjectCallback() {
+
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+
+                        //Toast.makeText(getApplicationContext(), "Welcome " + pf.getName(), Toast.LENGTH_LONG).show();
+
+                        Intent intent = new Intent(cx, MainActivity.class);
+                        intent.putExtra("Profiledetails", object.toString());
+                        intent.putExtra("ProfileImg", ur.toString());
+                        startActivity(intent);
+
+                        Log.d("JSON Data", object.toString());
+
+
+                    }
+                });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,link,gender,birthday,email,first_name,last_name");
+                request.setParameters(parameters);
+                request.executeAsync();
+
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+                Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        Log.d("Vibeosys", "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+    }
+
 }
