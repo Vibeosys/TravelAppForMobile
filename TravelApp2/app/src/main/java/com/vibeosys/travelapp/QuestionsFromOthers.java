@@ -32,6 +32,7 @@ import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -327,7 +328,10 @@ public class QuestionsFromOthers extends BaseFragment {
             userLikeImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                updateLike(userDetailsList.get(position).getUserId(),userDetailsList.get(position).getUserLikeCount());
+                    if(!UserAuth.isUserLoggedIn(getContext()))
+                        return ;
+
+                    updateLike(userDetailsList.get(position).getUserId(),userDetailsList.get(position).getUserLikeCount());
                 userLikeCount.setText(userDetailsList.get(position).getUserLikeCount()+1+" Likes");
                 }
             });
@@ -338,6 +342,7 @@ public class QuestionsFromOthers extends BaseFragment {
     }
 
     private boolean updateLike(String imageUserId,int userLikeCount) {
+
         Like like = new Like();
         like.setUserId(imageUserId);
         like.setDestId(Integer.parseInt(destId));

@@ -25,6 +25,7 @@ import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +82,10 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
+
+        if(!UserAuth.isUserLoggedIn(this.getContext()))
+            return;
+
         int Destinatinid = DestId;
         if (editTextCommentByUser.getText().toString().length() > 0 && editTextCommentByUser.getText().toString() != null) {
             String comment = editTextCommentByUser.getText().toString();

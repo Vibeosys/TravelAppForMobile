@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -34,8 +33,10 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 import com.vibeosys.travelapp.view.LoaderImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -44,18 +45,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 /**
  * Created by mahesh on 10/12/2015.
  */
-public class GridViewPhotos extends AppCompatActivity {
+public class GridViewPhotos extends BaseActivity {
 
     GridView mGridViewPhotos;
-    List<String> mImages;
-    private static final int IMAGE_CAPTURE_CODE = 100;
+    //List<String> mImages;
+    //private static final int IMAGE_CAPTURE_CODE = 100;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int MEDIA_IMAGE = 1;
     private static final String IMAGE_DIRECTORY_NAME = "TravelPhotos";
@@ -66,9 +66,9 @@ public class GridViewPhotos extends AppCompatActivity {
     private String[] mNames = null;
     private Cursor cc = null;
     private Uri imageUri;
-    private NewDataBase newDataBase;
+    //private NewDataBase newDataBase;
     int DestId;
-    SessionManager mSessionManager;
+    //SessionManager mSessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +144,9 @@ public class GridViewPhotos extends AppCompatActivity {
     }
 
     private void captureImage() {
+        if (!UserAuth.isUserLoggedIn(getApplicationContext()))
+            return;
+
         Intent takephoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
@@ -322,19 +325,6 @@ public class GridViewPhotos extends AppCompatActivity {
         return output;
     }
 
-    /**
-     * Matches code in MediaProvider.computeBucketValues. Should be a common
-     * function.
-     */
-   /* public static void getCameraImages(Context context) {
-        final String[] projection = { MediaStore.usersImages.Media.DATA };
-        final String selection = MediaStore.usersImages.Media.BUCKET_ID + " = ?";
-        final String[] selectionArgs = { CAMERA_IMAGE_BUCKET_ID };
-
-        }
-    }*/
-
-
     private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
 
         public GalleryAdapter(Context context, Cursor aCur) {
@@ -391,54 +381,6 @@ public class GridViewPhotos extends AppCompatActivity {
         }
     }
 
-
-    /*
-    private class ShowImages extends BaseAdapter {
-
-        Context theContext;
-
-        public ShowImages(Context context) {
-            theContext = context;
-        }
-
-        @Override
-        public int getCount() {
-            return cc.getCount();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return position;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
-
-            View row = convertView;
-            ViewHolder viewHolder = null;
-
-            if (row == null) {
-                LayoutInflater theLayoutInflator = getLayoutInflater();
-                row = theLayoutInflator.inflate(R.layout.gridviewsource, null);
-                viewHolder = new ViewHolder();
-                viewHolder.image = (LoaderImageView) row.findViewById(R.id.viewImage);
-                row.setTag(viewHolder);
-
-            } else {
-                viewHolder = (ViewHolder) row.getTag();
-            }
-
-            viewHolder.image.loadImageFromFile(mUrls[position].getPath());
-            return row;
-        }
-
-    }
-    */
     static class ViewHolder {
         LoaderImageView image;
     }

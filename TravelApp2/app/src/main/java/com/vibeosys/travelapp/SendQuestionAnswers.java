@@ -3,13 +3,13 @@ package com.vibeosys.travelapp;
 /**
  * Created by mahesh on 10/16/2015.
  */
-public class SendQuestionAnswers extends UserDetails{
-int mQuestionId;
-String mQuestionText;
-int mOptionId;
-String mOptionText;
+public class SendQuestionAnswers extends UserDetails {
+    int mQuestionId;
+    String mQuestionText;
+    int mOptionId;
+    String mOptionText;
     int mOptionIdArr[];
-String mOptionTextArr[];
+    String mOptionTextArr[];
     int mId;
 
     public int getmId() {
@@ -20,25 +20,28 @@ String mOptionTextArr[];
         this.mId = mId;
     }
 
-    public SendQuestionAnswers(){
+    public SendQuestionAnswers() {
 
     }
-    SendQuestionAnswers(int cQuestionId,String cQuestionText){
-this.mQuestionId=cQuestionId;
-this.mQuestionText=cQuestionText;
+
+    SendQuestionAnswers(int cQuestionId, String cQuestionText) {
+        this.mQuestionId = cQuestionId;
+        this.mQuestionText = cQuestionText;
     }
-    SendQuestionAnswers(int QuestionId,int cOptionId,String cOptionText){
-        this.mOptionId=cOptionId;
-        this.mQuestionId=QuestionId;
-        this.mOptionText=cOptionText;
+
+    SendQuestionAnswers(int QuestionId, int cOptionId, String cOptionText) {
+        this.mOptionId = cOptionId;
+        this.mQuestionId = QuestionId;
+        this.mOptionText = cOptionText;
     }
-    SendQuestionAnswers(String cUserId,int DestId,int cQuestionId,int OptionId,String OptionText,String QuestionText){
-this.UserId=cUserId;
-this.DestId=DestId;
-this.mOptionId=OptionId;
-this.mOptionText=OptionText;
-this.mQuestionId=cQuestionId;
-this.mQuestionText=QuestionText;
+
+    SendQuestionAnswers(String cUserId, int DestId, int cQuestionId, int OptionId, String OptionText, String QuestionText) {
+        this.UserId = cUserId;
+        this.DestId = DestId;
+        this.mOptionId = OptionId;
+        this.mOptionText = OptionText;
+        this.mQuestionId = cQuestionId;
+        this.mQuestionText = QuestionText;
     }
 
     public int[] getmOptionIdArr() {
@@ -49,12 +52,12 @@ this.mQuestionText=QuestionText;
         this.mOptionIdArr = mOptionIdArr;
     }
 
-    SendQuestionAnswers(int id,String cQuestionText,int OptionId[],String cOptionText[]){
-  this.mOptionIdArr=OptionId;
-  this.mOptionTextArr=cOptionText;
-  this.mId=id;
-  this.mQuestionText=cQuestionText;
-}
+    SendQuestionAnswers(int id, String cQuestionText, int OptionId[], String cOptionText[]) {
+        this.mOptionIdArr = OptionId;
+        this.mOptionTextArr = cOptionText;
+        this.mId = id;
+        this.mQuestionText = cQuestionText;
+    }
 
     public int getmQuestionId() {
         return mQuestionId;

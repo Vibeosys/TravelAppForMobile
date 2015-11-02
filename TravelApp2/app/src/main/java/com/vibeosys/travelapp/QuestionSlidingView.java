@@ -27,6 +27,7 @@ import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +41,9 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     private PagerAdapter mPagerAdapter;
     Button mPrevButton, mNextButton;
     NewDataBase newDataBase = null;
-    String UserId;
+    //String UserId;
     int DestId;
-    String EmailId;
+    //String EmailId;
     List<String> mListOptions;
     SessionManager mSessionManager;
 
@@ -60,8 +61,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         DestId = getIntent().getExtras().getInt("DestId");
         mListOptions = new ArrayList<>();
-        UserId = mSessionManager.Instance().getUserId();
-        EmailId = mSessionManager.Instance().getUserEmailId();
+        //UserId = mSessionManager.Instance().getUserId();
+        //EmailId = mSessionManager.Instance().getUserEmailId();
         newDataBase = new NewDataBase(this);
         int pages = newDataBase.Questions(DestId);
         NUM_PAGES = pages;
@@ -84,6 +85,12 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!UserAuth.isUserLoggedIn(getApplicationContext()))
+                    return;
+
+                String theUserId = SessionManager.Instance().getUserId();
+                String theUserEmailId = SessionManager.Instance().getUserEmailId();
+
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
 
                 if ((mViewPager.getCurrentItem() + 1 == mPagerAdapter.getCount())) {
@@ -95,19 +102,19 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
                         Gson gson = new Gson();
                         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
                         for (int i = 0; i < mListOptions.size(); i++) {
-                            Answer answer = new Answer(mListOptions.get(i), String.valueOf(DestId), UserId);
+                            Answer answer = new Answer(mListOptions.get(i), String.valueOf(DestId), theUserId);
                             String SerializedJsonString = gson.toJson(answer);
                             Log.d("Option Data", SerializedJsonString);
                             tableDataList.add(new TableDataDTO("answer", SerializedJsonString));
                         }
 
-                        uploadData = gson.toJson(new Upload(new UploadUser(UserId, EmailId), tableDataList));
+                        uploadData = gson.toJson(new Upload(new UploadUser(theUserId, theUserEmailId), tableDataList));
                         Log.d("Like Data to Uplaod", uploadData);
 
                         if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
                             Upload(uploadData);
                         } else {
-                            newDataBase.addDataToSync("answer", UserId, uploadData);
+                            newDataBase.addDataToSync("answer", theUserEmailId, uploadData);
                             LayoutInflater
                                     layoutInflater = getLayoutInflater();
                             View view = layoutInflater.inflate(R.layout.cust_toast, null);

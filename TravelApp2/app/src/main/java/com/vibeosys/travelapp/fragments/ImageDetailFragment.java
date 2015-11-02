@@ -46,6 +46,7 @@ import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.ImageWorker;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 import com.vibeosys.travelapp.util.Utils;
 
 import java.util.ArrayList;
@@ -127,6 +128,9 @@ public class ImageDetailFragment extends BaseFragment {
         like.setOnClickListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+                                        if (!UserAuth.isUserLoggedIn(getContext()))
+                                            return;
+
                                         updateLike(images.getUserId());
                                         likeCountText.setText(images.getLikeCount() + 1 + "  Likes  ");
                                     }
@@ -150,7 +154,7 @@ public class ImageDetailFragment extends BaseFragment {
         Log.d("EmailId", "" + EmailId);
         String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
         Log.d("UploadingLike", uploadData.toString());
-        newDataBase.updateLikeCount(imageUserId,images.getDestId(),images.getLikeCount());
+        newDataBase.updateLikeCount(imageUserId, images.getDestId(), images.getLikeCount());
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
             newDataBase.getFromSync();
             super.uploadToServer(uploadData, getActivity());

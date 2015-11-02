@@ -25,6 +25,7 @@ import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,6 +66,9 @@ public class PreviewImage extends AppCompatActivity {
         uploadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!UserAuth.isUserLoggedIn(getApplicationContext()))
+                    return;
+
                 progress = new ProgressDialog(PreviewImage.this);
                 progress.setMessage("Uploading Image...");
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);

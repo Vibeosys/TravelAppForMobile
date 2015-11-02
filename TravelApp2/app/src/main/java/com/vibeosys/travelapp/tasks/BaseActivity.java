@@ -1,7 +1,6 @@
 package com.vibeosys.travelapp.tasks;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,12 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -35,13 +28,7 @@ import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.gson.Gson;
-import com.vibeosys.travelapp.DestinationUsersImages;
-import com.vibeosys.travelapp.GridViewPhotos;
 import com.vibeosys.travelapp.MainActivity;
-import com.vibeosys.travelapp.QuestionSlidingView;
-import com.vibeosys.travelapp.QuestionsFromOthers;
-import com.vibeosys.travelapp.R;
-import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.Destination;
@@ -75,9 +62,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     protected NewDataBase newDataBase = null;
     protected static SessionManager mSessionManager = null;
 
-    //Facebook
-    protected  CallbackManager callbackManager;
-
     private List<Comment> commentList = null;
     private List<Like> likeList = null;
     private List<Destination> destinationList = null;
@@ -87,6 +71,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     private List<com.vibeosys.travelapp.data.Question> questionsList = null;
     private List<Option> optionsList = null;
     //private int id;
+    //Facebook
+    protected CallbackManager callbackManager;
 
     public void UploadUserDetails() {
         Gson gson = new Gson();
@@ -294,143 +280,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
     }
 
-    protected void showDestinationInfoDialog(String title, final int cDestId) {
-        // Create custom dialog object
-        final String titlename = title;
-        final Dialog dialog = new Dialog(this);
-        // Include dialog.xml file
-        dialog.setContentView(R.layout.cust_dialog);
-        // Set dialog title
-        dialog.setTitle(title);
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        newDataBase = new NewDataBase(getApplicationContext());
-        int imageCount = this.newDataBase.Images(cDestId, false).size();
-        int msgCount = this.newDataBase.MsgCount(cDestId);
-        dialog.show();
-        Log.d("INDialog", "" + cDestId);
-        TextView mCountPhotos = (TextView) dialog.findViewById(R.id.photocounttext);
-        mCountPhotos.setText(String.valueOf(imageCount));
-        TextView mCountMsgs = (TextView) dialog.findViewById(R.id.item_counter);
-        mCountMsgs.setText(String.valueOf(msgCount));
-        RelativeLayout relativeLayout = (RelativeLayout) dialog.findViewById(R.id.userphoto);
-        relativeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), DestinationUsersImages.class);
-                intent.putExtra("DestId", cDestId);
-                intent.putExtra("DestName", titlename);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), "View Photos...", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        RelativeLayout relativeLayout1 = (RelativeLayout) dialog.findViewById(R.id.mymessages);
-        relativeLayout1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentphoto = new Intent(getApplicationContext(), QuestionsFromOthers.class);
-                intentphoto.putExtra("DestId", cDestId);
-                intentphoto.putExtra("DestName", titlename);
-                startActivity(intentphoto);
-                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
-            }
-        });
-        Button sendphoto_button = (Button) dialog.findViewById(R.id.senduserButton);
-        Button sendmsg_button = (Button) dialog.findViewById(R.id.sendbutton);
-        Button usercomments = (Button) dialog.findViewById(R.id.usercommentsButton);
-        usercomments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), DestinationComments.class);
-                theIntent.putExtra("DestId", cDestId);
-                theIntent.putExtra("DestName", titlename);
-                startActivity(theIntent);
-            }
-        });
-
-        sendmsg_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent theIntent = new Intent(getApplicationContext(), QuestionSlidingView.class);
-                theIntent.putExtra("DestId", cDestId);
-                theIntent.putExtra("DestName", titlename);
-                startActivity(theIntent);
-                Toast.makeText(getApplicationContext(), "View Messages...", Toast.LENGTH_SHORT).show();
-            }
-        });
-        sendphoto_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(BaseActivity.this, GridViewPhotos.class);
-                intent.putExtra("DestId", cDestId);
-                intent.putExtra("DestName", titlename);
-                startActivity(intent);
-            }
-        });
-    }
-
     @Override
     public void onFailure(String aData) {
         Log.d("BaseActivity", "IN Base");
     }
 
-
-    class BackgroundTask extends AsyncTask<String, Void, String> {
-
-        private boolean mShowProgressDlg;
-        private ProgressDialog mProgressDialog = new ProgressDialog(BaseActivity.this);
-
-        public BackgroundTask(boolean aShowProgressDlg) {
-            mShowProgressDlg = aShowProgressDlg;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (mProgressDialog != null) {
-                mProgressDialog.dismiss();
-            }
-
-            if (s != null) {
-                onSuccess(s);
-            } else {
-                onFailure(null);
-            }
-
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            try {
-                URL url = new URL(params[0]);
-                String id = params[1];
-                Log.d("Param", id);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String dataLine = null;
-
-                StringBuffer dataBuffer = new StringBuffer();
-                while ((dataLine = br.readLine()) != null) {
-                    dataBuffer.append(dataLine);
-                }
-                return dataBuffer.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if (mShowProgressDlg) {
-                mProgressDialog.show();
-            }
-        }
-    }
 
     public void FacebookLogin(final Activity act) {
         //Facebook call authentication
@@ -500,6 +354,62 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
         Log.d("Vibeosys", "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+    }
+
+    class BackgroundTask extends AsyncTask<String, Void, String> {
+
+        private boolean mShowProgressDlg;
+        private ProgressDialog mProgressDialog = new ProgressDialog(BaseActivity.this);
+
+        public BackgroundTask(boolean aShowProgressDlg) {
+            mShowProgressDlg = aShowProgressDlg;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (mProgressDialog != null) {
+                mProgressDialog.dismiss();
+            }
+
+            if (s != null) {
+                onSuccess(s);
+            } else {
+                onFailure(null);
+            }
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                URL url = new URL(params[0]);
+                //String id = params[1];
+                //Log.d("Param", id);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String dataLine = null;
+
+                StringBuffer dataBuffer = new StringBuffer();
+                while ((dataLine = br.readLine()) != null) {
+                    dataBuffer.append(dataLine);
+                }
+                return dataBuffer.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (mShowProgressDlg) {
+                mProgressDialog.show();
+            }
+        }
     }
 
 }
