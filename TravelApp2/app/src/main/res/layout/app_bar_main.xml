@@ -16,28 +16,24 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
+            android:background="?attr/colorPrimary">
 
             <LinearLayout
-                android:id="@+id/linearlistlist"
+                android:id="@+id/linearlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_gravity="center"
-                android:background="#ffffff">
+                android:layout_gravity="center">
 
                 <AutoCompleteTextView
                     android:id="@+id/dest_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:background="@color/colorPrimary"
+                    android:layout_weight="5"
+                    android:background="?attr/colorPrimary"
                     android:drawableLeft="@drawable/search"
                     android:hint=" Search Destination"
-
-                    android:inputType="textAutoComplete"
-                    android:textColor="#ffffff"
+                    android:inputType="textFilter"
                     android:textSize="14dp" />
 
             </LinearLayout>

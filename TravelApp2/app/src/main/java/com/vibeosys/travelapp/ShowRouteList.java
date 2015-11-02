@@ -33,12 +33,13 @@ import java.util.List;
 /**
  * Created by mahesh on 10/3/2015.
  */
-public class ShowRouteList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ShowRouteList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     ListView listView;
     Context context;
     NewDataBase newDataBase;
     List<Routes> mRouteList;
-    int REQUESTCODE=100;
+    int REQUESTCODE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,10 +47,10 @@ public class ShowRouteList extends AppCompatActivity implements NavigationView.O
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("My Routes");
-        listView=(ListView)findViewById(R.id.routelistview);
-        context=getApplicationContext();
-        newDataBase=new NewDataBase(ShowRouteList.this);
-        mRouteList=newDataBase.getRouteList();
+        listView = (ListView) findViewById(R.id.routelistview);
+        context = getApplicationContext();
+        newDataBase = new NewDataBase(ShowRouteList.this);
+        mRouteList = newDataBase.getRouteList();
         listView.setAdapter(new TravelCustomAdaptor(mRouteList));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -84,8 +85,10 @@ public class ShowRouteList extends AppCompatActivity implements NavigationView.O
             Intent intent2 = new Intent(getApplicationContext(), ShowMyPhotos.class);
             startActivity(intent2);
 
+        } else if (id == R.id.userprofile) {
+            Intent userprofile = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(userprofile);
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -135,16 +138,16 @@ public class ShowRouteList extends AppCompatActivity implements NavigationView.O
             detail = (TextView) row.findViewById(R.id.to_destination);
             textdatetext = (TextView) row.findViewById(R.id.textdate);
             title.setText(theRouteList.get(position).getmRouteName());
-            String date= theRouteList.get(position).getmRouteDate();
+            String date = theRouteList.get(position).getmRouteDate();
             //SimpleDateFormat simpleDateFormat=new SimpleDateFormat();
 
-            textdatetext.setText(date.substring(0,14));
+            textdatetext.setText(date.substring(0, 14));
             List<String> theRouteNames = new ArrayList<>();
             JSONArray theJsonArray;
             JSONObject jsonObject;
             try {
                 theJsonArray = new JSONArray(theRouteList.get(position).getmRoutetripsNames());
-                Log.d("SHOWROUTELIST :- JSON",theJsonArray.toString());
+                Log.d("SHOWROUTELIST :- JSON", theJsonArray.toString());
                 for (int i = 0; i < theJsonArray.length(); i++) {
                     jsonObject = theJsonArray.getJSONObject(i);
                     theRouteNames.add(jsonObject.getString("DestName"));
@@ -163,14 +166,15 @@ public class ShowRouteList extends AppCompatActivity implements NavigationView.O
         }
 
     }
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
 
-          if (id==R.id.home){
-                 NavUtils.getParentActivityIntent(this);
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.home) {
+            NavUtils.getParentActivityIntent(this);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
+}

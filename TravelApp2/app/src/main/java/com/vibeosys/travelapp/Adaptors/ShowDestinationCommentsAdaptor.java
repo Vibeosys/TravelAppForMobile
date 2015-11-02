@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.vibeosys.travelapp.CommentsAndLikes;
 import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.RoundedImageView;
 import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.textView = (TextView) viewrow.findViewById(R.id.userNametext1);
             viewHolder.textView1 = (TextView) viewrow.findViewById(R.id.userNameComment2);
-            viewHolder.imageView = (ImageView) viewrow.findViewById(R.id.userimagedest);
+            viewHolder.imageView = (RoundedImageView) viewrow.findViewById(R.id.userimagedest);
 
             viewrow.setTag(viewHolder);
         } else viewHolder = (ViewHolder) viewrow.getTag();

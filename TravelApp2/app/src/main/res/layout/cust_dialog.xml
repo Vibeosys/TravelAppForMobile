@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <RelativeLayout
+        android:id="@+id/userphoto"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#F3F3F3"
-        android:orientation="vertical"
-        android:id="@+id/userphoto">
+        android:orientation="vertical">
 
         <!-- icon -->
         <ImageView
+            android:id="@+id/imageView2"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/camera"
-            android:id="@+id/imageView2" />
+            android:src="@drawable/camera" />
 
         <!-- title -->
         <TextView
             android:id="@+id/item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Photos "
-            android:textSize="18dp"
             android:layout_alignTop="@+id/imageView2"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:text="Photos "
+            android:textSize="18dp" />
 
         <!-- counter -->
         <TextView
+            android:id="@+id/photocounttext"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentRight="true"
@@ -42,18 +43,17 @@
             android:text="10"
             android:textColor="#000"
             android:textSize="12sp"
-            android:textStyle="bold"
-            android:id="@+id/photocounttext" />
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mymessages"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#F3F3F3"
-        android:orientation="vertical"
         android:layout_below="@+id/userphoto"
-        android:id="@+id/mymessages">
+        android:background="#F3F3F3"
+        android:orientation="vertical">
 
         <!-- icon -->
         <ImageView
@@ -64,17 +64,16 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/message"
-            />
+            android:src="@drawable/message" />
 
         <!-- title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:text="New Messages"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:text="New Messages"
+            android:textSize="18dp" />
 
         <!-- counter -->
         <TextView
@@ -85,9 +84,9 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:gravity="center"
+            android:text="3"
             android:textColor="#000"
             android:textSize="12sp"
-            android:text="3"
             android:textStyle="bold" />
     </RelativeLayout>
 
@@ -101,46 +100,46 @@
 
         <Button
 
+            android:id="@+id/sendbutton"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:text="Send \nMessage"
-            android:id="@+id/sendbutton"
-            android:background="#283593"
-            android:textColor="#ffffff"
             android:layout_marginLeft="8dp"
             android:layout_weight="0.00"
-            android:textSize="12sp"
-            />
+            android:background="#283593"
+            android:text="Send \nMessage"
+            android:textColor="#ffffff"
+            android:textSize="12sp" />
 
         <Button
+            android:id="@+id/moredetails"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
+            android:layout_marginLeft="5dp"
+            android:background="#283593"
             android:text="More Details"
             android:textColor="#ffffff"
-            android:id="@+id/moredetails"
-            android:layout_marginLeft="5dp"
-            android:background="#283593"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
+
         <Button
+            android:id="@+id/usercommentsButton"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:text="User\nComments"
-            android:background="#283593"
-            android:id="@+id/usercommentsButton"
             android:layout_marginLeft="5dp"
+            android:background="#283593"
+            android:text="User\nComments"
             android:textColor="#ffffff"
             android:textSize="12sp"
 
             />
 
         <Button
+            android:id="@+id/senduserButton"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:text="Send \nPhoto"
-            android:textColor="#ffffff"
-            android:id="@+id/senduserButton"
             android:layout_marginLeft="5dp"
             android:background="#283593"
+            android:text="Send \nPhoto"
+            android:textColor="#ffffff"
             android:textSize="12sp"
 
             />
