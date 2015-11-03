@@ -311,7 +311,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     }
 
     public void FacebookLogout() {
+        try {
+            LoginManager.getInstance().logOut();
 
+            //Clean Authentication data from share preference
+            UserAuth.CleanAuthenticationInfo();
+
+            Toast.makeText(getApplicationContext(), "You have successfully logged out", Toast.LENGTH_SHORT);
+        }
+        catch (Exception ex) {
+            Log.e("Facebook Logout:",ex.getMessage());
+        }
     }
 
 
@@ -402,9 +412,19 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     protected void GooglePlusLogout() {
         // Clear the default account so that GoogleApiClient will not automatically
         // connect in the future.
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
+        try {
+            if (mGoogleApiClient.isConnected()) {
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                mGoogleApiClient.disconnect();
+
+                //Clean Authentication data from share preference
+                UserAuth.CleanAuthenticationInfo();
+
+                Toast.makeText(getApplicationContext(), "You have successfully logged out", Toast.LENGTH_SHORT);
+            }
+        }
+        catch (Exception ex) {
+            Log.e("Google Logout:",ex.getMessage());
         }
 
 

@@ -28,6 +28,17 @@ public class UserAuth {
         return isUserLoggedIn(context, theUserName, theUserEmailId);
     }
 
+    public static boolean isUserLoggedIn() {
+        String theUserEmailId = SessionManager.Instance().getUserEmailId();
+        String theUserName = SessionManager.Instance().getUserName();
+        String theUserPhotoURL = SessionManager.Instance().getUserPhotoUrl();
+
+        if (theUserEmailId == null || theUserEmailId == "" || theUserName == null || theUserName == "" || theUserPhotoURL==null || theUserPhotoURL=="" ) {
+            return false;
+        }
+        return true;
+    }
+
     public static boolean saveAuthenticationInfo(User userInfo, Context context) {
         if (userInfo == null)
             return false;
@@ -46,6 +57,18 @@ public class UserAuth {
         NewDataBase newDataBase = new NewDataBase(context);
         boolean isRecordUpdated = newDataBase.updateUserAuthenticationInfo(userInfo);
         return isRecordUpdated;
+    }
+
+    public static boolean CleanAuthenticationInfo() {
+
+        SessionManager theSessionManager = SessionManager.Instance();
+        theSessionManager.setUserName(null);
+        theSessionManager.setUserEmailId(null);
+        theSessionManager.setUserPhotoUrl(null);
+        theSessionManager.setUserLoginRegdSoure(null);
+        theSessionManager.setUserRegdApiKey(null);
+
+        return true;
     }
 
 }

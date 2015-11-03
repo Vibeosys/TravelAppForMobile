@@ -50,6 +50,7 @@ import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -632,7 +633,8 @@ public class MainActivity extends BaseActivity
         //Setting values from JSON Object
         userName.setText(mSessionManager.getUserName());
         userEmail.setText(mSessionManager.getUserEmailId());
-        downloadAvatar(mSessionManager.getUserPhotoUrl());
+        if(UserAuth.isUserLoggedIn())
+            downloadAvatar(mSessionManager.getUserPhotoUrl());
     }
 
     private synchronized void downloadAvatar(final String url) {
