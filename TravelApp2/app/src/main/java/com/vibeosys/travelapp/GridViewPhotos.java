@@ -75,8 +75,8 @@ public class GridViewPhotos extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gridviewphotos);
         setTitle("Choose Photos");
-        SessionManager.Instance();
-        SessionManager.getInstance(getApplicationContext());
+        //SessionManager.Instance();
+        mSessionManager = SessionManager.getInstance(getApplicationContext());
         mGridViewPhotos = (GridView) findViewById(R.id.showgridphotos);
         DestId = getIntent().getExtras().getInt("DestId");
         String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";

@@ -515,7 +515,7 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateUserInfo(String userId) {
+    public boolean createUserId(String userId) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         long count = -1;
@@ -523,13 +523,14 @@ public class NewDataBase extends SQLiteOpenHelper {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
             contentValues.put("UserId", userId);
-            sqLiteDatabase.insert("MyUser", null, contentValues);
+            count = sqLiteDatabase.insert("MyUser", null, contentValues);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            contentValues.clear();
+            sqLiteDatabase.close();
         }
 
-        contentValues.clear();
-        sqLiteDatabase.close();
         if (count == -1) return false;
         else return true;
 

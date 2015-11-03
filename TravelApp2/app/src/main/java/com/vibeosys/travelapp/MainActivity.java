@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity
             String UserId = mSessionManager.getUserId();
             //Log.d("UserId", UserId);
             super.fetchData(UserId, true);//id 1=>download 2=>upload
-            newDataBase.updateUserInfo(String.valueOf(UserId));
+            //newDataBase.updateUserInfo(String.valueOf(UserId));
         } else {
 
             layoutInflater = getLayoutInflater();
@@ -469,6 +469,10 @@ public class MainActivity extends BaseActivity
 
         uuid = UUID.randomUUID();
         mSessionManager.setUserId(uuid.toString());
+        boolean userCreated = newDataBase.createUserId(mSessionManager.getUserId());
+        if(!userCreated)
+            Log.e("UserCreation","New user could not be created in DB");
+
         String downloadDBURL = mSessionManager.getDownloadDbUrl(mSessionManager.getUserId());
 
         try {
