@@ -1,7 +1,6 @@
 package com.vibeosys.travelapp.tasks;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -11,12 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -42,13 +35,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.gson.Gson;
-import com.vibeosys.travelapp.DestinationUsersImages;
-import com.vibeosys.travelapp.GridViewPhotos;
 import com.vibeosys.travelapp.MainActivity;
-import com.vibeosys.travelapp.QuestionSlidingView;
-import com.vibeosys.travelapp.QuestionsFromOthers;
-import com.vibeosys.travelapp.R;
-import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.Destination;
@@ -59,14 +46,15 @@ import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.util.RegistrationSourceTypes;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -78,7 +66,7 @@ import java.util.Map;
 /**
  * Base Activity will give the basic implementation with async task support and other things
  */
-public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     protected NewDataBase newDataBase = null;
     protected static SessionManager mSessionManager = null;
@@ -102,7 +90,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     private static final int RC_SIGN_IN = 1;
     final static String TAG = "com.vibeosys";
     private Activity mFromactivitycall;
-
 
 
     public void UploadUserDetails() {
@@ -323,8 +310,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         LoginManager.getInstance().logInWithReadPermissions(act, Arrays.asList("public_profile", "user_friends", "email"));
     }
 
-    public void FacebookLogout()
-    {
+    public void FacebookLogout() {
 
     }
 
@@ -339,29 +325,44 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // App code
-
-
-                AccessToken at = loginResult.getAccessToken();
-
-                Profile pf = Profile.getCurrentProfile();
-                final Uri ur = pf.getProfilePictureUri(150, 150);
-
+                final AccessToken facebookAppToken = loginResult.getAccessToken();
                 //Getting all details in one short, no need to call individual methods to get details from Facebook
-                GraphRequest request = GraphRequest.newMeRequest(at, new GraphRequest.GraphJSONObjectCallback() {
-
+                GraphRequest request = GraphRequest.newMeRequest(facebookAppToken, new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
+                        Profile facebookProfile = Profile.getCurrentProfile();
+                        if (facebookProfile == null) {
+                            Log.e("Login", "facebook Profile is null");
+                            Toast.makeText(getApplicationContext(), "Facebook application is not installed", Toast.LENGTH_SHORT);
+                            return;
+                        }
 
-                        //Toast.makeText(getApplicationContext(), "Welcome " + pf.getName(), Toast.LENGTH_LONG).show();
+                        final Uri profilePic = facebookProfile.getProfilePictureUri(150, 150);
+                        User theUser = null;
 
+                        try {
+                            theUser = new User(SessionManager.Instance().getUserId(),
+                                    object.getString("name"),
+                                    object.getString("email"),
+                                    profilePic.toString(),
+                                    RegistrationSourceTypes.FACEBOOK,
+                                    facebookAppToken.getToken(),
+                                    object.getString("id"));
+                        } catch (JSONException ex) {
+                            Log.e("LoginFacebook", "JSON exception from facebook data deserialization");
+                        }
+
+                        boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
+                        if (!userAdded) {
+                            Toast.makeText(getApplicationContext(), "User is not Added successfully", Toast.LENGTH_SHORT);
+                            Log.e("LoginFacebook", "User is not Added successfully " + object.toString());
+                        }
                         Intent intent = new Intent(cx, MainActivity.class);
-                        intent.putExtra("Profiledetails", object.toString());
-                        intent.putExtra("ProfileImg", ur.toString());
+                        /*intent.putExtra("Profiledetails", object.toString());
+                        intent.putExtra("ProfileImg", profilePic.toString());*/
                         startActivity(intent);
 
                         Log.d("JSON Data", object.toString());
-
-
                     }
                 });
 
@@ -369,7 +370,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
                 parameters.putString("fields", "id,name,link,gender,birthday,email,first_name,last_name");
                 request.setParameters(parameters);
                 request.executeAsync();
-
             }
 
             @Override
@@ -393,7 +393,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         // attempt to resolve any errors that occur.
         mShouldResolve = true;
         mGoogleApiClient.connect();
-        mFromactivitycall =act;
+        mFromactivitycall = act;
 
         // Show a message to the user that we are signing in.
         Toast.makeText(this, "Signing in", Toast.LENGTH_SHORT).show();
@@ -421,24 +421,41 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
+        try {
 
-        Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-        String name = currentPerson.getDisplayName();
-        String imageURL = currentPerson.getImage().getUrl();
+            Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+            if (currentPerson == null) {
+                Log.e("LoginGoogle+", "Error while getting data from Google+");
+                return;
+            }
+            String name = currentPerson.getDisplayName();
+            String imageURL = currentPerson.getImage().getUrl();
 
-        //changing the default size of image which API return i.e 50 X 50
-        imageURL = imageURL.substring(0,
-                imageURL.length() - 2)
-                + 150;
+            //changing the default size of image which API return i.e 50 X 50
+            imageURL = imageURL.substring(0,
+                    imageURL.length() - 2)
+                    + 150;
 
-        String emailID =  Plus.AccountApi.getAccountName(mGoogleApiClient);
+            String googleEmailId = Plus.AccountApi.getAccountName(mGoogleApiClient);
 
-        JSONObject object = new JSONObject();
-        try
-        {
+            User theUser = new User(SessionManager.Instance().getUserId(),
+                    currentPerson.getDisplayName(),
+                    googleEmailId,
+                    currentPerson.getImage().getUrl(),
+                    RegistrationSourceTypes.GOOGLE_PLUS,
+                    null,
+                    currentPerson.getId());
+
+            Boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
+            if (!userAdded) {
+                Toast.makeText(getApplicationContext(), "User is not Added successfully", Toast.LENGTH_SHORT);
+                Log.e("LoginGoogle+", "User is not Added successfully ");
+            }
+            JSONObject object = new JSONObject();
+
 
             object.put("name", name);
-            object.put("email",emailID);
+            object.put("email", googleEmailId);
 
 
             Log.d(TAG, ":" + name);
@@ -449,16 +466,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
             Intent intent = new Intent(mFromactivitycall, MainActivity.class);
             //Send Data or Save Data
             intent.putExtra("Profiledetails", object.toString());
-            intent.putExtra("ProfileImg",imageURL);
+            intent.putExtra("ProfileImg", imageURL);
 
             startActivity(intent);
 
-        }
-        catch (JSONException ex)
-        {
+        } catch (JSONException ex) {
             Log.d(TAG, "Error:" + ex.getMessage());
         }
-
 
 
         // Show a message to the user that we are signing in.
@@ -527,8 +541,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
 
     }
 
-    public void GooglePlusAPIInit()
-    {
+    public void GooglePlusAPIInit() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)

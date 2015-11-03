@@ -161,11 +161,7 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
 
         //Login Profile Data Integration with UI
-        try {
-            ProfileLoginData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setProfileInfoInNavigationBar();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -626,32 +622,17 @@ public class MainActivity extends BaseActivity
 
     //-------------Login----------------------//
 
-    private void ProfileLoginData() {
+    private void setProfileInfoInNavigationBar() {
         // After successful Loing
-        Intent intent = getIntent();
-        String profileDataJSON = intent.getStringExtra("Profiledetails"); //if it's a string you stored.
-        if (!profileDataJSON.isEmpty()) {
-            try {
 
-                JSONObject obj = new JSONObject(profileDataJSON);
-                TextView userName = (TextView) findViewById(R.id.userName);
-                TextView userEmail = (TextView) findViewById(R.id.userEmailID);
+        TextView userName = (TextView) findViewById(R.id.userName);
+        TextView userEmail = (TextView) findViewById(R.id.userEmailID);
+        userProfileImage = (ImageView) findViewById(R.id.userProfileImage);
 
-                //Setting values from JSON Object
-                userName.setText(obj.getString("name").toString());
-                userEmail.setText(obj.getString("email").toString());
-
-
-            } catch (JSONException e) {
-                Log.d("Error", e.getMessage());
-            }
-
-
-            String ur = intent.getStringExtra("ProfileImg"); //if it's a string you stored.
-            //Toast.makeText(getApplicationContext(), ur.toString(), Toast.LENGTH_LONG).show();
-            userProfileImage = (ImageView) findViewById(R.id.userProfileImage);
-            downloadAvatar(ur);
-        }
+        //Setting values from JSON Object
+        userName.setText(mSessionManager.getUserName());
+        userEmail.setText(mSessionManager.getUserEmailId());
+        downloadAvatar(mSessionManager.getUserPhotoUrl());
     }
 
     private synchronized void downloadAvatar(final String url) {

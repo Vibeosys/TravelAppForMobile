@@ -354,19 +354,19 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateLikeCount(String userId, int destId,int previousLikeCount) {
+    public boolean updateLikeCount(String userId, int destId, int previousLikeCount) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         int rows = 0;
         try {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
-            contentValues.put("LikeCount", previousLikeCount+1);
+            contentValues.put("LikeCount", previousLikeCount + 1);
             rows = sqLiteDatabase.update("comment_and_like", contentValues, "userid=? and destid=?", new String[]{userId, String.valueOf(destId)});
 
             sqLiteDatabase.close();
         } catch (Exception e) {
-           Log.e("UPDATELIKECOUNTEx", e.toString());
+            Log.e("UPDATELIKECOUNTEx", e.toString());
         }
         if (rows > 0) return true;
         return false;
@@ -534,6 +534,31 @@ public class NewDataBase extends SQLiteOpenHelper {
         else return true;
 
     }
+
+    public boolean updateUserAuthenticationInfo(User userAuthInfo) {
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues = null;
+        long rowsAffected = 0;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("UserName", userAuthInfo.getUserName());
+            contentValues.put("UserEmail", userAuthInfo.getEmailId());
+            contentValues.put("PhotoURL", userAuthInfo.getPhotoURL());
+            contentValues.put("APIKey", userAuthInfo.getApiKey());
+            contentValues.put("LginSource", userAuthInfo.getLoginSource().toString());
+            rowsAffected = sqLiteDatabase.update("MyUser", contentValues, "UserId=?",
+                    new String[]{userAuthInfo.getUserId()});
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            contentValues.clear();
+            sqLiteDatabase.close();
+        }
+
+        return rowsAffected != 0;
+    }
+
 
     public int MsgCount(int cDestId) {
         int count = 0;

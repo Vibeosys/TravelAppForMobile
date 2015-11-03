@@ -7,8 +7,8 @@
     android:animateLayoutChanges="true"
     android:background="@drawable/side_nav_bar"
     android:gravity="bottom|center_horizontal"
-    android:textAlignment="center"
     android:orientation="vertical"
+    android:textAlignment="center"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <com.vibeosys.travelapp.RoundedImageView
@@ -30,6 +30,7 @@
         android:id="@+id/userEmailID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="6dp"
         android:text="" />
 
 </LinearLayout>

@@ -157,6 +157,30 @@ public class SessionManager {
         return mProjectSharedPref.getString(PropertyTypeConstants.DATABASE_FILE_NAME, null);
     }
 
+    public void setUserPhotoUrl(String userPhotoUrl) {
+        setValuesInSharedPrefs(PropertyTypeConstants.USER_PHOTO_URL, userPhotoUrl);
+    }
+
+    public String getUserPhotoUrl() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.USER_PHOTO_URL, null);
+    }
+
+    public void setUserRegdApiKey(String userRegdApiKey) {
+        setValuesInSharedPrefs(PropertyTypeConstants.USER_REGD_API_KEY, userRegdApiKey);
+    }
+
+    public String getUserRegdApiKey() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.USER_REGD_API_KEY, null);
+    }
+
+    public void setUserLoginRegdSoure(String userRegdApiKey) {
+        setValuesInSharedPrefs(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE, userRegdApiKey);
+    }
+
+    public String getUserLoginRegdSoure() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE, null);
+    }
+
     private static void setValuesInSharedPrefs(String sharedPrefKey, String sharedPrefValue) {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();
         editor.putString(sharedPrefKey, sharedPrefValue);

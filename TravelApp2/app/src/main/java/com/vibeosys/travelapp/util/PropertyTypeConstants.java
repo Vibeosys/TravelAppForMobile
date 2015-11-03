@@ -21,5 +21,7 @@ public final class PropertyTypeConstants {
     public static final String USER_ID = "user.id";
     public static final String USER_NAME = "user.name";
     public static final String USER_EMAIL_ID = "user.email";
-
+    public static final String USER_PHOTO_URL = "user.photo.url";
+    public static final String USER_REGD_API_KEY = "user.regd.api.key";
+    public static final String USER_LOGIN_REGD_SOURCE = "user.login.regd.source";
 }
