@@ -19,7 +19,9 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center"
             android:text="Login"
-            android:textSize="14sp" />
+            android:textSize="25sp"
+            android:layout_marginBottom="10dp"
+            />
 
         <!-- Email Label -->
 
@@ -44,23 +46,14 @@
         <Button
             android:id="@+id/btn_login"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="35dp"
             android:layout_marginTop="24dp"
             android:background="?attr/colorPrimary"
             android:padding="12dp"
             android:text="Login"
             android:textSize="14sp"
             android:textColor="#ffffff" />
-
-        <TextView
-            android:id="@+id/link_signup"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
-            android:text="No account yet? Create one"
-            android:textSize="8sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,12 +63,12 @@
 
             <Button
                 android:id="@+id/btn_fbLogin"
-                android:layout_width="214dp"
-                android:layout_height="38dp"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:background="#3b579d"
                 android:drawableLeft="@drawable/fbbtn_logo"
-                android:text="Sign in"
+                android:text="Log in with Facebook"
                 android:textColor="#ffffff"
                 android:textSize="14sp" />
 
@@ -83,22 +76,25 @@
             <TextView
                 android:id="@+id/textOR"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="55dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="24dp"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="-------- OR ---------"
-                android:textSize="10sp" />
+                android:textSize="15sp" />
 
-            <com.google.android.gms.common.SignInButton
+            <Button
                 android:id="@+id/btn_GPLogin"
-                android:layout_width="220dp"
+                android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="-15dp"
-                android:drawableLeft="@drawable/common_signin_btn_icon_normal_dark"
-                android:text="Log in with Google+" />
+                android:drawableLeft="@drawable/btn_google"
+                android:text="Log in with Google+"
+                android:background="#dd4b39"
+                android:textColor="#ffffff"
+                />
         </LinearLayout>
 
     </LinearLayout>
