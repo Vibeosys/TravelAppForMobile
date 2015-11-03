@@ -12,7 +12,7 @@
             android:title="My Routes" />
         <item
             android:id="@+id/userprofile"
-            android:icon="@drawable/user_profileimage"
+            android:icon="@drawable/ic_account_circle"
             android:title="My Profile" />
     </group>
 
