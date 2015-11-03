@@ -69,12 +69,6 @@ public class LoginActivity extends BaseActivity {
 
     }
 
-    public void OnClickSkipLogin(View view)
-    {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.putExtra("Profiledetails", "");
-        intent.putExtra("ProfileImg", "");
-        startActivity(intent);
-    }
+
 
 }
