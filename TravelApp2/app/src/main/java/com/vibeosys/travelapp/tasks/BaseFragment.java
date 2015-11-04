@@ -21,7 +21,6 @@ import com.vibeosys.travelapp.data.Download;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.Option;
-import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.SessionManager;
@@ -61,68 +60,6 @@ public class BaseFragment extends Fragment implements BackgroundTaskCallback {
     private List<com.vibeosys.travelapp.data.Question> questionsList = null;
     private List<Option> optionsList = null;
 
-
-    public void UploadUserDetails() {
-        Gson gson = new Gson();
-        String EmailId = mSessionManager.getUserEmailId();
-        String UserId = mSessionManager.getUserId();
-        String UserName = mSessionManager.getUserName();
-        UploadUser uploadUser = new UploadUser(UserId, EmailId, UserName);
-        final String encodedString = gson.toJson(uploadUser);
-        RequestQueue rq = Volley.newRequestQueue(getActivity());
-        Log.d("Encoded String", encodedString);
-        rq = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-                mSessionManager.getUpdateUserDetails(), encodedString, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONObject jresponse = response;//.getJSONObject(0);
-                    Log.d("UploadUserDetails", jresponse + "");
-                    String res = jresponse.getString("message");
-                    String code = jresponse.getString("errorCode");
-                    if (code.equals("0")) {
-                        //  JSONObject json = new JSONObject(response);
-                        Toast.makeText(getActivity(),
-                                "Updated Successfully", Toast.LENGTH_SHORT)
-                                .show();
-                    }
-
-                    if (code.equals("100")) {
-                        Log.e("Error", "User Not Authenticated..");
-                    }
-                    if (code.equals("101")) {
-                        Log.e("Error", "User Id is Blanck");
-                    }
-                    if (code.equals("102")) {
-                        Log.e("Error", "Unknown Error");
-                    }
-
-
-                } catch (JSONException e) {
-                    Log.d("JSON Exception", e.toString());
-                    Toast.makeText(getActivity(),
-                            "Error while loadin data!",
-                            Toast.LENGTH_LONG).show();
-                }
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("ERROR", "Error [" + error.getMessage() + "]");
-                Toast.makeText(getActivity(),
-                        "Cannot connect to server", Toast.LENGTH_LONG)
-                        .show();
-            }
-
-        });
-
-        rq.add(jsonArrayRequest);
-        rq.add(jsonArrayRequest);
-    }
 
     public void fetchData(String userId, final boolean aShowProgressDlg) {
         Log.d("BaseActivity", "IN Base");

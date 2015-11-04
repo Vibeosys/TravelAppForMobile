@@ -68,7 +68,7 @@ public class PropertyFileReader {
     }
 
     public String getUploadUserDetails() {
-        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPDATE_USERS_DETAILS);
+        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPDATE_USERS_DETAILS_URL);
     }
 
     public String getDatabaseDirPath() {

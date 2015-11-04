@@ -132,7 +132,7 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
 
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
 
-            super.UploadUserDetails();
+            //super.UploadUserDetails();
             newDataBase.getFromSync();
             super.uploadToServer(uploadData, getActivity());
 

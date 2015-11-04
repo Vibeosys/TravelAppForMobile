@@ -78,7 +78,7 @@ public class SessionManager {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();
         editor.putString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, mPropertyFileReader.getImageUploadUrl());
         editor.putString(PropertyTypeConstants.API_UPLOAD_URL, mPropertyFileReader.getUploadUrl());
-        editor.putString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, mPropertyFileReader.getUploadUserDetails());
+        editor.putString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS_URL, mPropertyFileReader.getUploadUserDetails());
         editor.putString(PropertyTypeConstants.API_DOWNLOAD_DB_URI, mPropertyFileReader.getDownloadDbUrl());
         editor.putString(PropertyTypeConstants.API_DOWNLOAD_URI, mPropertyFileReader.getDownloadUrl());
         editor.putString(PropertyTypeConstants.DATABASE_DEVICE_FULLPATH, mPropertyFileReader.getDatabaseDeviceFullPath());
@@ -113,8 +113,8 @@ public class SessionManager {
         return mProjectSharedPref.getString(PropertyTypeConstants.API_UPLOAD_IMAGE_URL, null);
     }
 
-    public String getUpdateUserDetails() {
-        return mProjectSharedPref.getString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS, null);
+    public String getUpdateUserDetailsUrl() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.API_UPDATE_USERS_DETAILS_URL, null);
     }
 
     public String getUploadUrl() {

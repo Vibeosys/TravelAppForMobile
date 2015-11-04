@@ -145,7 +145,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     }
 
     void Upload(String uploadData) {
-        super.UploadUserDetails();
+        //super.UploadUserDetails();
         super.uploadToServer(uploadData, QuestionSlidingView.this);//id 1=>download 2=>upload
     }
 

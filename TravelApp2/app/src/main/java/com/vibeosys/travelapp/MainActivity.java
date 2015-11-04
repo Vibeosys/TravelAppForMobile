@@ -142,8 +142,9 @@ public class MainActivity extends BaseActivity
             File internalfile = new File(directory, mSessionManager.getDatabaseFileName());
             if (!internalfile.exists()) {
                 downloadDatabase(internalfile);
+            } else if (internalfile.exists() && (mSessionManager.getUserId() == null || mSessionManager.getUserId() == "")) {
+                downloadDatabase(internalfile);
             }
-
             String UserId = mSessionManager.getUserId();
             //Log.d("UserId", UserId);
             super.fetchData(UserId, true);//id 1=>download 2=>upload
@@ -470,8 +471,8 @@ public class MainActivity extends BaseActivity
         uuid = UUID.randomUUID();
         mSessionManager.setUserId(uuid.toString());
         boolean userCreated = newDataBase.createUserId(mSessionManager.getUserId());
-        if(!userCreated)
-            Log.e("UserCreation","New user could not be created in DB");
+        if (!userCreated)
+            Log.e("UserCreation", "New user could not be created in DB");
 
         String downloadDBURL = mSessionManager.getDownloadDbUrl(mSessionManager.getUserId());
 
@@ -637,7 +638,7 @@ public class MainActivity extends BaseActivity
         //Setting values from JSON Object
         userName.setText(mSessionManager.getUserName());
         userEmail.setText(mSessionManager.getUserEmailId());
-        if(UserAuth.isUserLoggedIn())
+        if (UserAuth.isUserLoggedIn())
             downloadAvatar(mSessionManager.getUserPhotoUrl());
     }
 

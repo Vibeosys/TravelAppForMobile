@@ -52,7 +52,8 @@ public class QuestionsFromOthers extends BaseFragment {
     HashMap<String, Options> mListQuestionsAnswers = null;
     private List<UserLikeDTO> listUsersDetails = new ArrayList<>();
     String destId;
-    SessionManager sessionManager=SessionManager.Instance();
+    SessionManager sessionManager = SessionManager.Instance();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +95,7 @@ public class QuestionsFromOthers extends BaseFragment {
             }
 
         }
-        if(mListOptions!=null) {
+        if (mListOptions != null) {
             questionslistView.setAdapter(new OthersQuestionsAdaptor(getActivity(), mListQuestionsAnswers));
         }
         questionslistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -323,25 +324,25 @@ public class QuestionsFromOthers extends BaseFragment {
             View view = inflater.inflate(R.layout.userlikelist, null);
             TextView usernameText = (TextView) view.findViewById(R.id.userlikesname);
             usernameText.setText(userDetailsList.get(position).getUserName());
-            final TextView userLikeCount=(TextView) view.findViewById(R.id.userlikecountText);
-            ImageView userLikeImage=(ImageView) view.findViewById(R.id.likebutton);
+            final TextView userLikeCount = (TextView) view.findViewById(R.id.userlikecountText);
+            ImageView userLikeImage = (ImageView) view.findViewById(R.id.likebutton);
             userLikeImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!UserAuth.isUserLoggedIn(getContext()))
-                        return ;
+                    if (!UserAuth.isUserLoggedIn(getContext()))
+                        return;
 
-                    updateLike(userDetailsList.get(position).getUserId(),userDetailsList.get(position).getUserLikeCount());
-                userLikeCount.setText(userDetailsList.get(position).getUserLikeCount()+1+" Likes");
+                    updateLike(userDetailsList.get(position).getUserId(), userDetailsList.get(position).getUserLikeCount());
+                    userLikeCount.setText(userDetailsList.get(position).getUserLikeCount() + 1 + " Likes");
                 }
             });
 
-            userLikeCount.setText(userDetailsList.get(position).getUserLikeCount()+"  Likes");
+            userLikeCount.setText(userDetailsList.get(position).getUserLikeCount() + "  Likes");
             return view;
         }
     }
 
-    private boolean updateLike(String imageUserId,int userLikeCount) {
+    private boolean updateLike(String imageUserId, int userLikeCount) {
 
         Like like = new Like();
         like.setUserId(imageUserId);
@@ -355,7 +356,7 @@ public class QuestionsFromOthers extends BaseFragment {
         Log.d("EmailId", "" + EmailId);
         String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
         Log.d("UploadingLike", uploadData.toString());
-        newDataBase.updateLikeCount(imageUserId,Integer.parseInt(destId),userLikeCount);
+        newDataBase.updateLikeCount(imageUserId, Integer.parseInt(destId), userLikeCount);
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
             newDataBase.getFromSync();
             super.uploadToServer(uploadData, getActivity());

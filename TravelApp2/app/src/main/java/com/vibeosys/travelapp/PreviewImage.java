@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
@@ -29,7 +30,9 @@ import java.io.FileInputStream;
  * Created by mahesh on 10/13/2015.
  */
 
-public class PreviewImage extends BaseActivity implements View.OnClickListener {
+public class PreviewImage extends BaseActivity
+        implements View.OnClickListener,
+        ImageFileUploader.OnUploadCompleteListener, ImageFileUploader.OnUploadErrorListener {
 
     private NewDataBase newDataBase = null;
     private String imageData = null;
@@ -111,8 +114,10 @@ public class PreviewImage extends BaseActivity implements View.OnClickListener {
 
             String filename = path.substring(path.lastIndexOf("/") + 1);
 
-            new ImageFileUploader(this)
-                    .uploadImageFile(progress, path, filename, DestId);
+            ImageFileUploader imageFileUploader = new ImageFileUploader(this);
+            imageFileUploader.setOnUploadCompleteListener(this);
+            imageFileUploader.setOnUploadErrorListener(this);
+            imageFileUploader.uploadDestinationImage(path, filename, DestId);
 
         } else {
             try {
@@ -138,4 +143,23 @@ public class PreviewImage extends BaseActivity implements View.OnClickListener {
         return encodedImage;
     }
 
+    @Override
+    public void onUploadComplete(String uploadJsonResponse) {
+
+        Log.i("DestinationUploadJSON", uploadJsonResponse);
+
+        if (progress != null && progress.isShowing())
+            progress.dismiss();
+
+        this.finish();
+    }
+
+    @Override
+    public void onUploadError(VolleyError error) {
+        if (progress != null && progress.isShowing())
+            progress.dismiss();
+
+        Log.e("DestinationUploadError",error.toString());
+        this.finish();
+    }
 }

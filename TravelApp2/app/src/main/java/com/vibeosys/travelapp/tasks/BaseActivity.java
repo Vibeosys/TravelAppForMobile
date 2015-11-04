@@ -43,7 +43,6 @@ import com.vibeosys.travelapp.data.Download;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.Option;
-import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.util.RegistrationSourceTypes;
@@ -66,7 +65,9 @@ import java.util.Map;
 /**
  * Base Activity will give the basic implementation with async task support and other things
  */
-public abstract class BaseActivity extends AppCompatActivity implements BackgroundTaskCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public abstract class BaseActivity extends AppCompatActivity
+        implements BackgroundTaskCallback, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     protected NewDataBase newDataBase = null;
     protected static SessionManager mSessionManager = null;
@@ -92,64 +93,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Backgrou
     private Activity mFromactivitycall;
 
 
-    public void UploadUserDetails() {
-        Gson gson = new Gson();
-        String UserId = mSessionManager.getUserId();
-        String EmailId = mSessionManager.getUserEmailId();
 
-        String UserName = mSessionManager.getUserName();
-        UploadUser uploadUser = new UploadUser(UserId, EmailId, UserName);
-
-        final String encodedString = gson.toJson(uploadUser);
-        RequestQueue rq = Volley.newRequestQueue(this);
-        String updateUsersDetailsUrl = mSessionManager.getUpdateUserDetails();
-        Log.d("Encoded String", encodedString);
-        rq = Volley.newRequestQueue(this);
-        JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-                updateUsersDetailsUrl, encodedString, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONObject jresponse = response;//.getJSONObject(0);
-                    Log.d("UploadUserDetails", jresponse + "");
-                    String res = jresponse.getString("message");
-                    String code = jresponse.getString("errorCode");
-                    if (code.equals("0")) {
-                        //  JSONObject json = new JSONObject(response);
-                        Toast.makeText(getBaseContext(),
-                                "Updated Successfully", Toast.LENGTH_SHORT)
-                                .show();
-                    }
-
-                    if (code.equals("100")) {
-                        Log.e("Error", "User Not Authenticated..");
-                    }
-                    if (code.equals("101")) {
-                        Log.e("Error", "User Id is Blanck");
-                    }
-                    if (code.equals("102")) {
-                        Log.e("Error", "Unknown Error");
-                    }
-
-
-                } catch (JSONException e) {
-                    Log.e("JSON Exception", e.toString());
-
-                }
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("UPLOADUSERDETAILSERROR", "Error [" + error.getMessage() + "]");
-            }
-
-        });
-
-        rq.add(jsonArrayRequest);
-    }
 
 
     public void fetchData(String userId, final boolean aShowProgressDlg) {
