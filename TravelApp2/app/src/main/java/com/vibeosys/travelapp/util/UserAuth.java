@@ -27,7 +27,9 @@ public class UserAuth {
     public static boolean isUserLoggedIn(Context context, String userName, String userEmailId) {
         if (userEmailId == null || userEmailId == "" || userName == null || userName == "") {
             Intent theLoginIntent = new Intent(context, LoginActivity.class);
+            //theLoginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             theLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            theLoginIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             context.startActivity(theLoginIntent);
             return false;
         }

@@ -79,12 +79,12 @@ public class User {
     }
 
     public User(String userId, String userName, String userEmailId,
-                String userPhotoUrl, RegistrationSourceTypes userLoginSource,
+                RegistrationSourceTypes userLoginSource,
                 String apiKey, String thirdPartyUserId) {
         this.mApiKey = apiKey;
         this.mUserId = userId;
         this.mUserName = userName;
-        this.mPhotoURL = userPhotoUrl;
+        //this.mPhotoURL = userPhotoUrl;
         this.mEmailId = userEmailId;
         this.mLoginSource = userLoginSource;
         this.mThirdPartyUserId = thirdPartyUserId;

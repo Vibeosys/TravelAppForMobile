@@ -4,11 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
@@ -34,8 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -50,7 +45,6 @@ import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
-import com.vibeosys.travelapp.util.UserAuth;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,7 +69,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private GoogleMapOptions googleMapOptions;
@@ -470,10 +464,6 @@ public class MainActivity extends BaseActivity
 
         uuid = UUID.randomUUID();
         mSessionManager.setUserId(uuid.toString());
-        boolean userCreated = newDataBase.createUserId(mSessionManager.getUserId());
-        if (!userCreated)
-            Log.e("UserCreation", "New user could not be created in DB");
-
         String downloadDBURL = mSessionManager.getDownloadDbUrl(mSessionManager.getUserId());
 
         try {
@@ -518,6 +508,10 @@ public class MainActivity extends BaseActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        boolean userCreated = newDataBase.createUserId(mSessionManager.getUserId());
+        if (!userCreated)
+            Log.e("UserCreation", "New user could not be created in DB");
 
          /*catch (JSONException e) {
             e.printStackTrace();
@@ -614,60 +608,5 @@ public class MainActivity extends BaseActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e("TAG", "onConnectionFailed: ConnectionResult.getErrorCode() = "
-                + connectionResult.getErrorCode());
-
-        Toast.makeText(this,
-                "Could not connect to Google API Client: Error " + connectionResult.getErrorCode(),
-                Toast.LENGTH_SHORT).show();
-    }
-
-
-    //-------------Login----------------------//
-
-    private void setProfileInfoInNavigationBar() {
-        // After successful Loing
-
-        TextView userName = (TextView) findViewById(R.id.userName);
-        TextView userEmail = (TextView) findViewById(R.id.userEmailID);
-        userProfileImage = (ImageView) findViewById(R.id.userProfileImage);
-
-        //Setting values from JSON Object
-        userName.setText(mSessionManager.getUserName());
-        userEmail.setText(mSessionManager.getUserEmailId());
-        if (UserAuth.isUserLoggedIn())
-            downloadAvatar(mSessionManager.getUserPhotoUrl());
-    }
-
-    private synchronized void downloadAvatar(final String url) {
-        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
-
-            @Override
-            public Bitmap doInBackground(Void... params) {
-                URL fbAvatarUrl = null;
-                Bitmap fbAvatarBitmap = null;
-                try {
-                    fbAvatarUrl = new URL(url);
-                    fbAvatarBitmap = BitmapFactory.decodeStream(fbAvatarUrl.openConnection().getInputStream());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return fbAvatarBitmap;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap result) {
-                userProfileImage.setImageBitmap(result);
-            }
-
-        };
-        task.execute();
-    }
-
 
 }

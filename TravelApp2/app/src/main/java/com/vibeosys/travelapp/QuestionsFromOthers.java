@@ -329,9 +329,9 @@ public class QuestionsFromOthers extends BaseFragment {
             userLikeImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!UserAuth.isUserLoggedIn(getContext()))
+                    if (!UserAuth.isUserLoggedIn(getContext())) {
                         return;
-
+                    }
                     updateLike(userDetailsList.get(position).getUserId(), userDetailsList.get(position).getUserLikeCount());
                     userLikeCount.setText(userDetailsList.get(position).getUserLikeCount() + 1 + " Likes");
                 }

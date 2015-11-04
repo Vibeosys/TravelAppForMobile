@@ -46,7 +46,7 @@ public class ImageFileUploader {
     public void uploadUserProfileImage(final Bitmap bitmapFile) {
         String base64EncodedString = getBase64EncodedStringFromImage(bitmapFile);
         Map<String, String> dataMap = getUserProfileImageParams(base64EncodedString,
-                UUID.randomUUID().toString(), SessionManager.Instance().getUserId(),
+                UUID.randomUUID().toString() + ".jpg", SessionManager.Instance().getUserId(),
                 SessionManager.Instance().getUserEmailId(), SessionManager.Instance().getUserName());
         uploadImage(dataMap);
     }
