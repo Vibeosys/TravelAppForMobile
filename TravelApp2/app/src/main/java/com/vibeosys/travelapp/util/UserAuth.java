@@ -45,9 +45,9 @@ public class UserAuth {
     public static boolean isUserLoggedIn() {
         String theUserEmailId = SessionManager.Instance().getUserEmailId();
         String theUserName = SessionManager.Instance().getUserName();
-        String theUserPhotoURL = SessionManager.Instance().getUserPhotoUrl();
+        //String theUserPhotoURL = SessionManager.Instance().getUserPhotoUrl();
 
-        if (theUserEmailId == null || theUserEmailId == "" || theUserName == null || theUserName == "" || theUserPhotoURL == null || theUserPhotoURL == "") {
+        if (theUserEmailId == null || theUserEmailId == "" || theUserName == null || theUserName == "") {
             return false;
         }
         return true;
@@ -65,7 +65,7 @@ public class UserAuth {
         theSessionManager.setUserName(userInfo.getUserName());
         theSessionManager.setUserEmailId(userInfo.getEmailId());
         theSessionManager.setUserPhotoUrl(userInfo.getPhotoURL());
-        theSessionManager.setUserLoginRegdSoure(userInfo.getLoginSource().toString());
+        theSessionManager.setUserLoginRegdSoure(userInfo.getLoginSource());
         theSessionManager.setUserRegdApiKey(userInfo.getApiKey());
 
                 /*new Thread(
@@ -87,7 +87,7 @@ public class UserAuth {
         theSessionManager.setUserName(null);
         theSessionManager.setUserEmailId(null);
         theSessionManager.setUserPhotoUrl(null);
-        theSessionManager.setUserLoginRegdSoure(null);
+        theSessionManager.setUserLoginRegdSoure(RegistrationSourceTypes.NONE);
         theSessionManager.setUserRegdApiKey(null);
 
         return true;

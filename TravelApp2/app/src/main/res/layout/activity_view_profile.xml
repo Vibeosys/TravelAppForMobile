@@ -19,7 +19,8 @@
             android:layout_height="70dp"
             android:background="@android:color/transparent"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:src="@drawable/user_profileimage" />
+            android:src="@drawable/user_profileimage"
+            android:layout_gravity="center|bottom" />
 
     </LinearLayout>
 
@@ -27,12 +28,14 @@
         android:id="@+id/userNameViewProfile"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="Not Logged In" />
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="2dip"
+        android:layout_height="1dip"
+        android:layout_margin="10dp"
         android:background="#FF0000" />
 
     <TableLayout
@@ -42,9 +45,19 @@
 
     <TableLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:collapseColumns="true"
+        android:gravity="fill_horizontal|center_vertical|center_horizontal"
+        android:shrinkColumns="true">
 
-        <TableRow android:layout_width="fill_parent">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
 
             <TextView
                 android:id="@+id/emailIdText"
@@ -54,22 +67,54 @@
                 android:text="Email Id" />
         </TableRow>
 
-        <TableRow android:layout_width="fill_parent">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
 
             <TextView
                 android:id="@+id/emailIdValue"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:text="Email Id" />
 
             <Button
                 android:id="@+id/changeButton"
                 android:layout_width="wrap_content"
+                android:gravity="right"
                 android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimaryDark"
+                android:background="@android:color/transparent"
                 android:text="Change" />
 
         </TableRow>
 
 
     </TableLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:animateLayoutChanges="true"
+        android:baselineAligned="false"
+        android:clickable="true"
+        android:gravity="bottom|center_horizontal"
+        android:touchscreenBlocksFocus="false"
+        android:outlineProvider="bounds">
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="@color/colorPrimaryDark"
+            android:background="@android:color/transparent"
+            android:text="Logout"
+            android:textSize="18sp" />
+    </LinearLayout>
 </LinearLayout>

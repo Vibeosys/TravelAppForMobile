@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -39,12 +38,13 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
+import com.vibeosys.travelapp.activities.ViewProfileActivity;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
+import com.vibeosys.travelapp.util.UserAuth;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,11 +110,11 @@ public class MainActivity extends BaseActivity
         if (!mList.isEmpty()) {
             for (int i = 0; i < mList.size(); i++) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mList.get(i).getLat(), mList.get(i).getLong())).title(mList.get(i).getDestName()));
-                if (i < mList.size() - 1) {
+                /*if (i < mList.size() - 1) {
                     mMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(mList.get(i).getLat(), mList.get(i).getLong()))
                             .add(new LatLng(mList.get(i + 1).getLat(), mList.get(i + 1).getLong())).width(5).color(Color.BLACK));
-                }
+                }*/
             }
         }
     }
@@ -217,15 +217,15 @@ public class MainActivity extends BaseActivity
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(7);
                 mMap.animateCamera(zoom);
                 //Log.d("TempData",String.valueOf(mTempData.size()));
-                if (destinationTempData != null) {
+                //if (destinationTempData != null) {
 
-                    mMap.addPolyline(new PolylineOptions().geodesic(true)
-                                    .add(new LatLng(mCurrentDestinationData.get(0).getmLat(),
-                                            mCurrentDestinationData.get(0).getmLong()))
-                                    .add(new LatLng(destinationTempData.getmLat(),
-                                            destinationTempData.getmLong())).width(5).color(Color.BLACK)
-                    );
-                }
+                //  mMap.addPolyline(new PolylineOptions().geodesic(true)
+                //                  .add(new LatLng(mCurrentDestinationData.get(0).getmLat(),
+                //                          mCurrentDestinationData.get(0).getmLong()))
+                //                  .add(new LatLng(destinationTempData.getmLat(),
+                //                          destinationTempData.getmLong())).width(5).color(Color.BLACK)
+                //  );
+                //}
 
             }
         });
@@ -253,7 +253,6 @@ public class MainActivity extends BaseActivity
                                 mTempDataList = new ArrayList<>();
                                 mTempDataList = newDataBase.GetFromTemp();
                                 JSONArray jsonArray = new JSONArray();
-                                ;
                                 JSONObject jsonObject;
                                 Log.d("mTempDataSize", String.valueOf(mTempDataList.size()));
                                 for (int i = 0; i < mTempDataList.size(); i++) {
@@ -592,17 +591,22 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_manage) {
-            Intent intent2 = new Intent(getApplicationContext(), ShowRouteList.class);
-            startActivity(intent2);
+            Intent routeListIntent = new Intent(getApplicationContext(), ShowRouteList.class);
+            startActivity(routeListIntent);
 
 
         } else if (id == R.id.nav_gallery) {
-            Intent intent2 = new Intent(getApplicationContext(), ShowMyPhotos.class);
-            startActivity(intent2);
+            Intent showPhotosIntent = new Intent(getApplicationContext(), ShowMyPhotos.class);
+            startActivity(showPhotosIntent);
 
         } else if (id == R.id.userprofile) {
-            Intent userprofile = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(userprofile);
+            Intent userProfileIntent;
+            if (UserAuth.isUserLoggedIn()) {
+                userProfileIntent = new Intent(getApplicationContext(), ViewProfileActivity.class);
+            } else {
+                userProfileIntent = new Intent(getApplicationContext(), LoginActivity.class);
+            }
+            startActivity(userProfileIntent);
         }
 
 

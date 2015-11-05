@@ -173,12 +173,17 @@ public class SessionManager {
         return mProjectSharedPref.getString(PropertyTypeConstants.USER_REGD_API_KEY, null);
     }
 
-    public void setUserLoginRegdSoure(String userRegdApiKey) {
-        setValuesInSharedPrefs(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE, userRegdApiKey);
+    public void setUserLoginRegdSoure(RegistrationSourceTypes registrationSourceType) {
+        setValuesInSharedPrefs(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE,
+                registrationSourceType.name());
     }
 
-    public String getUserLoginRegdSoure() {
-        return mProjectSharedPref.getString(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE, null);
+    public RegistrationSourceTypes getUserLoginRegdSoure() {
+        String enumString = mProjectSharedPref.getString(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE, null);
+        RegistrationSourceTypes registrationSourceTypes = RegistrationSourceTypes.NONE;
+        if (enumString != null || enumString != "")
+            registrationSourceTypes = Enum.valueOf(RegistrationSourceTypes.class, enumString);
+        return registrationSourceTypes;
     }
 
     private static void setValuesInSharedPrefs(String sharedPrefKey, String sharedPrefValue) {
