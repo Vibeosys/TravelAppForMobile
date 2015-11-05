@@ -134,7 +134,7 @@ public class LoginActivity
 
                         boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
                         if (!userAdded) {
-                            Toast.makeText(getApplicationContext(), "User is not Added successfully", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(), "User is not able to login successfully.", Toast.LENGTH_SHORT);
                             Log.e("LoginFacebook", "User is not Added successfully " + object.toString());
                         }
                         downloadImgFromFbGPlusAndUploadToAws(profilePic.toString());
