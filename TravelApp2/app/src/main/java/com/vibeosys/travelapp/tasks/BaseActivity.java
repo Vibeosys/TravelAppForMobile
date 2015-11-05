@@ -5,8 +5,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -221,49 +223,45 @@ public abstract class BaseActivity extends AppCompatActivity
         Log.d("BaseActivity", "IN Base");
     }
 
-    protected void setProfileInfoInNavigationBar() {
-        // After successful Loing
+    protected static void setProfileInfoInNavigationBar(View view) {
+        // After successful Login
 
-        TextView userName = (TextView) findViewById(R.id.userName);
-        TextView userEmail = (TextView) findViewById(R.id.userEmailID);
-        ImageView userProfileImage = (ImageView) findViewById(R.id.userProfileImage);
+        TextView userName = (TextView) view.findViewById(R.id.userName);
+        TextView userEmail = (TextView) view.findViewById(R.id.userEmailID);
+        ImageView userProfileImage = (ImageView) view.findViewById(R.id.userProfileImage);
 
         //Setting values from JSON Object
         userName.setText(SessionManager.Instance().getUserName());
         userEmail.setText(SessionManager.Instance().getUserEmailId());
-        //userProfileImage.setImageBitmap();
+
         if (SessionManager.Instance().getUserPhotoUrl() != null || SessionManager.Instance().getUserPhotoUrl() == "") {
-            try {
-                URL url = new URL(SessionManager.Instance().getUserPhotoUrl());
-                //Bitmap profileImage = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                //userProfileImage.setImageBitmap(profileImage);
-            } catch (IOException e) {
-                Log.e("PhotoUrlException", e.toString());
-            } finally {
-            }
+            downloadImageAsync(SessionManager.Instance().getUserPhotoUrl(), userProfileImage);
         }
     }
 
-    protected void downloadAvatar(final String url) {
+    protected void downloadImgFromFbGPlusAndUploadToAws(final String url) {
         URL fbAvatarUrl = null;
         Bitmap fbAvatarBitmap = null;
         try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+            StrictMode.setThreadPolicy(policy);
+
             fbAvatarUrl = new URL(url);
             fbAvatarBitmap = BitmapFactory.decodeStream(fbAvatarUrl.openConnection().getInputStream());
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e("DownloadImageEx", "Exception while downloading AWS image " + e.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("DownloadImageEx", "Exception while downloading AWS image " + e.toString());
         }
 
         ImageFileUploader imageFileUploader = new ImageFileUploader(getApplicationContext());
         imageFileUploader.setOnUploadCompleteListener(this);
         imageFileUploader.setOnUploadErrorListener(this);
         imageFileUploader.uploadUserProfileImage(fbAvatarBitmap);
-
     }
 
-    protected synchronized void downloadAvatarAsync(final String url) {
+    protected static synchronized void downloadImageAsync(final String url, final ImageView imageView) {
         AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
 
             @Override
@@ -274,43 +272,18 @@ public abstract class BaseActivity extends AppCompatActivity
                     fbAvatarUrl = new URL(url);
                     fbAvatarBitmap = BitmapFactory.decodeStream(fbAvatarUrl.openConnection().getInputStream());
                 } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    Log.e("DownloadImgBkgErr", "Error occurred while downloading profile image in background " + e.toString());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e("DownloadImgBkgErr", "Error occurred while downloading profile image in background " + e.toString());
+                } catch (Exception e) {
+                    Log.e("DownloadImgBkgErr", "Error occurred while downloading profile image in background " + e.toString());
                 }
                 return fbAvatarBitmap;
             }
 
             @Override
             protected void onPostExecute(Bitmap result) {
-                //userProfileImage.setImageBitmap(result);
-                ImageFileUploader imageFileUploader = new ImageFileUploader(getApplicationContext());
-                imageFileUploader.setOnUploadCompleteListener(
-                        new ImageFileUploader.OnUploadCompleteListener() {
-                            @Override
-                            public void onUploadComplete(String uploadJsonResponse) {
-                                try {
-                                    JSONObject jsonObject = new JSONObject(uploadJsonResponse);
-                                    String imageUrl = jsonObject.getString("message");
-                                    SessionManager.Instance().setUserPhotoUrl(imageUrl);
-
-                                } catch (JSONException e) {
-                                    Log.e("ProfileImgUpErr", "JSON exception while uploading the image." + e.toString());
-                                }
-
-                            }
-                        }
-
-                );
-                imageFileUploader.setOnUploadErrorListener(
-                        new ImageFileUploader.OnUploadErrorListener() {
-                            @Override
-                            public void onUploadError(VolleyError error) {
-                                Log.e("ProfileImageUpErr", "Error occurred while uploading to server " + error.toString());
-                            }
-                        }
-                );
-                imageFileUploader.uploadUserProfileImage(result);
+                imageView.setImageBitmap(result);
             }
 
         };
@@ -346,8 +319,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
             try {
                 URL url = new URL(params[0]);
-                //String id = params[1];
-                //Log.d("Param", id);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String dataLine = null;
@@ -379,22 +350,15 @@ public abstract class BaseActivity extends AppCompatActivity
             JSONObject jsonObject = new JSONObject(uploadJsonResponse);
             String imageUrl = jsonObject.getString("message");
             SessionManager.Instance().setUserPhotoUrl(imageUrl);
-            //setProfileInfoInNavigationBar();
-            this.finish();
         } catch (JSONException e) {
             Log.e("ProfileImgUpErr", "JSON exception while uploading the image." + e.toString());
         }
-
-        if (mProgressDialog != null && mProgressDialog.isShowing())
-            mProgressDialog.dismiss();
 
         this.finish();
     }
 
     @Override
     public void onUploadError(VolleyError error) {
-        if (mProgressDialog != null && mProgressDialog.isShowing())
-            mProgressDialog.dismiss();
 
         Log.e("ProfileUploadError", error.toString());
         this.finish();

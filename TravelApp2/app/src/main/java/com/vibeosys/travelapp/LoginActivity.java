@@ -121,20 +121,29 @@ public class LoginActivity
 
 
     public void FacebookLoginAPIInit(final Context cx) {
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
+        FacebookSdk.sdkInitialize(cx);
         callbackManager = CallbackManager.Factory.create();
 
         // Callback registration
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
+            ProgressDialog progressDialog = new ProgressDialog(cx);
+
             @Override
             public void onSuccess(LoginResult loginResult) {
+
+                progressDialog.show();
+
                 // App code
                 final AccessToken facebookAppToken = loginResult.getAccessToken();
                 //Getting all details in one short, no need to call individual methods to get details from Facebook
                 GraphRequest request = GraphRequest.newMeRequest(facebookAppToken, new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
+
+                        progressDialog.setMessage("Setting up your account");
+                        progressDialog.show();
+
                         Profile facebookProfile = Profile.getCurrentProfile();
                         if (facebookProfile == null) {
                             Log.e("Login", "facebook Profile is null");
@@ -161,13 +170,13 @@ public class LoginActivity
                             Toast.makeText(getApplicationContext(), "User is not Added successfully", Toast.LENGTH_SHORT);
                             Log.e("LoginFacebook", "User is not Added successfully " + object.toString());
                         }
-                        downloadAvatar(profilePic.toString());
+                        downloadImgFromFbGPlusAndUploadToAws(profilePic.toString());
 
                         //Intent intent = new Intent(cx, MainActivity.class);
                         /*intent.putExtra("Profiledetails", object.toString());
                         intent.putExtra("ProfileImg", profilePic.toString());*/
                         //startActivity(intent);
-
+                        progressDialog.dismiss();
                         Log.d("JSON Data", object.toString());
                         //finish();
                     }
@@ -237,6 +246,9 @@ public class LoginActivity
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
+        mProgressDialog.setMessage("Setting up your account");
+        mProgressDialog.show();
+
         try {
 
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
@@ -262,7 +274,7 @@ public class LoginActivity
                     currentPerson.getId());
 
             Boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
-            downloadAvatar(currentPerson.getImage().getUrl());
+            downloadImgFromFbGPlusAndUploadToAws(currentPerson.getImage().getUrl());
 
             if (!userAdded) {
                 Toast.makeText(getApplicationContext(), "User is not Added successfully", Toast.LENGTH_SHORT);
@@ -368,12 +380,6 @@ public class LoginActivity
                 .addScope(new Scope(Scopes.PROFILE))
                 .addScope(new Scope(Scopes.EMAIL))
                 .build();
-    }
-
-    @Override
-    public void finish() {
-        setProfileInfoInNavigationBar();
-        super.finish();
     }
 
 

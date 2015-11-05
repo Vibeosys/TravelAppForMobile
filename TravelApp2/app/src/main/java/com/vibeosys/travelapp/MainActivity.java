@@ -156,9 +156,6 @@ public class MainActivity extends BaseActivity
 
         setContentView(R.layout.activity_main);
 
-        //Login Profile Data Integration with UI
-        setProfileInfoInNavigationBar();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
@@ -176,11 +173,11 @@ public class MainActivity extends BaseActivity
         if(temp) newDataBase.DeleteTempMaps();
         else temp=false;*/
 //       Log.d("MainActivity",String.valueOf(mDestinationList.size()));
-        List<String> mDestNames = new ArrayList<>();
+        //List<String> mDestNames = new ArrayList<>();
 
         ArrayAdapter<String> arrayAdapter = null;
         try {
-            arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+            arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
                     Collections.list(Collections.enumeration(mDestinationNames.keySet())));
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -314,7 +311,18 @@ public class MainActivity extends BaseActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000), 5));
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+                /** Called when a drawer has settled in a completely open state. */
+                public void onDrawerOpened(View drawerView) {
+                    super.onDrawerOpened(drawerView);
+
+                    setProfileInfoInNavigationBar(drawerView);
+                    //getActionBar().setTitle(mDrawerTitle);
+                    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                }
+
+            };
             drawer.setDrawerListener(toggle);
             toggle.syncState();
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -409,33 +417,25 @@ public class MainActivity extends BaseActivity
                     commentsLabel.setText(destCommentcount + " People have commented about the place.");
                     rattingsLabel.setText(String.valueOf(msgCount) + " Reviews for this place");
 
-                    view.findViewById(R.id.overlay).setOnClickListener(new View.OnClickListener() {
+                    view.findViewById(R.id.overlay).setOnClickListener(
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View aView) {
+                                    dlg.dismiss();
+                                }
+                            });
 
-                        @Override
-                        public void onClick(View aView) {
-                            dlg.dismiss();
-                        }
-                    });
-
-                    view.findViewById(R.id.send_photos).setOnClickListener(new View.OnClickListener() {
-
-                                                                               @Override
-                                                                               public void onClick(View v) {
-                                                                                   Intent theIntent = new Intent(MainActivity.this, GridViewPhotos.class);
-                                                                                   theIntent.putExtra("DestId", mDestId);
-                                                                                   startActivity(theIntent);
-                                                                               }
-                                                                           }
-                    );
-
-                    /*
-                    phtotosView.setOnClickListener(new View.OnClickListener() {
+                    view.findViewById(R.id.send_photos).setOnClickListener(
+                            new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
+                                    Intent theIntent = new Intent(MainActivity.this, GridViewPhotos.class);
+                                    theIntent.putExtra("DestId", mDestId);
+                                    startActivity(theIntent);
                                 }
-                    });
-                    view.setLayoutParams(new ViewGroup.LayoutParams(200, 200));*/
+                            }
+                    );
+
                     TextView title = (TextView) view.findViewById(R.id.dlg_title);
                     title.setText(marker.getTitle());
                     dlg.show();
@@ -499,14 +499,16 @@ public class MainActivity extends BaseActivity
                 inputStream.close();
             }
 
-        } catch (ConnectException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (ConnectException cEx) {
+            Log.e("DbDownloadException", "Error while downloading database" + cEx.toString());
+        } catch (MalformedURLException eMf) {
+            Log.e("DbDownloadException", "Error while downloading database" + eMf.toString());
+        } catch (FileNotFoundException eFn) {
+            Log.e("DbDownloadException", "Error while downloading database" + eFn.toString());
+        } catch (IOException eIo) {
+            Log.e("DbDownloadException", "Error while downloading database" + eIo.toString());
+        } catch (Exception ex) {
+            Log.e("DbDownloadException", "Error while downloading database" + ex.toString());
         }
 
         boolean userCreated = newDataBase.createUserId(mSessionManager.getUserId());
