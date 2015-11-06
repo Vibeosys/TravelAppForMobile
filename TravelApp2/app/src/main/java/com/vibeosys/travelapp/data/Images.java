@@ -62,7 +62,7 @@ Images(){
     }
 
     public int getDestId() {
-        return DestId;
+        return this.DestId;
     }
 
     public void setDestId(int destId) {

@@ -65,6 +65,7 @@ public class ImageDetailFragment extends BaseFragment
     private List<Images> listImages;
     private NewDataBase newDataBase;
     private Images images;
+    private TextView mLikeCountText;
     SessionManager sessionManager = SessionManager.Instance();
 
     /**
@@ -114,7 +115,7 @@ public class ImageDetailFragment extends BaseFragment
         // Inflate and locate the main ImageView
         final View v = inflater.inflate(R.layout.image_detail_fragment, container, false);
         TextView usernameText = (TextView) v.findViewById(R.id.usernaemimagetext);
-        final TextView likeCountText = (TextView) v.findViewById(R.id.likecounttext);
+        mLikeCountText = (TextView) v.findViewById(R.id.likecounttext);
         ImageView like = (ImageView) v.findViewById(R.id.likebutton);
 
         if (images != null) {
@@ -124,7 +125,7 @@ public class ImageDetailFragment extends BaseFragment
             ss1.setSpan(new RelativeSizeSpan(2f), 0, ss1.length(), 0);
             Spanned text = Html.fromHtml("<font >Updated By </font>  " + "<b>" + ss1.toString() + "</b> ");
             usernameText.setText(text);
-            likeCountText.setText(images.getLikeCount() + "  Likes  ");
+            mLikeCountText.setText(images.getLikeCount() + "  Likes  ");
         }
 
         like.setOnClickListener(this);
@@ -138,9 +139,8 @@ public class ImageDetailFragment extends BaseFragment
         if (!UserAuth.isUserLoggedIn(getContext()))
             return;
 
-        TextView likeCountText = (TextView) v.findViewById(R.id.likecounttext);
+        mLikeCountText.setText(images.getLikeCount() + 1 + "  Likes  ");
         updateLike(images.getUserId());
-        likeCountText.setText(images.getLikeCount() + 1 + "  Likes  ");
     }
 
     private boolean updateLike(String imageUserId) {

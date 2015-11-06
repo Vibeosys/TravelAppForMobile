@@ -378,7 +378,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         Images images = null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            String qurey = "select UserName, comment_and_like.LikeCount,user.userid, comment_and_like.destid " +
+            String qurey = "select UserName, comment_and_like.LikeCount,user.UserId, images.DestId " +
                     " from Images left outer join comment_and_like on images.DestId = comment_and_like.DestId " +
                     " and images.UserId = comment_and_like.UserId " +
                     " inner join user on images.UserId = user.UserId" +
