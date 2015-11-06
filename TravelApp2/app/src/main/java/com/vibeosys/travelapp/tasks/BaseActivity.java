@@ -516,7 +516,7 @@ public abstract class BaseActivity extends AppCompatActivity
             }
         } else {
             // Show the signed-out UI
-            Toast.makeText(this, "Signout", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Authentication failed.Please check the Internet connection!", Toast.LENGTH_SHORT).show();
         }
 
     }

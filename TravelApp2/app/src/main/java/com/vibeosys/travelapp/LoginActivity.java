@@ -159,13 +159,14 @@ public class LoginActivity
             @Override
             public void onCancel() {
                 // App code
-                Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "User authentication cancelled!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onError(FacebookException exception) {
                 // App code
-                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Authentication failed.Please check the Internet connection!", Toast.LENGTH_LONG).show();
+                Log.e("LoginFacebook",exception.getMessage());
             }
         });
     }
