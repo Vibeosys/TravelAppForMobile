@@ -896,7 +896,6 @@ public class NewDataBase extends SQLiteOpenHelper {
         List<SendQuestionAnswers> theListAskQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
-        int mQuestionId = cQuestionId;
         try {
             theListAskQuestions = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();

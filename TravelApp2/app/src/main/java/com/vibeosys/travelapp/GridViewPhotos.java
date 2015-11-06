@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,13 +19,21 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.vibeosys.travelapp.data.ImageUploadDTO;
+import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
+import com.vibeosys.travelapp.util.ImageFileUploader;
+import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.UserAuth;
 import com.vibeosys.travelapp.view.LoaderImageView;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -32,7 +41,8 @@ import java.util.Locale;
 /**
  * Created by mahesh on 10/12/2015.
  */
-public class GridViewPhotos extends BaseActivity {
+public class GridViewPhotos extends BaseActivity
+        implements ImageFileUploader.OnUploadCompleteListener, ImageFileUploader.OnUploadErrorListener {
 
     private GridView mGridViewPhotos;
     //List<String> mImages;
@@ -50,6 +60,7 @@ public class GridViewPhotos extends BaseActivity {
     //private NewDataBase newDataBase;
     private int DestId;
     //SessionManager mSessionManager;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +135,74 @@ public class GridViewPhotos extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("Uploading Image...");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.show();
+
+        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                final String imagePath = imageUri.getPath();
+                String date = DateFormat.getDateTimeInstance().format(new Date());
+                newDataBase = new NewDataBase(getApplicationContext());
+                newDataBase.saveInMyImages(imagePath, date);
+                Gson gson = new Gson();
+                ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
+                imageUploadDTO.setImageData(imagePath);
+
+                imageUploadDTO.setImageName(imagePath);
+                String SerializedJsonString = gson.toJson(imageUploadDTO);
+                if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
+                    final String filename = imagePath.substring(imagePath.lastIndexOf("/") + 1);
+
+                    final ImageFileUploader imageFileUploader = new ImageFileUploader(this);
+                    imageFileUploader.setOnUploadCompleteListener(this);
+                    imageFileUploader.setOnUploadErrorListener(this);
+
+                    new Thread() {
+                        public void run() {
+                            try {
+                                imageFileUploader.uploadDestinationImage(imagePath, filename, DestId);
+                            } catch (Exception ex) {
+                                Log.e("ExceptionGridImgUp", "Error uploading the captured photo");
+                            } finally {
+                                if (mProgressDialog != null && mProgressDialog.isShowing())
+                                    mProgressDialog.dismiss();
+                            }
+                        }
+                    }.start();
+
+                } else {
+                    try {
+                        newDataBase.addDataToSync("MyImages", mSessionManager.getUserId(), SerializedJsonString);
+                        LayoutInflater layoutInflater = getLayoutInflater();
+                        View view = layoutInflater.inflate(R.layout.cust_toast, null);
+                        Toast toast = new Toast(getApplicationContext());
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        toast.setView(view);//setting the view of custom toast layout
+                        toast.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // user cancelled Image capture
+                Toast.makeText(getApplicationContext(),
+                        "User cancelled image capture", Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                // failed to capture image
+                Toast.makeText(getApplicationContext(),
+                        "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
+
     private void captureImage() {
         if (!UserAuth.isUserLoggedIn(getApplicationContext()))
             return;
@@ -132,8 +211,6 @@ public class GridViewPhotos extends BaseActivity {
         imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(takephoto, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
-        //Toast.makeText(GridViewPhotos.this, "", Toast.LENGTH_SHORT).show();
-
     }
 
     private Uri getOutputMediaFileUri(int mediafile) {
@@ -158,6 +235,26 @@ public class GridViewPhotos extends BaseActivity {
             mediaFile = new File(fileDIr.getAbsolutePath(), "IMG_" + timeStamp + ".jpg");
 
         return mediaFile;
+    }
+
+    @Override
+    public void onUploadComplete(String uploadJsonResponse) {
+
+        Log.i("DestinationUploadJSON", uploadJsonResponse);
+
+        if (mProgressDialog != null && mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
+
+        this.finish();
+    }
+
+    @Override
+    public void onUploadError(VolleyError error) {
+        if (mProgressDialog != null && mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
+
+        Log.e("DestinationUploadError", error.toString());
+        this.finish();
     }
 
     private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {

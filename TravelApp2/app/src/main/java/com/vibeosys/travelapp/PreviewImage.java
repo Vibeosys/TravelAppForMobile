@@ -36,7 +36,7 @@ public class PreviewImage extends BaseActivity
 
     private NewDataBase newDataBase = null;
     private String imageData = null;
-    private ProgressDialog progress;
+    private ProgressDialog mProgressDialog;
     //SessionManager mSessionManager;
 
     @Override
@@ -95,29 +95,39 @@ public class PreviewImage extends BaseActivity
         if (!UserAuth.isUserLoggedIn(getApplicationContext()))
             return;
 
-        progress = new ProgressDialog(PreviewImage.this);
-        progress.setMessage("Uploading Image...");
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setIndeterminate(true);
-        progress.show();
+        mProgressDialog = new ProgressDialog(PreviewImage.this);
+        mProgressDialog.setMessage("Uploading Image...");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.show();
 
         Gson gson = new Gson();
         ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
         imageUploadDTO.setImageData(imageData);
-        String path = getIntent().getExtras().getString("Data");
+        final String path = getIntent().getExtras().getString("Data");
         Log.d("Path File ", path);
         //String UserId = mSessionManager.Instance().getUserId();
-        int DestId = getIntent().getExtras().getInt("DestId");
+        final int DestId = getIntent().getExtras().getInt("DestId");
         imageUploadDTO.setImageName(path);
         String SerializedJsonString = gson.toJson(imageUploadDTO);
         if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
 
-            String filename = path.substring(path.lastIndexOf("/") + 1);
+            final String filename = path.substring(path.lastIndexOf("/") + 1);
 
-            ImageFileUploader imageFileUploader = new ImageFileUploader(this);
+            final ImageFileUploader imageFileUploader = new ImageFileUploader(this);
             imageFileUploader.setOnUploadCompleteListener(this);
             imageFileUploader.setOnUploadErrorListener(this);
-            imageFileUploader.uploadDestinationImage(path, filename, DestId);
+            new Thread() {
+                public void run() {
+                    try {
+                        imageFileUploader.uploadDestinationImage(path, filename, DestId);
+                    } catch (Exception ex) {
+                        Log.e("ExceptionGridImgUp", "Error uploading the captured photo");
+                    } finally {
+                        if (mProgressDialog != null && mProgressDialog.isShowing())
+                            mProgressDialog.dismiss();
+                    }
+                }
+            }.start();
 
         } else {
             try {
@@ -148,18 +158,18 @@ public class PreviewImage extends BaseActivity
 
         Log.i("DestinationUploadJSON", uploadJsonResponse);
 
-        if (progress != null && progress.isShowing())
-            progress.dismiss();
+        if (mProgressDialog != null && mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
 
         this.finish();
     }
 
     @Override
     public void onUploadError(VolleyError error) {
-        if (progress != null && progress.isShowing())
-            progress.dismiss();
+        if (mProgressDialog != null && mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
 
-        Log.e("DestinationUploadError",error.toString());
+        Log.e("DestinationUploadError", error.toString());
         this.finish();
     }
 }

@@ -343,15 +343,13 @@ public class MainActivity extends BaseActivity
                     //view.setLayoutParams(new RelativeLayout.LayoutParams(250, RelativeLayout.LayoutParams.WRAP_CONTENT));
                     //View phtotosView = view.findViewById(R.id.item_title);
                     final int mDestId = mDestinationNames.get(marker.getTitle());
+                    final String destName = marker.getTitle();
                     TextView photoLabel = (TextView) view.findViewById(R.id.photo_label);
                     TextView detailsLable = (TextView) view.findViewById(R.id.details_label);
                     detailsLable.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startMoreDetailsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
-                            startMoreDetailsActivitty.putExtra("DestId", mDestId);
-                            startMoreDetailsActivitty.putExtra("DestName", marker.getTitle());
-                            startActivity(startMoreDetailsActivitty);
+                            startIntendedActivity(mDestId, destName, -1, ShowDestinationDetailsMain.class);
                         }
                     });
 
@@ -361,43 +359,27 @@ public class MainActivity extends BaseActivity
                     sendPhotos.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startPhotosActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
-                            startPhotosActivitty.putExtra("DestId", mDestId);
-                            startPhotosActivitty.putExtra("DestName", marker.getTitle());
-                            startPhotosActivitty.putExtra("Id", 0);
-                            startActivity(startPhotosActivitty);
+                            startIntendedActivity(mDestId, destName, 0, ShowDestinationDetailsMain.class);
                         }
                     });
                     ImageView sendMessages = (ImageView) view.findViewById(R.id.sendDestinatiomMessages);
                     sendMessages.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startSendMessagesActivitty = new Intent(getApplicationContext(), QuestionSlidingView.class);
-                            startSendMessagesActivitty.putExtra("DestId", mDestId);
-                            startSendMessagesActivitty.putExtra("DestName", marker.getTitle());
-                            startActivity(startSendMessagesActivitty);
-
+                            startIntendedActivity(mDestId, destName, -1, QuestionSlidingView.class);
                         }
                     });
                     sendReviews.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startReviewsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
-                            startReviewsActivitty.putExtra("DestId", mDestId);
-                            startReviewsActivitty.putExtra("DestName", marker.getTitle());
-                            startReviewsActivitty.putExtra("Id", 3);
-                            startActivity(startReviewsActivitty);
+                            startIntendedActivity(mDestId, destName, 3, ShowDestinationDetailsMain.class);
                         }
                     });
 
                     commentsrowLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent startCommentActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
-                            startCommentActivitty.putExtra("DestId", mDestId);
-                            startCommentActivitty.putExtra("DestName", marker.getTitle());
-                            startCommentActivitty.putExtra("Id", 1);
-                            startActivity(startCommentActivitty);
+                            startIntendedActivity(mDestId, destName, 1, ShowDestinationDetailsMain.class);
                         }
                     });
 
@@ -444,8 +426,16 @@ public class MainActivity extends BaseActivity
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("GeneralException", e.toString());
         }
+    }
+
+    private void startIntendedActivity(int destId, String destination, int id, Class<?> cls) {
+        Intent activityIntent = new Intent(getApplicationContext(), cls);
+        activityIntent.putExtra("DestId", destId);
+        activityIntent.putExtra("DestName", destination);
+        activityIntent.putExtra("Id", id);
+        startActivity(activityIntent);
     }
 
     private void downloadDatabase(File internalfile) {
