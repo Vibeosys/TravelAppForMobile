@@ -148,7 +148,7 @@ public class MainActivity extends BaseActivity
             layoutInflater = getLayoutInflater();
             View view = layoutInflater.inflate(R.layout.cust_toast, null);
             Toast toast = new Toast(this);
-            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setDuration(Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.setView(view);//setting the view of custom toast layout
             toast.show();

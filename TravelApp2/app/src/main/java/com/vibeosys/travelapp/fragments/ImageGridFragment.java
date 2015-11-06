@@ -35,6 +35,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.BuildConfig;
@@ -138,6 +139,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
                                 final int columnWidth =
                                         (mGridView.getWidth() / numColumns) - mImageThumbSpacing;
                                 mAdapter.setNumColumns(numColumns);
+                                mAdapter.setItemHeight(columnWidth);
                                /* mAdapter.setItemHeight(columnWidth);*/
                                 if (BuildConfig.DEBUG) {
                                     Log.d(TAG, "onCreateView - numColumns set to " + numColumns);
@@ -228,22 +230,18 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         private int mItemHeight = 0;
         private int mNumColumns = 0;
         private int mActionBarHeight = 0;
-        private GridView.LayoutParams mImageViewLayoutParams;
+        private RelativeLayout.LayoutParams mImageViewLayoutParams;
         private List<usersImages> mListImages = null;
+        private LayoutInflater mInflater;
 
         public ImageAdapter(Context context, List<usersImages> mPhotoList) {
             super();
             mContext = context;
             mListImages = mPhotoList;
-           /* mImageViewLayoutParams = new GridView.LayoutParams(
-                    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);*/
-            // Calculate ActionBar height
-           /* TypedValue tv = new TypedValue();
-            if (context.getTheme().resolveAttribute(
-                    android.R.attr.actionBarSize, tv, true)) {
-                mActionBarHeight = TypedValue.complexToDimensionPixelSize(
-                        tv.data, context.getResources().getDisplayMetrics());
-            }*/
+
+            mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mImageViewLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT);
         }
 
         @Override
@@ -309,6 +307,10 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
             view = layoutInflater.inflate(R.layout.showdestinationimages, null);
             imageView = (ImageView) view.findViewById(R.id.userimages);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            // Check the height matches our calculated column width
+            if (imageView.getLayoutParams().height != mItemHeight) {
+                imageView.setLayoutParams(mImageViewLayoutParams);
+            }
             // imageView.setLayoutParams(mImageViewLayoutParams);
             /*// Check the height matches our calculated column width
             if (imageView.getLayoutParams().height != mItemHeight) {
@@ -345,5 +347,16 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         public int getNumColumns() {
             return mNumColumns;
         }
+
+        // set photo item height
+        public void setItemHeight(int height) {
+            if (height == mItemHeight) {
+                return;
+            }
+            mItemHeight = height;
+            mImageViewLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, mItemHeight);
+            notifyDataSetChanged();
+        }
+
     }
 }

@@ -319,9 +319,6 @@ public abstract class BaseActivity extends AppCompatActivity
             if (mGoogleApiClient.isConnected()) {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
                 mGoogleApiClient.disconnect();
-
-                Toast.makeText(getApplicationContext(), "You have successfully logged out", Toast.LENGTH_SHORT);
-
             } else {
                 mGoogleApiClient.disconnect();
             }
@@ -329,8 +326,8 @@ public abstract class BaseActivity extends AppCompatActivity
             Log.e("Google Logout:", ex.getMessage());
         }
 
-        // Show a message to the user that we are signing in.
-        Toast.makeText(this, "Sign out", Toast.LENGTH_SHORT).show();
+        // Show a message to the user that we are signing out.
+        Toast.makeText(getApplicationContext(), "You have successfully logged out", Toast.LENGTH_SHORT);
     }
 
     protected void googlePlusAPIInit() {

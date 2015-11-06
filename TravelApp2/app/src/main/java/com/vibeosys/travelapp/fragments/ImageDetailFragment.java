@@ -120,7 +120,8 @@ public class ImageDetailFragment extends BaseFragment
         if (images != null) {
             String username = images.getUsername();
             SpannableString ss1 = new SpannableString(username);
-            ss1.setSpan(new RelativeSizeSpan(2f), 0, 5, 0);
+
+            ss1.setSpan(new RelativeSizeSpan(2f), 0, ss1.length(), 0);
             Spanned text = Html.fromHtml("<font >Updated By </font>  " + "<b>" + ss1.toString() + "</b> ");
             usernameText.setText(text);
             likeCountText.setText(images.getLikeCount() + "  Likes  ");
