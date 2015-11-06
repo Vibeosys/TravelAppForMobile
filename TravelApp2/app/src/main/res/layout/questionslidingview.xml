@@ -21,18 +21,18 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:textColor="#ffffff"
             android:background="@color/colorPrimary"
-            android:text="Prev" />
+            android:text="Prev"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/nextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:textColor="#ffffff"
+            android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:layout_weight="1" />
+            android:textColor="#ffffff" />
     </LinearLayout>
 
 </LinearLayout>

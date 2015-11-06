@@ -2,25 +2,27 @@ package com.vibeosys.travelapp.activities;
 
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.vibeosys.travelapp.Adaptors.DestinationDetailsPagerAdapter;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.tasks.BaseActivity;
+import com.vibeosys.travelapp.util.SessionManager;
 
 /**
  * Created by mahesh on 10/28/2015.
  */
-public class ShowDestinationDetailsMain extends AppCompatActivity {
+public class ShowDestinationDetailsMain extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fetchData(SessionManager.Instance().getUserId(), false);
         setContentView(R.layout.show_destination_details);
         // Get the ViewPager and set it's PagerAdapter so that it can display items
 
         String destName = getIntent().getExtras().getString("DestName");
-        int id =getIntent().getExtras().getInt("Id");
+        int id = getIntent().getExtras().getInt("Id");
         setTitle(destName);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -31,7 +33,5 @@ public class ShowDestinationDetailsMain extends AppCompatActivity {
 
         // Attach the view pager to the tab strip
         tabsStrip.setViewPager(viewPager);
-
-
     }
 }

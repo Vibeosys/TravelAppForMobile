@@ -379,7 +379,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         try {
             sqLiteDatabase = getReadableDatabase();
             String qurey = "select UserName, comment_and_like.LikeCount,user.userid, comment_and_like.destid " +
-                    " from Images inner join comment_and_like on images.DestId = comment_and_like.DestId " +
+                    " from Images left outer join comment_and_like on images.DestId = comment_and_like.DestId " +
                     " and images.UserId = comment_and_like.UserId " +
                     " inner join user on images.UserId = user.UserId" +
                     " where images.ImageId = ?";
@@ -390,8 +390,12 @@ public class NewDataBase extends SQLiteOpenHelper {
 
                     cursor.moveToFirst();
                     do {
-                        images = new Images(cursor.getString(cursor.getColumnIndex("UserName")),
-                                cursor.getInt(cursor.getColumnIndex("LikeCount")), cursor.getInt(cursor.getColumnIndex("DestId")), cursor.getString(cursor.getColumnIndex("UserId")));
+                        images = new Images(
+                                cursor.getString(cursor.getColumnIndex("UserName")),
+                                cursor.getInt(cursor.getColumnIndex("LikeCount")),
+                                cursor.getInt(cursor.getColumnIndex("DestId")),
+                                cursor.getString(cursor.getColumnIndex("UserId"))
+                        );
                     } while (cursor.moveToNext());
 
                 }

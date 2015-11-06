@@ -161,6 +161,11 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 
         @Override
         public Fragment getItem(int position) {
+            /*Bundle args = new Bundle();
+            args.putString("extra_image_data", mPhotoList.get(position).getmImagePaths());
+            args.putString("ImageId", imageId);*/
+
+            //return Fragment.instantiate(getApplicationContext(),"ImageDetailFragment",args);
             return ImageDetailFragment.newInstance(mPhotoList.get(position).getmImagePaths(), imageId);
         }
     }

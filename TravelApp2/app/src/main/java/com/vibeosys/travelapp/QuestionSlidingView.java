@@ -45,7 +45,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     int DestId;
     //String EmailId;
     List<String> mListOptions;
-    SessionManager mSessionManager;
+    //SessionManager mSessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         // Make us non-modal, so that others can receive touch events.
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
         //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         DestId = getIntent().getExtras().getInt("DestId");
         mListOptions = new ArrayList<>();

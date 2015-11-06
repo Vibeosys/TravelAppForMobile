@@ -25,6 +25,7 @@ import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.util.NetworkUtils;
+import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.UserAuth;
 
 import java.util.ArrayList;
@@ -73,8 +74,8 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
         mListDestination = newDataBase.DestinationComments(DestId);
 
         Log.d("DestinationComment", String.valueOf(mListDestination.size()));
-        UserId = mSessionManager.getUserId();
-        UserName = mSessionManager.getUserName();
+        UserId = SessionManager.Instance().getUserId();
+        UserName = SessionManager.Instance().getUserName();
         showDestinationCommentsAdaptor = new ShowDestinationCommentsAdaptor(getActivity(), mListDestination, DestId);
         mDestinationCommentListView.setAdapter(showDestinationCommentsAdaptor);
         return view;
@@ -124,7 +125,7 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
 
         tableDataList.add(new TableDataDTO("comment", SerializedJsonString));
-        String EmailId = mSessionManager.getUserEmailId();
+        String EmailId = SessionManager.Instance().getUserEmailId();
         Log.d("EmailId", "" + EmailId);
         String uploadData = gson.toJson(new Upload(new UploadUser(userId, EmailId), tableDataList));
 

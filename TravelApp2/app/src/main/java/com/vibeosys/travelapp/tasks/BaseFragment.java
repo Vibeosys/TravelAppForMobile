@@ -48,7 +48,7 @@ public class BaseFragment extends Fragment implements BackgroundTaskCallback {
      * Base Activity will give the basic implementation with async task support and other things
      */
     //int id;
-    protected static SessionManager mSessionManager = SessionManager.Instance();
+    //protected static SessionManager mSessionManager = SessionManager.Instance();
     protected NewDataBase newDataBase = null;
 
     private List<Comment> commentList = null;
@@ -63,7 +63,7 @@ public class BaseFragment extends Fragment implements BackgroundTaskCallback {
 
     public void fetchData(String userId, final boolean aShowProgressDlg) {
         Log.d("BaseActivity", "IN Base");
-        String downloadUrl = mSessionManager.getDownloadUrl(userId);
+        String downloadUrl = SessionManager.Instance().getDownloadUrl(userId);
         new BackgroundTask(aShowProgressDlg).execute(downloadUrl);
     }
 
@@ -78,7 +78,7 @@ public class BaseFragment extends Fragment implements BackgroundTaskCallback {
         RequestQueue rq = Volley.newRequestQueue(getActivity());
 
         JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.POST,
-                mSessionManager.getUploadUrl(), uploadData, new Response.Listener<JSONObject>() {
+                SessionManager.Instance().getUploadUrl(), uploadData, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {

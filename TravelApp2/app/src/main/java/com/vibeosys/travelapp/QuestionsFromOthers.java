@@ -360,7 +360,7 @@ public class QuestionsFromOthers extends BaseFragment {
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
             newDataBase.getFromSync();
             super.uploadToServer(uploadData, getActivity());
-            String UserId = mSessionManager.getUserId();
+            String UserId = SessionManager.Instance().getUserId();
             //Log.d("UserId", UserId);
             super.fetchData(UserId, true);//id 1=>download 2=>upload
             return true;

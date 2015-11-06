@@ -55,7 +55,8 @@ import java.util.List;
 /**
  * This fragment will populate the children of the ViewPager from {@link ImageDetailActivity}.
  */
-public class ImageDetailFragment extends BaseFragment {
+public class ImageDetailFragment extends BaseFragment
+        implements ImageView.OnClickListener {
     private static final String IMAGE_DATA_EXTRA = "extra_image_data";
     private String mImageUrl;
     private ImageView mImageView;
@@ -125,20 +126,20 @@ public class ImageDetailFragment extends BaseFragment {
             likeCountText.setText(images.getLikeCount() + "  Likes  ");
         }
 
-        like.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (!UserAuth.isUserLoggedIn(getContext()))
-                                            return;
-
-                                        updateLike(images.getUserId());
-                                        likeCountText.setText(images.getLikeCount() + 1 + "  Likes  ");
-                                    }
-                                }
-        );
+        like.setOnClickListener(this);
         mImageView = (ImageView) v.findViewById(R.id.usersimageView);
 
         return v;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (!UserAuth.isUserLoggedIn(getContext()))
+            return;
+
+        TextView likeCountText = (TextView) v.findViewById(R.id.likecounttext);
+        updateLike(images.getUserId());
+        likeCountText.setText(images.getLikeCount() + 1 + "  Likes  ");
     }
 
     private boolean updateLike(String imageUserId) {
@@ -149,8 +150,8 @@ public class ImageDetailFragment extends BaseFragment {
         String SerializedJsonString = gson.toJson(like);
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
         tableDataList.add(new TableDataDTO("like", SerializedJsonString));
-        String currentUserID = mSessionManager.getUserId();
-        String EmailId = mSessionManager.getUserEmailId();
+        String currentUserID = SessionManager.Instance().getUserId();
+        String EmailId = SessionManager.Instance().getUserEmailId();
         Log.d("EmailId", "" + EmailId);
         String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
         Log.d("UploadingLike", uploadData.toString());
@@ -158,7 +159,7 @@ public class ImageDetailFragment extends BaseFragment {
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
             newDataBase.getFromSync();
             super.uploadToServer(uploadData, getActivity());
-            String UserId = mSessionManager.getUserId();
+            String UserId = SessionManager.Instance().getUserId();
             //Log.d("UserId", UserId);
             super.fetchData(UserId, true);//id 1=>download 2=>upload
             return true;
