@@ -954,7 +954,7 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public boolean mSaveMyImages(String cImagePath, String cDate) {
+    public boolean saveInMyImages(String cImagePath, String cDate) {
         try {
             SQLiteDatabase thesqLiteDatabase = getWritableDatabase();
             ContentValues contentValues = new ContentValues();

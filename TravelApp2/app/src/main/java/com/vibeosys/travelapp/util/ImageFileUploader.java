@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.util.Base64;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -23,7 +21,7 @@ import java.util.UUID;
 /**
  * Created by anand on 03-11-2015.
  */
-public class ImageFileUploader {
+public final class ImageFileUploader {
     private Context mContext;
     //private Activity mActivity;
     private OnUploadCompleteListener mOnUploadCompleteListener;
@@ -81,43 +79,17 @@ public class ImageFileUploader {
 
             @Override
             public void onResponse(String response) {
-                try {
-
-                    Log.e("RESPONSE", response);
-                    //progressDialog.dismiss();
-                    Toast.makeText(mContext,
-                            "The image is upload", Toast.LENGTH_SHORT)
-                            .show();
-
-
-                } catch (Exception e) {
-                    Log.d("JSON Exception", e.toString());
-                    Toast.makeText(mContext,
-                            "Error while loadin data!",
-                            Toast.LENGTH_LONG).show();
-
-                } finally {
-                    if (mOnUploadCompleteListener != null)
-                        mOnUploadCompleteListener.onUploadComplete(response);
-                }
-
+                if (mOnUploadCompleteListener != null)
+                    mOnUploadCompleteListener.onUploadComplete(response);
             }
 
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("ERROR", "Error [" + error + "]");
-                //progressDialog.dismiss();
-                Toast.makeText(mContext,
-                        "Cannot connect to server", Toast.LENGTH_LONG)
-                        .show();
-
                 if (mOnUploadErrorListener != null)
                     mOnUploadErrorListener.onUploadError(error);
-
             }
         })
-
         {
             @Override
             protected Map<String, String> getParams() {

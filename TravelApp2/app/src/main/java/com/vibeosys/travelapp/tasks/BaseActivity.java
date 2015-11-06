@@ -88,7 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity
     private List<com.vibeosys.travelapp.data.Question> questionsList = null;
     private List<Option> optionsList = null;
     //private int id;
-    protected ProgressDialog mProgressDialog = null;
+    //protected ProgressDialog mProgressDialog = null;
 
     protected final static String TAG = "com.vibeosys";
 
@@ -262,14 +262,14 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected void downloadImgFromFbGPlusAndUploadToAws(final String url) {
         URL fbAvatarUrl = null;
-        Bitmap fbAvatarBitmap = null;
+        Bitmap thirdPartyImage = null;
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
             StrictMode.setThreadPolicy(policy);
 
             fbAvatarUrl = new URL(url);
-            fbAvatarBitmap = BitmapFactory.decodeStream(fbAvatarUrl.openConnection().getInputStream());
+            thirdPartyImage = BitmapFactory.decodeStream(fbAvatarUrl.openConnection().getInputStream());
         } catch (MalformedURLException e) {
             Log.e("DownloadImageEx", "Exception while downloading AWS image " + e.toString());
         } catch (IOException e) {
@@ -279,7 +279,7 @@ public abstract class BaseActivity extends AppCompatActivity
         ImageFileUploader imageFileUploader = new ImageFileUploader(getApplicationContext());
         imageFileUploader.setOnUploadCompleteListener(this);
         imageFileUploader.setOnUploadErrorListener(this);
-        imageFileUploader.uploadUserProfileImage(fbAvatarBitmap);
+        imageFileUploader.uploadUserProfileImage(thirdPartyImage);
     }
 
     protected static synchronized void downloadImageAsync(final String url, final ImageView imageView) {
@@ -312,6 +312,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     protected void googlePlusLogout() {
+        googlePlusAPIInit();
         // Clear the default account so that GoogleApiClient will not automatically
         // connect in the future.
         try {
@@ -320,22 +321,26 @@ public abstract class BaseActivity extends AppCompatActivity
                 mGoogleApiClient.disconnect();
 
                 Toast.makeText(getApplicationContext(), "You have successfully logged out", Toast.LENGTH_SHORT);
+
+            } else {
+                mGoogleApiClient.disconnect();
             }
         } catch (Exception ex) {
             Log.e("Google Logout:", ex.getMessage());
         }
-
 
         // Show a message to the user that we are signing in.
         Toast.makeText(this, "Sign out", Toast.LENGTH_SHORT).show();
     }
 
     protected void googlePlusAPIInit() {
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API)
                 .addScope(new Scope(Scopes.PROFILE))
+                .addScope(new Scope(Scopes.PLUS_LOGIN))
                 .addScope(new Scope(Scopes.EMAIL))
                 .build();
     }
@@ -437,68 +442,47 @@ public abstract class BaseActivity extends AppCompatActivity
         progressDialog.setMessage("Setting up your account");
         progressDialog.show();
 
+        User theUser = new User();
+        theUser.setLoginSource(RegistrationSourceTypes.GOOGLE_PLUS);
+
         try {
 
+            String userEmailId = Plus.AccountApi.getAccountName(mGoogleApiClient);
+            theUser.setEmailId(userEmailId);
+
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-            if (currentPerson == null) {
-                Log.e("LoginGoogle+", "Error while getting data from Google+");
-                return;
+
+            if (currentPerson != null) {
+                String name = currentPerson.getDisplayName();
+                String imageURL = currentPerson.getImage().getUrl();
+                String gId = currentPerson.getId();
+                /*imageURL = imageURL.substring(0,
+                        imageURL.length() - 2)
+                        + 150;*/
+
+                downloadImgFromFbGPlusAndUploadToAws(imageURL);
+
+                theUser.setUserName(name);
+                theUser.setThirdPartyUserId(gId);
+
+            } else {
+                theUser.setUserName(userEmailId.substring(0, userEmailId.indexOf("@")));
+
             }
-            String name = currentPerson.getDisplayName();
-            String imageURL = currentPerson.getImage().getUrl();
-
-            //changing the default size of image which API return i.e 50 X 50
-            imageURL = imageURL.substring(0,
-                    imageURL.length() - 2)
-                    + 150;
-
-            String googleEmailId = Plus.AccountApi.getAccountName(mGoogleApiClient);
-
-            User theUser = new User(SessionManager.Instance().getUserId(),
-                    currentPerson.getDisplayName(),
-                    googleEmailId,
-                    RegistrationSourceTypes.GOOGLE_PLUS,
-                    null,
-                    currentPerson.getId());
 
             Boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
-            downloadImgFromFbGPlusAndUploadToAws(currentPerson.getImage().getUrl());
 
             if (!userAdded) {
-                Toast.makeText(getApplicationContext(), "User is not Added successfully", Toast.LENGTH_SHORT);
                 Log.e("LoginGoogle+", "User is not Added successfully ");
             }
-            JSONObject object = new JSONObject();
 
 
-            object.put("name", name);
-            object.put("email", googleEmailId);
-
-
-            Log.d(TAG, ":" + name);
-            Log.d(TAG, ":" + imageURL);
-
-            //finish();
-
-            //Redirect to Page once Authenticatied
-
-            //Intent intent = new Intent(mFromactivitycall, MainActivity.class);
-            //Send Data or Save Data
-            //intent.putExtra("Profiledetails", object.toString());
-            //intent.putExtra("ProfileImg", imageURL);
-
-            //startActivity(intent);
-
-
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             Log.d(TAG, "Error:" + ex.getMessage());
         } finally {
             progressDialog.dismiss();
+            this.finish();
         }
-
-
-        // Show a message to the user that we are signing in.
-        //Toast.makeText(this, "Welcome " + name, Toast.LENGTH_SHORT).show();
 
     }
 

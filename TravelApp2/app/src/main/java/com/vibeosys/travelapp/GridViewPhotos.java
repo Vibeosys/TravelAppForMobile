@@ -4,15 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,38 +18,23 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.GridView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.vibeosys.travelapp.data.ImageUploadDTO;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
-import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.UserAuth;
 import com.vibeosys.travelapp.view.LoaderImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created by mahesh on 10/12/2015.
  */
 public class GridViewPhotos extends BaseActivity {
 
-    GridView mGridViewPhotos;
+    private GridView mGridViewPhotos;
     //List<String> mImages;
     //private static final int IMAGE_CAPTURE_CODE = 100;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
@@ -67,7 +48,7 @@ public class GridViewPhotos extends BaseActivity {
     private Cursor cc = null;
     private Uri imageUri;
     //private NewDataBase newDataBase;
-    int DestId;
+    private int DestId;
     //SessionManager mSessionManager;
 
     @Override
@@ -151,7 +132,7 @@ public class GridViewPhotos extends BaseActivity {
         imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(takephoto, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
-        Toast.makeText(GridViewPhotos.this, "", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(GridViewPhotos.this, "", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -177,152 +158,6 @@ public class GridViewPhotos extends BaseActivity {
             mediaFile = new File(fileDIr.getAbsolutePath(), "IMG_" + timeStamp + ".jpg");
 
         return mediaFile;
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                String date = DateFormat.getDateTimeInstance().format(new Date());
-                newDataBase = new NewDataBase(getApplicationContext());
-                newDataBase.mSaveMyImages(imageUri.getPath(), date);
-                Gson gson = new Gson();
-                ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
-                imageUploadDTO.setImageData(imageUri.getPath());
-                ProgressDialog progress = new ProgressDialog(GridViewPhotos.this);
-                progress.setMessage("Uploading Image...");
-                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progress.setIndeterminate(true);
-                progress.show();
-                imageUploadDTO.setImageName(imageUri.getPath());
-                String SerializedJsonString = gson.toJson(imageUploadDTO);
-                if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
-                    String filename = imageUri.getPath().substring(imageUri.getPath().lastIndexOf("/") + 1);
-                    Bitmap myImg = BitmapFactory.decodeFile(imageUri.getPath());
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    // Must compress the Image to reduce image size to make upload easy
-                    myImg.compress(Bitmap.CompressFormat.PNG, 50, stream);
-                    byte[] byte_arr = stream.toByteArray();
-                    // Encode Image to String
-                    String encodedString = Base64.encodeToString(byte_arr, 0);
-
-                    uploadImage(encodedString, filename, DestId, mSessionManager.getUserId());
-
-                } else {
-                    try {
-                        newDataBase.addDataToSync("MyImages", mSessionManager.getUserId(), SerializedJsonString);
-                        LayoutInflater layoutInflater = getLayoutInflater();
-                        View view = layoutInflater.inflate(R.layout.cust_toast, null);
-                        Toast toast = new Toast(getApplicationContext());
-                        toast.setDuration(Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                        toast.setView(view);//setting the view of custom toast layout
-                        toast.show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                Toast.makeText(getApplicationContext(),
-                        "User image capture" + imageUri.getPath(), Toast.LENGTH_SHORT)
-                        .show();
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // user cancelled Image capture
-                Toast.makeText(getApplicationContext(),
-                        "User cancelled image capture", Toast.LENGTH_SHORT)
-                        .show();
-            } else {
-                // failed to capture image
-                Toast.makeText(getApplicationContext(),
-                        "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
-                        .show();
-            }
-        }
-    }
-
-    private void uploadImage(final String encodedString, final String filename, int destId, final String userId) {
-
-        RequestQueue rq = Volley.newRequestQueue(this);
-        // final String fileName = filename.replaceAll(" ", "");
-        String imageUplaodURL = mSessionManager.getUploadImagesUrl();
-        Log.d("FileName", filename);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                imageUplaodURL, new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                try {
-
-                    Log.e("RESPONSE", response);
-                    //  JSONObject json = new JSONObject(response);
-                    Toast.makeText(getBaseContext(),
-                            "The image is upload", Toast.LENGTH_SHORT)
-                            .show();
-
-                } catch (Exception e) {
-                    Log.d("JSON Exception", e.toString());
-                    Toast.makeText(getBaseContext(),
-                            "Error while loadin data!",
-                            Toast.LENGTH_LONG).show();
-
-                }
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("ERROR", "Error [" + error + "]");
-                Toast.makeText(getBaseContext(),
-                        "Cannot connect to server", Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-        })
-
-        {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-
-                params.put("upload", encodedString);
-                params.put("imagename", filename);
-                params.put("DestId", String.valueOf(DestId));
-                params.put("UserId", userId);
-
-                return params;
-
-            }
-
-        };
-
-        rq.add(stringRequest);
-
-    }
-
-    public Bitmap decodeURI(String filePath) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        // Only scale if we need to
-        // (16384 buffer for img processing)
-        Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
-        if (options.outHeight * options.outWidth * 2 >= 16384) {
-            // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
-            double sampleSize = scaleByHeight
-                    ? options.outHeight / 100
-                    : options.outWidth / 100;
-            options.inSampleSize =
-                    (int) Math.pow(2d, Math.floor(
-                            Math.log(sampleSize) / Math.log(2d)));
-        }
-
-        // Do the actual decoding
-        options.inJustDecodeBounds = false;
-        options.inTempStorage = new byte[512];
-        Bitmap output = BitmapFactory.decodeFile(filePath, options);
-
-        return output;
     }
 
     private class GalleryAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
@@ -384,5 +219,4 @@ public class GridViewPhotos extends BaseActivity {
     static class ViewHolder {
         LoaderImageView image;
     }
-
 }

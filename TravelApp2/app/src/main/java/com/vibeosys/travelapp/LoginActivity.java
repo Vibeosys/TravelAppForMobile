@@ -51,6 +51,7 @@ public class LoginActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTitle("Login");
         super.onCreate(savedInstanceState);
         //Facebook SDK Initialization
         FacebookLoginAPIInit(LoginActivity.this);
@@ -77,7 +78,7 @@ public class LoginActivity
             }
         });
 
-        mProgressDialog = new ProgressDialog(this.getApplicationContext());
+        //mProgressDialog = new ProgressDialog(this.getApplicationContext());
     }
 
     //-------------Facebook API calls--------------------------------//
@@ -174,15 +175,10 @@ public class LoginActivity
     protected void GooglePlusLogin(Activity act) {
         // User clicked the sign-in button, so begin the sign-in process and automatically
         // attempt to resolve any errors that occur.
-        ProgressDialog progressDialog = new ProgressDialog(act);
-        progressDialog.show();
 
         mShouldResolve = true;
         mGoogleApiClient.connect();
         mFromactivitycall = act;
-
-        // Show a message to the user that we are signing in.
-        Toast.makeText(this, "Signing in", Toast.LENGTH_SHORT).show();
     }
 
 
