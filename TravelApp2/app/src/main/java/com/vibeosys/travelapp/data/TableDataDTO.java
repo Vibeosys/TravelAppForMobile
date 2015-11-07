@@ -1,18 +1,22 @@
 package com.vibeosys.travelapp.data;
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by mahesh on 10/21/2015.
  */
 public class TableDataDTO {
-    String tableName;
-    String tableData;
+    private String tableName;
+    private String tableData;
+    private String operation;
 
-   public TableDataDTO(String tableName, String tableData) {
+    public TableDataDTO(String tableName, String tableData, @Nullable String operation) {
         this.tableName = tableName;
         this.tableData = tableData;
+        this.operation = operation;
     }
 
-   public TableDataDTO() {
+    public TableDataDTO() {
 
     }
 
@@ -31,5 +35,13 @@ public class TableDataDTO {
 
     public void setTableData(String tableData) {
         tableData = tableData;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 }

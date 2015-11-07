@@ -6,7 +6,7 @@ package com.vibeosys.travelapp.data;
 public class UploadUser {
     private String userId;
     private String emailId;
-    String userName;
+    private String userName;
 
     public UploadUser() {
 
@@ -16,10 +16,11 @@ public class UploadUser {
         this.userId = userId;
         this.emailId = emailId;
     }
-    public UploadUser(String userId, String emailId,String userName) {
+
+    public UploadUser(String userId, String emailId, String userName) {
         this.userId = userId;
         this.emailId = emailId;
-        this.userName=userName;
+        this.userName = userName;
     }
 
     public String getUserName() {

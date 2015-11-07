@@ -40,10 +40,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.activities.ViewProfileActivity;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
-import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.UserAuth;
 
 import org.json.JSONArray;
@@ -83,30 +82,14 @@ public class MainActivity extends BaseActivity
     private LayoutInflater layoutInflater;
 
     //Facebook User Profile Image
-    private ImageView userProfileImage;
+    //private ImageView userProfileImage;
 
-
-    @Override
-    public void onFailure(String aData) {
-        super.onFailure(aData);
-        try {
-            //   Log.d("Failed to Load", "Data" + aData.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onSuccess(String aData) {
-        super.onSuccess(aData);
-
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
         List<GetTemp> mList = null;
-        mList = newDataBase.GetFromTemp();
+        mList = mNewDataBase.GetFromTemp();
         if (!mList.isEmpty()) {
             for (int i = 0; i < mList.size(); i++) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mList.get(i).getLat(), mList.get(i).getLong())).title(mList.get(i).getDestName()));
@@ -122,11 +105,10 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSessionManager = SessionManager.getInstance(getBaseContext());
+        //mSessionManager = SessionManager.getInstance(getBaseContext());
         setTitle(null);
 
-        newDataBase = new NewDataBase(getApplicationContext());
-        //  newDataBase.insertComment(commentList);
+        //  mNewDataBase.insertComment(commentList);
 
         //Sample of USAGE of session manager
 
@@ -139,10 +121,11 @@ public class MainActivity extends BaseActivity
             } else if (internalfile.exists() && (mSessionManager.getUserId() == null || mSessionManager.getUserId() == "")) {
                 downloadDatabase(internalfile);
             }
-            String UserId = mSessionManager.getUserId();
+            //String UserId = mSessionManager.getUserId();
             //Log.d("UserId", UserId);
-            super.fetchData(UserId, true);//id 1=>download 2=>upload
-            //newDataBase.updateUserInfo(String.valueOf(UserId));
+            //super.fetchData(UserId, true);//id 1=>download 2=>upload
+            mServerSyncManager.downloadDataFromServer(true);
+            //mNewDataBase.updateUserInfo(String.valueOf(UserId));
         } else {
 
             layoutInflater = getLayoutInflater();
@@ -162,15 +145,15 @@ public class MainActivity extends BaseActivity
         mDestList = new ArrayList<>();
         UserDetails userDetails = new UserDetails();
 
-        // newDataBase.AddUser(UserId,UserName);
-//        newDataBase.GetUser();
+        // mNewDataBase.AddUser(UserId,UserName);
+//        mNewDataBase.GetUser();
 
-        //       newDataBase.addDestinations(mDestList);
-        mDestinationNames = newDataBase.getDestNames();
+        //       mNewDataBase.addDestinations(mDestList);
+        mDestinationNames = mNewDataBase.getDestNames();
         mDestinationList = new ArrayList<>();
-        mDestinationList = newDataBase.GetFromTempLatLong();
+        mDestinationList = mNewDataBase.GetFromTempLatLong();
       /* boolean temp=true;
-        if(temp) newDataBase.DeleteTempMaps();
+        if(temp) mNewDataBase.DeleteTempMaps();
         else temp=false;*/
 //       Log.d("MainActivity",String.valueOf(mDestinationList.size()));
         //List<String> mDestNames = new ArrayList<>();
@@ -198,7 +181,7 @@ public class MainActivity extends BaseActivity
                 mDestName = (String) parent.getItemAtPosition(position);
                 int mDestId = mDestinationNames.get(mDestName);//Get DestId of Selected Location
                 Log.d("MainActivity", String.valueOf(mDestId));
-                mCurrentDestinationData = newDataBase.GetLatLong(mDestId);//Get Lat Long of DestName
+                mCurrentDestinationData = mNewDataBase.GetLatLong(mDestId);//Get Lat Long of DestName
                 Log.d("MainActivitymTempData ", mCurrentDestinationData.toString());
                 mMap.addMarker(new MarkerOptions().position(
                         new LatLng(mCurrentDestinationData.get(0).getmLat(),
@@ -206,9 +189,9 @@ public class MainActivity extends BaseActivity
                 Log.d("MainActivity", String.valueOf(mCurrentDestinationData.get(0).getmLat()));
 
 
-                newDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
+                mNewDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
 
-                destinationTempData = newDataBase.mGetLatLongFromTemp(
+                destinationTempData = mNewDataBase.mGetLatLongFromTemp(
                         mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
                 final CameraUpdate center = CameraUpdateFactory.newLatLng(
                         new LatLng(mCurrentDestinationData.get(0).getmLat(),
@@ -234,7 +217,7 @@ public class MainActivity extends BaseActivity
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (newDataBase.CheckTempData()) {
+                if (mNewDataBase.CheckTempData()) {
                     final Dialog dialog;
                     dialog = new Dialog(MainActivity.this);
                     dialog.setContentView(R.layout.save_map_conform);
@@ -251,7 +234,7 @@ public class MainActivity extends BaseActivity
                             if (mMapTitle.getText().toString().length() > 0 && mMapTitle.getText().toString() != null) {
                                 String mMapName = mMapTitle.getText().toString();
                                 mTempDataList = new ArrayList<>();
-                                mTempDataList = newDataBase.GetFromTemp();
+                                mTempDataList = mNewDataBase.GetFromTemp();
                                 JSONArray jsonArray = new JSONArray();
                                 JSONObject jsonObject;
                                 Log.d("mTempDataSize", String.valueOf(mTempDataList.size()));
@@ -270,14 +253,14 @@ public class MainActivity extends BaseActivity
                                 }
                                 Log.d("MainActivity: JSONDATA", jsonArray.toString());
                                 String date = DateFormat.getDateTimeInstance().format(new Date());
-                                if (newDataBase.SaveinMapTable(mMapName, jsonArray.toString(), date)) {
-                                    newDataBase.DeleteTempMaps();
+                                if (mNewDataBase.SaveinMapTable(mMapName, jsonArray.toString(), date)) {
+                                    mNewDataBase.DeleteTempMaps();
                                     Log.d("DATABSE", "DELETED DATA FROm TEMPDATA TABLE");
                                     Toast.makeText(getApplicationContext(), "Saved Map..", Toast.LENGTH_SHORT).show();
                                     mMap.clear();
                                     dialog.dismiss();
                                 } else {
-                                    Log.d("ERROR", "Error During Inserting in MyMap");
+                                    Log.d("ERROR", "TravelAppError During Inserting in MyMap");
                                 }
                             } else {
                                 Toast.makeText(getApplicationContext(), "Please Enter Valid Journey Name", Toast.LENGTH_SHORT).show();
@@ -386,11 +369,11 @@ public class MainActivity extends BaseActivity
 
                     TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                     TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
-                    int imagesCount = newDataBase.Images(mDestId, false).size();
-                    List<SendQuestionAnswers> listofQuestion = newDataBase.mListQuestions(String.valueOf(mDestId));
+                    int imagesCount = mNewDataBase.Images(mDestId, false).size();
+                    List<SendQuestionAnswers> listofQuestion = mNewDataBase.mListQuestions(String.valueOf(mDestId));
                     int msgCount = 0;
                     int destCommentcount = 0;
-                    List<CommentsAndLikes> destinationComment = newDataBase.DestinationComments(mDestId);
+                    List<UserCommentDTO> destinationComment = mNewDataBase.getDestinationComments(mDestId);
                     if (destinationComment != null) destCommentcount = destinationComment.size();
                     if (listofQuestion != null) msgCount = listofQuestion.size();
 
@@ -489,18 +472,18 @@ public class MainActivity extends BaseActivity
             }
 
         } catch (ConnectException cEx) {
-            Log.e("DbDownloadException", "Error while downloading database" + cEx.toString());
+            Log.e("DbDownloadException", "TravelAppError while downloading database" + cEx.toString());
         } catch (MalformedURLException eMf) {
-            Log.e("DbDownloadException", "Error while downloading database" + eMf.toString());
+            Log.e("DbDownloadException", "TravelAppError while downloading database" + eMf.toString());
         } catch (FileNotFoundException eFn) {
-            Log.e("DbDownloadException", "Error while downloading database" + eFn.toString());
+            Log.e("DbDownloadException", "TravelAppError while downloading database" + eFn.toString());
         } catch (IOException eIo) {
-            Log.e("DbDownloadException", "Error while downloading database" + eIo.toString());
+            Log.e("DbDownloadException", "TravelAppError while downloading database" + eIo.toString());
         } catch (Exception ex) {
-            Log.e("DbDownloadException", "Error while downloading database" + ex.toString());
+            Log.e("DbDownloadException", "TravelAppError while downloading database" + ex.toString());
         }
 
-        boolean userCreated = newDataBase.createUserId(mSessionManager.getUserId());
+        boolean userCreated = mNewDataBase.createUserId(mSessionManager.getUserId());
         if (!userCreated)
             Log.e("UserCreation", "New user could not be created in DB");
 
@@ -567,7 +550,7 @@ public class MainActivity extends BaseActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
             mMap.clear();
-            newDataBase.DeleteTempMaps();
+            mNewDataBase.DeleteTempMaps();
             return true;
         }
 

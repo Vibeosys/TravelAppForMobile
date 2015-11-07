@@ -3,13 +3,8 @@ package com.vibeosys.travelapp.Adaptors;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +13,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vibeosys.travelapp.CommentsAndLikes;
 import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.RoundedImageView;
+import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.util.SessionManager;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,20 +32,21 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
     Context mContext;
     List<MyImageDB> mUserImagesList = null;
     int DestId;
-    List<CommentsAndLikes> mListDestinationComments = new ArrayList<>();
+    List<UserCommentDTO> mListDestinationComments = new ArrayList<>();
     //SharedPreferences sharedPref;
     //public static final String MyPREFERENCES = "MyPrefs";
     String UserId;
     String UserName;
-    public ShowDestinationCommentsAdaptor(Context destinationComments, List<CommentsAndLikes> mListDestination, int destId) {
+
+    public ShowDestinationCommentsAdaptor(Context destinationComments, List<UserCommentDTO> mListDestination, int destId) {
         this.mContext = destinationComments;
         this.DestId = destId;
         UserId = SessionManager.Instance().getUserId();
-        UserName=SessionManager.Instance().getUserName();
+        UserName = SessionManager.Instance().getUserName();
         updateResults(mListDestination);
     }
 
-    public void updateResults(List<CommentsAndLikes> results) {
+    public void updateResults(List<UserCommentDTO> results) {
         mListDestinationComments = results;
         //Triggers the list update
         notifyDataSetChanged();
@@ -106,16 +105,19 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
             viewHolder.imageView = (RoundedImageView) viewrow.findViewById(R.id.userimagedest);
 
             viewrow.setTag(viewHolder);
-        } else viewHolder = (ViewHolder) viewrow.getTag();
-        if(mListDestinationComments.get(position).getUserId().equals(UserId)){
-            Log.d("UserId",""+UserId);
-            viewHolder.textView.setText(UserName);
-            viewHolder.textView1.setText(mListDestinationComments.get(position).getmCommentText());
         } else {
-            Log.d("UserId", "" + UserId);
-            viewHolder.textView1.setText(mListDestinationComments.get(position).getmCommentText());
-            viewHolder.textView.setText(mListDestinationComments.get(position).getUserName());
+            viewHolder = (ViewHolder) viewrow.getTag();
         }
+
+        Log.d("UserId", "" + UserId);
+        viewHolder.textView1.setText(mListDestinationComments.get(position).getCommentText());
+        viewHolder.textView.setText(mListDestinationComments.get(position).getUserName());
+        RoundedImageView roundedImageView = (RoundedImageView) viewHolder.imageView;
+        String photoUrl = mListDestinationComments.get(position).getUserPhotoUrl();
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            downloadImageAsync(photoUrl, roundedImageView);
+        }
+
         return viewrow;
     }
 
@@ -139,32 +141,39 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
         return false;
     }
 
+    protected static synchronized void downloadImageAsync(final String url, final ImageView imageView) {
+        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
+
+            @Override
+            public Bitmap doInBackground(Void... params) {
+                URL imageUrl = null;
+                Bitmap imageBitmap = null;
+                try {
+                    imageUrl = new URL(url);
+                    imageBitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+                } catch (MalformedURLException e) {
+                    Log.e("DownloadImgBkgErr", "TravelAppError occurred while downloading profile image in background " + e.toString());
+                } catch (IOException e) {
+                    Log.e("DownloadImgBkgErr", "TravelAppError occurred while downloading profile image in background " + e.toString());
+                } catch (Exception e) {
+                    Log.e("DownloadImgBkgErr", "TravelAppError occurred while downloading profile image in background " + e.toString());
+                }
+                return imageBitmap;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                imageView.setImageBitmap(result);
+            }
+
+        };
+        task.execute();
+    }
+
     private static class ViewHolder {
         ImageView imageView;
         TextView textView;
         TextView textView1;
-    }
-
-    public Bitmap roundCornerImage(Bitmap raw, float round) {
-        int width = raw.getWidth();
-        int height = raw.getHeight();
-        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
-        canvas.drawARGB(0, 0, 0, 0);
-
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.parseColor("#000000"));
-
-        final Rect rect = new Rect(0, 0, width, height);
-        final RectF rectF = new RectF(rect);
-
-        canvas.drawRoundRect(rectF, round, round, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        canvas.drawBitmap(raw, rect, rect, paint);
-
-        return result;
     }
 
 }

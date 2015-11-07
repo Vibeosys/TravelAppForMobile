@@ -21,9 +21,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.TableDataDTO;
-import com.vibeosys.travelapp.data.Upload;
-import com.vibeosys.travelapp.data.UploadUser;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
@@ -40,7 +37,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     Button mPrevButton, mNextButton;
-    NewDataBase newDataBase = null;
+    //NewDataBase newDataBase = null;
     //String UserId;
     int DestId;
     //String EmailId;
@@ -64,8 +61,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         mListOptions = new ArrayList<>();
         //UserId = mSessionManager.Instance().getUserId();
         //EmailId = mSessionManager.Instance().getUserEmailId();
-        newDataBase = new NewDataBase(this);
-        int pages = newDataBase.Questions(DestId);
+        //newDataBase = new NewDataBase(this);
+        int pages = mNewDataBase.Questions(DestId);
         NUM_PAGES = pages;
 
         // ...but notify us that it happened.
@@ -106,16 +103,18 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
                             Answer answer = new Answer(mListOptions.get(i), String.valueOf(DestId), theUserId);
                             String SerializedJsonString = gson.toJson(answer);
                             Log.d("Option Data", SerializedJsonString);
-                            tableDataList.add(new TableDataDTO("answer", SerializedJsonString));
+                            tableDataList.add(new TableDataDTO("answer", SerializedJsonString, null));
                         }
 
-                        uploadData = gson.toJson(new Upload(new UploadUser(theUserId, theUserEmailId), tableDataList));
-                        Log.d("Like Data to Uplaod", uploadData);
+                        //uploadData = gson.toJson(new Upload(new UploadUser(theUserId, theUserEmailId), tableDataList));
+                        //Log.d("Like Data to Uplaod", uploadData);
 
                         if (NetworkUtils.isActiveNetworkAvailable(getApplicationContext())) {
-                            Upload(uploadData);
+                            mServerSyncManager.uploadDataToServer(tableDataList);
                         } else {
-                            newDataBase.addDataToSync("answer", theUserEmailId, uploadData);
+                            for (TableDataDTO tableData : tableDataList)
+                                mNewDataBase.addDataToSync("answer", theUserEmailId, tableData.getTableData());
+
                             LayoutInflater
                                     layoutInflater = getLayoutInflater();
                             View view = layoutInflater.inflate(R.layout.cust_toast, null);
@@ -143,11 +142,6 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
                 invalidateOptionsMenu();
             }
         });
-    }
-
-    void Upload(String uploadData) {
-        //super.UploadUserDetails();
-        super.uploadToServer(uploadData, QuestionSlidingView.this);//id 1=>download 2=>upload
     }
 
     @Override

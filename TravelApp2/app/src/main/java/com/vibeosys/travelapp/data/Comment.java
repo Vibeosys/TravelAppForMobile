@@ -15,12 +15,9 @@ public class Comment {
     private int destId;
     private String commentText;
 
-public Comment(){
+    public Comment() {
 
-}
-
-
-
+    }
 
     public String getUserId() {
         return userId;
@@ -49,17 +46,18 @@ public Comment(){
 
     public static List<Comment> deserializeSting(ArrayList<String> serializedStringList) {
         Gson gson = new Gson();
-        ArrayList<Comment> commentList=new ArrayList<>();
+        ArrayList<Comment> commentList = new ArrayList<>();
 
-        for(String serializedString: serializedStringList){
-            Comment deserizeedComment= gson.fromJson(serializedString, Comment.class);
+        for (String serializedString : serializedStringList) {
+            Comment deserizeedComment = gson.fromJson(serializedString, Comment.class);
             commentList.add(deserizeedComment);
         }
         return commentList;
     }
-    public static String serializeString(Comment comment){
+
+    public static String serializeString(Comment comment) {
         Gson gson = new Gson();
-        Comment comment1=comment;
+        Comment comment1 = comment;
         String serializedString = gson.toJson(comment1);
         Log.d("Comment Serialized ", serializedString);
         return serializedString;

@@ -17,7 +17,6 @@
 package com.vibeosys.travelapp;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,6 +36,7 @@ import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.fragments.ImageDetailFragment;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
+import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.Utils;
 
 import java.util.ArrayList;
@@ -64,14 +64,15 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         }
 
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent();
+        newDataBase = new NewDataBase(getApplicationContext(), SessionManager.getInstance(getApplicationContext()));
+        //Intent intent = new Intent();
         listImages = new ArrayList<>();
-        Bundle extras = intent.getExtras();
+        //Bundle extras = intent.getExtras();
         mDestId = getIntent().getIntExtra("DestId", -1);
         Log.d("PhotosFromOthers", "" + mDestId);
         imageId = getIntent().getStringExtra("ImageId");
         Log.d("PhotosFromOthers", "" + imageId);
-        newDataBase = new NewDataBase(getApplicationContext());
+        //newDataBase = new NewDataBase(getApplicationContext());
         mPhotoList = newDataBase.Images(mDestId, true);
         setContentView(R.layout.image_detail_pager);
         // Fetch screen height and width, to use as our max size when loading images as this

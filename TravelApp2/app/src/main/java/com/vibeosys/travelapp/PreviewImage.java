@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.ImageFileUploader;
 import com.vibeosys.travelapp.util.NetworkUtils;
@@ -34,7 +33,7 @@ public class PreviewImage extends BaseActivity
         implements View.OnClickListener,
         ImageFileUploader.OnUploadCompleteListener, ImageFileUploader.OnUploadErrorListener {
 
-    private NewDataBase newDataBase = null;
+    //private NewDataBase newDataBase = null;
     private String imageData = null;
     private ProgressDialog mProgressDialog;
     //SessionManager mSessionManager;
@@ -45,7 +44,7 @@ public class PreviewImage extends BaseActivity
         setContentView(R.layout.previewimage);
         setTitle("Preview Image");
         // Selected image id
-        newDataBase = new NewDataBase(getApplicationContext());
+        //newDataBase = new NewDataBase(getApplicationContext());
         final String path = getIntent().getExtras().getString("Data");
         Log.d("PreviewImage ImagePath", path);
 
@@ -81,7 +80,7 @@ public class PreviewImage extends BaseActivity
                         buf.close();
                     }
                 } catch (Exception e) {
-                    Log.e("Error reading file", e.toString());
+                    Log.e("ErrorDownLoad", e.toString());
                 }
 
             }
@@ -121,7 +120,7 @@ public class PreviewImage extends BaseActivity
                     try {
                         imageFileUploader.uploadDestinationImage(path, filename, DestId);
                     } catch (Exception ex) {
-                        Log.e("ExceptionGridImgUp", "Error uploading the captured photo");
+                        Log.e("ExceptionGridImgUp", "TravelAppError uploading the captured photo");
                     } finally {
                         if (mProgressDialog != null && mProgressDialog.isShowing())
                             mProgressDialog.dismiss();
@@ -131,7 +130,7 @@ public class PreviewImage extends BaseActivity
 
         } else {
             try {
-                newDataBase.addDataToSync("MyImages", mSessionManager.Instance().getUserId(), SerializedJsonString);
+                mNewDataBase.addDataToSync("MyImages", mSessionManager.Instance().getUserId(), SerializedJsonString);
                 LayoutInflater layoutInflater = getLayoutInflater();
                 View view = layoutInflater.inflate(R.layout.cust_toast, null);
                 Toast toast = new Toast(getApplicationContext());

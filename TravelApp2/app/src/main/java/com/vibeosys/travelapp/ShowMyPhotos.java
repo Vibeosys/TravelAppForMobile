@@ -2,36 +2,36 @@ package com.vibeosys.travelapp;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.vibeosys.travelapp.Adaptors.ImageAdapter;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import java.util.List;
 
 /**
  * Created by mahesh on 10/3/2015.
  */
-public class ShowMyPhotos extends AppCompatActivity {
+public class ShowMyPhotos extends BaseActivity {
     ListView showphoto_view;
     List<MyImageDB> mUserImagesList = null;
-    NewDataBase newDataBase;
+    //NewDataBase newDataBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.showmyphoto_layout);
         getSupportActionBar().setTitle("My Photos");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         showphoto_view = (ListView) findViewById(R.id.grid_images);
-        newDataBase = new NewDataBase(this);
+
         try {
-            mUserImagesList = newDataBase.mUserImagesList();
+            mUserImagesList = mNewDataBase.mUserImagesList();
             showphoto_view.setAdapter(new ImageAdapter(this, mUserImagesList));
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 

@@ -1,6 +1,5 @@
 package com.vibeosys.travelapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -8,7 +7,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
@@ -21,7 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,12 +31,13 @@ import java.util.List;
 /**
  * Created by mahesh on 10/3/2015.
  */
-public class ShowRouteList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ShowRouteList extends BaseActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
     ListView listView;
-    Context context;
-    NewDataBase newDataBase;
+    //Context context;
+    //NewDataBase newDataBase;
     List<Routes> mRouteList;
-    int REQUESTCODE = 100;
+    //int REQUESTCODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +47,9 @@ public class ShowRouteList extends AppCompatActivity implements NavigationView.O
         setSupportActionBar(toolbar);
         setTitle("My Routes");
         listView = (ListView) findViewById(R.id.routelistview);
-        context = getApplicationContext();
-        newDataBase = new NewDataBase(ShowRouteList.this);
-        mRouteList = newDataBase.getRouteList();
+        //context = getApplicationContext();
+        //newDataBase = new NewDataBase(ShowRouteList.this);
+        mRouteList = mNewDataBase.getRouteList();
         listView.setAdapter(new TravelCustomAdaptor(mRouteList));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

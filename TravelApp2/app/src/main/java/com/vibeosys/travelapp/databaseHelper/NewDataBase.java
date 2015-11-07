@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.vibeosys.travelapp.CommentsAndLikes;
 import com.vibeosys.travelapp.Destination;
 import com.vibeosys.travelapp.DestinationTempData;
 import com.vibeosys.travelapp.GetTemp;
@@ -25,6 +24,7 @@ import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.data.Sync;
 import com.vibeosys.travelapp.data.User;
+import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.data.UserLikeDTO;
 import com.vibeosys.travelapp.usersImages;
 import com.vibeosys.travelapp.util.SessionManager;
@@ -40,12 +40,12 @@ import java.util.List;
 public class NewDataBase extends SQLiteOpenHelper {
     //private static final String DB_NAME = "/data/data/com.vibeosys.travelapp/app_databases/TravelApp";
 
-    private final Context mContext;
+    //private final Context mContext;
 
-    public NewDataBase(Context context) {
+    public NewDataBase(Context context, SessionManager sessionManager) {
 
-        super(context, SessionManager.getInstance(context).getDatabaseDeviceFullPath(), null, 1);
-        this.mContext = context;
+        super(context, sessionManager.getDatabaseDeviceFullPath(), null, 1);
+        //this.mContext = context;
     }
 
 
@@ -53,40 +53,43 @@ public class NewDataBase extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
     }
 
-    public boolean insertComment(List<Comment> listComment) {
-        List<Comment> mListComment = null;
+    public boolean insertOrUpdateComment(Comment comment) {
         SQLiteDatabase database = null;
-        mListComment = listComment;
         ContentValues contentValues = null;
-        long id = -1;
+        long affectedRows = 0;
         try {
-            database = getWritableDatabase();
-
-            contentValues = new ContentValues();
-            for (int i = 0; i < mListComment.size(); i++) {
-                contentValues.put("commentText", listComment.get(i).getCommentText());
-                contentValues.put("DestId", listComment.get(i).getDestId());
-                contentValues.put("UserId", listComment.get(i).getUserId());
-                id = database.insert("Comment_and_like", null, contentValues);
-                Log.d("Updated Databse", String.valueOf(id));
-                Log.d("Updated Column", listComment.get(i).getCommentText());
-                contentValues.clear();
-            }
+            String[] commentWhereClause = new String[]{comment.getUserId(), String.valueOf(comment.getDestId())};
+            database = getReadableDatabase();
+            Cursor cursor = database.rawQuery("select userid, destid, likecount from Comment_and_like where userid=? and destid=?",
+                    commentWhereClause);
+            int rowCount = cursor.getCount();
+            cursor.close();
             database.close();
-            Log.d("Comment Table", "Inserted in Comment");
-            if (id != -1) {
-                return true;
-            }
+
+            database = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("CommentText", comment.getCommentText());
+            contentValues.put("DestId", comment.getDestId());
+            contentValues.put("UserId", comment.getUserId());
+            if (rowCount == 0)
+                affectedRows = database.insert("Comment_and_like", null, contentValues);
+            else
+                affectedRows = database.update("Comment_and_like", contentValues, "userid=? and DestId=?", commentWhereClause);
+            contentValues.clear();
+
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            database.close();
         }
-        return false;
+
+        return affectedRows == 1;
     }
 
-    public List<Sync> getFromSync() {
+    public ArrayList<Sync> getPendingSyncRecords() {
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
-        List<Sync> syncTableData = null;
+        ArrayList<Sync> syncTableData = null;
         try {
             sqLiteDatabase = getReadableDatabase();
             cursor = sqLiteDatabase.rawQuery("select * from Sync ", null);
@@ -104,6 +107,11 @@ public class NewDataBase extends SQLiteOpenHelper {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
         return syncTableData;
     }
@@ -354,22 +362,32 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateLikeCount(String userId, int destId, int previousLikeCount) {
+    public boolean insertOrUpdateLikeCount(String userId, int destId, int previousLikeCount) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
-        int rows = 0;
+        long affectedRows = 0;
         try {
             sqLiteDatabase = getWritableDatabase();
+
+            String[] commentWhereClause = new String[]{userId, String.valueOf(destId)};
+            Cursor cursor = sqLiteDatabase.rawQuery("select * from Comment_and_like where userid=? and destid=?",
+                    commentWhereClause);
+            int rowCount = cursor.getCount();
             contentValues = new ContentValues();
             contentValues.put("LikeCount", previousLikeCount + 1);
-            rows = sqLiteDatabase.update("comment_and_like", contentValues, "userid=? and destid=?", new String[]{userId, String.valueOf(destId)});
+            contentValues.put("DestId", destId);
+            contentValues.put("UserId", userId);
+            if (rowCount == 0)
+                affectedRows = sqLiteDatabase.insert("Comment_and_like", null, contentValues);
+            else
+                affectedRows = sqLiteDatabase.update("Comment_and_like", contentValues, "userid=? and DestId=?",
+                        commentWhereClause);
+            contentValues.clear();
 
-            sqLiteDatabase.close();
         } catch (Exception e) {
             Log.e("UPDATELIKECOUNTEx", e.toString());
         }
-        if (rows > 0) return true;
-        return false;
+        return affectedRows != 0;
     }
 
     public Images imageUserLikeCount(String imageId) {
@@ -448,35 +466,37 @@ public class NewDataBase extends SQLiteOpenHelper {
         return cImagePaths;
     }
 
-    public List<CommentsAndLikes> DestinationComments(int DestId) {
-        List<CommentsAndLikes> DestComments = null;
+    public List<UserCommentDTO> getDestinationComments(int DestId) {
+        List<UserCommentDTO> DestComments = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
             DestComments = new ArrayList<>();
-            cursor = sqLiteDatabase.rawQuery("select * " +
-                    "from comment_and_like NATURAL JOIN user where destid=? and user.userid=comment_and_like.userid;", new String[]{String.valueOf(DestId)});
+            cursor = sqLiteDatabase.rawQuery("select user.userid, user.userName, user.photourl, comment_and_like.commentText, comment_and_like.destid " +
+                            "from comment_and_like inner join user " +
+                            " on comment_and_like.userid = user.userid where destid=?",
+                    new String[]{String.valueOf(DestId)});
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     do {
-                        CommentsAndLikes commentsAndLikes = new CommentsAndLikes(
-                                cursor.getString(cursor.getColumnIndex("UserId")),
-                                cursor.getInt(cursor.getColumnIndex("DestId")),
-                                cursor.getString(cursor.getColumnIndex("CommentText")),
-                                cursor.getString(cursor.getColumnIndex("UserName")),
-                                cursor.getString(cursor.getColumnIndex("PhotoURL"))
-                        );
+                        UserCommentDTO commentsAndLikes = new UserCommentDTO();
+                        commentsAndLikes.setUserId(cursor.getString(0));
+                        commentsAndLikes.setDestId(cursor.getInt(4));
+                        commentsAndLikes.setCommentText(cursor.getString(3));
+                        commentsAndLikes.setUserName(cursor.getString(1));
+                        commentsAndLikes.setUserPhotoUrl(cursor.getString(2));
                         DestComments.add(commentsAndLikes);
 
                     } while (cursor.moveToNext());
                 }
             }
-            cursor.close();
-            sqLiteDatabase.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            cursor.close();
+            sqLiteDatabase.close();
         }
         return DestComments;
     }
@@ -498,24 +518,34 @@ public class NewDataBase extends SQLiteOpenHelper {
         return noOfQuestions;
     }
 
-    public boolean updateUser(String UserName, String EmailAddress, String UserId) {
+    public boolean addOrUpdateUserToAllUsers(User userInfo) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
-        int rowsid = 0;
+        long rowsAffected = -1;
         try {
             sqLiteDatabase = getWritableDatabase();
+            Cursor userCursor = sqLiteDatabase.rawQuery("select * from User where userid=?",
+                    new String[]{userInfo.getUserId()});
+
             contentValues = new ContentValues();
-            contentValues.put("UserName", UserName);
-            contentValues.put("UserEmail", EmailAddress);
-            rowsid = sqLiteDatabase.update("MyUser", contentValues, "UserId=?", new String[]{UserId});
+            contentValues.put("UserName", userInfo.getUserName());
+            contentValues.put("UserId", userInfo.getUserId());
+            contentValues.put("PhotoURL", userInfo.getPhotoURL());
+            if (userCursor.getCount() == 0)
+                rowsAffected = sqLiteDatabase.insert("User", null, contentValues);
+            else {
+                contentValues.remove("UserId");
+                rowsAffected = sqLiteDatabase.update("User", contentValues, "userid=?",
+                        new String[]{userInfo.getUserId()});
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("UserAddException", "Error while adding this user " + userInfo.getUserId() + " " + e.toString());
+        } finally {
+            contentValues.clear();
+            sqLiteDatabase.close();
         }
-        contentValues.clear();
-        sqLiteDatabase.close();
-        if (rowsid > 0) {
-            return true;
-        } else return false;
+
+        return rowsAffected == 1;
     }
 
 
@@ -838,6 +868,10 @@ public class NewDataBase extends SQLiteOpenHelper {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            sqLiteDatabase.close();
         }
         return answerUsersList;
     }

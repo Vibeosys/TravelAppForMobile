@@ -24,7 +24,6 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.ImageFileUploader;
 import com.vibeosys.travelapp.util.NetworkUtils;
@@ -57,7 +56,7 @@ public class GridViewPhotos extends BaseActivity
     private String[] mNames = null;
     private Cursor cc = null;
     private Uri imageUri;
-    //private NewDataBase newDataBase;
+    //private NewDataBase mNewDataBase;
     private int DestId;
     //SessionManager mSessionManager;
     private ProgressDialog mProgressDialog;
@@ -146,8 +145,8 @@ public class GridViewPhotos extends BaseActivity
             if (resultCode == RESULT_OK) {
                 final String imagePath = imageUri.getPath();
                 String date = DateFormat.getDateTimeInstance().format(new Date());
-                newDataBase = new NewDataBase(getApplicationContext());
-                newDataBase.saveInMyImages(imagePath, date);
+                //mNewDataBase = new NewDataBase(getApplicationContext());
+                mNewDataBase.saveInMyImages(imagePath, date);
                 Gson gson = new Gson();
                 ImageUploadDTO imageUploadDTO = new ImageUploadDTO();
                 imageUploadDTO.setImageData(imagePath);
@@ -166,7 +165,7 @@ public class GridViewPhotos extends BaseActivity
                             try {
                                 imageFileUploader.uploadDestinationImage(imagePath, filename, DestId);
                             } catch (Exception ex) {
-                                Log.e("ExceptionGridImgUp", "Error uploading the captured photo");
+                                Log.e("ExceptionGridImgUp", "TravelAppError uploading the captured photo");
                             } finally {
                                 if (mProgressDialog != null && mProgressDialog.isShowing())
                                     mProgressDialog.dismiss();
@@ -176,7 +175,7 @@ public class GridViewPhotos extends BaseActivity
 
                 } else {
                     try {
-                        newDataBase.addDataToSync("MyImages", mSessionManager.getUserId(), SerializedJsonString);
+                        mNewDataBase.addDataToSync("MyImages", mSessionManager.getUserId(), SerializedJsonString);
                         LayoutInflater layoutInflater = getLayoutInflater();
                         View view = layoutInflater.inflate(R.layout.cust_toast, null);
                         Toast toast = new Toast(getApplicationContext());

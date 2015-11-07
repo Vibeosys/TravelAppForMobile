@@ -22,13 +22,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.TableDataDTO;
-import com.vibeosys.travelapp.data.Upload;
-import com.vibeosys.travelapp.data.UploadUser;
 import com.vibeosys.travelapp.data.UserLikeDTO;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.SessionManager;
@@ -46,13 +42,13 @@ import java.util.List;
 public class QuestionsFromOthers extends BaseFragment {
 
     ExpandableListView questionslistView;
-    NewDataBase newDataBase = null;
+    //NewDataBase mNewDataBase = null;
     List<SendQuestionAnswers> mListQuestions = null;
     List<SendQuestionAnswers> mListOptions = null;
     HashMap<String, Options> mListQuestionsAnswers = null;
     private List<UserLikeDTO> listUsersDetails = new ArrayList<>();
     String destId;
-    SessionManager sessionManager = SessionManager.Instance();
+    //SessionManager sessionManager = SessionManager.Instance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,8 +65,8 @@ public class QuestionsFromOthers extends BaseFragment {
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.otherquestionlist_layout, null);
         questionslistView = (ExpandableListView) view.findViewById(R.id.listView2);
-        newDataBase = new NewDataBase(getActivity());
-        mListQuestions = newDataBase.mListQuestions(destId);
+        //mNewDataBase = new NewDataBase(getActivity());
+        mListQuestions = mNewDataBase.mListQuestions(destId);
         if (mListQuestions != null && mListQuestions.size() > 0) {
             Log.d("Questions", "" + mListQuestions.size());
             Options options = null;
@@ -78,7 +74,7 @@ public class QuestionsFromOthers extends BaseFragment {
             for (int i = 0; i < mListQuestions.size(); i++) {
                 mListOptions = new ArrayList<>();
                 String m = mListQuestions.get(i).getmQuestionText();
-                mListOptions = newDataBase.mListOptions(mListQuestions.get(i).getmQuestionId(), Integer.parseInt(destId));
+                mListOptions = mNewDataBase.mListOptions(mListQuestions.get(i).getmQuestionId(), Integer.parseInt(destId));
                 options = new Options();
                 String[] option = new String[mListOptions.size()];
                 int[] optionids = new int[mListOptions.size()];
@@ -86,7 +82,7 @@ public class QuestionsFromOthers extends BaseFragment {
                 for (int j = 0; j < mListOptions.size(); j++) {
                     option[j] = mListOptions.get(j).getmOptionText();
                     optionids[j] = mListOptions.get(j).getmOptionId();
-                    UsersCount[j] = newDataBase.CountOfUsers(mListOptions.get(j).getmOptionId(), destId);
+                    UsersCount[j] = mNewDataBase.CountOfUsers(mListOptions.get(j).getmOptionId(), destId);
                 }
                 options.setmOptionText(option);
                 options.setmOptionIds(optionids);
@@ -284,7 +280,7 @@ public class QuestionsFromOthers extends BaseFragment {
         dialog.setTitle("Reviews from users");
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        listUsersDetails = newDataBase.answerlikesUsers(questionId, destId);
+        listUsersDetails = mNewDataBase.answerlikesUsers(questionId, destId);
         //likeCount=
         dialog.show();
         ListView usersListView = (ListView) dialog.findViewById(R.id.userlistview);
@@ -347,25 +343,17 @@ public class QuestionsFromOthers extends BaseFragment {
         Like like = new Like();
         like.setUserId(imageUserId);
         like.setDestId(Integer.parseInt(destId));
-        Gson gson = new Gson();
-        String SerializedJsonString = gson.toJson(like);
-        ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
-        tableDataList.add(new TableDataDTO("like", SerializedJsonString));
-        String currentUserID = sessionManager.getUserId();
-        String EmailId = sessionManager.getUserEmailId();
-        Log.d("EmailId", "" + EmailId);
-        String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
-        Log.d("UploadingLike", uploadData.toString());
-        newDataBase.updateLikeCount(imageUserId, Integer.parseInt(destId), userLikeCount);
+        String likeToSync = like.serializeString();
+        mNewDataBase.insertOrUpdateLikeCount(imageUserId, Integer.parseInt(destId), userLikeCount);
+
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
-            newDataBase.getFromSync();
-            super.uploadToServer(uploadData, getActivity());
-            String UserId = SessionManager.Instance().getUserId();
-            //Log.d("UserId", UserId);
-            super.fetchData(UserId, true);//id 1=>download 2=>upload
+
+            TableDataDTO tableData = new TableDataDTO("Like", like.serializeString(), null);
+            mServerSyncManager.uploadDataToServer(tableData);
+            //super.uploadToServer(uploadData, getActivity());
             return true;
         } else {
-            newDataBase.addDataToSync("Comment_and_like", currentUserID, uploadData);
+            mNewDataBase.addDataToSync("Like", SessionManager.Instance().getUserId(), likeToSync);
             LayoutInflater
                     layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);

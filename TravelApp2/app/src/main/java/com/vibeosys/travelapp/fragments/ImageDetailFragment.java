@@ -32,15 +32,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.vibeosys.travelapp.ImageDetailActivity;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.TableDataDTO;
-import com.vibeosys.travelapp.data.Upload;
-import com.vibeosys.travelapp.data.UploadUser;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.ImageWorker;
@@ -63,10 +59,10 @@ public class ImageDetailFragment extends BaseFragment
     private ImageFetcher mImageFetcher;
     private String ImageId;
     private List<Images> listImages;
-    private NewDataBase newDataBase;
+    //private NewDataBase newDataBase;
     private Images images;
     private TextView mLikeCountText;
-    SessionManager sessionManager = SessionManager.Instance();
+    //SessionManager sessionManager = SessionManager.Instance();
 
     /**
      * Factory method to generate a new instance of the fragment given an image number.
@@ -100,12 +96,12 @@ public class ImageDetailFragment extends BaseFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        newDataBase = new NewDataBase(getActivity());
+        //newDataBase = new NewDataBase(getActivity());
         listImages = new ArrayList<>();
         ImageId = getArguments() != null ? getArguments().getString("ImageId") : null;
         Log.d("ImageDetails", "" + ImageId);
         mImageUrl = getArguments() != null ? getArguments().getString(IMAGE_DATA_EXTRA) : null;
-        images = newDataBase.imageUserLikeCount(ImageId);
+
         Log.e("ListImagesSize", "" + listImages.size());
     }
 
@@ -117,6 +113,8 @@ public class ImageDetailFragment extends BaseFragment
         TextView usernameText = (TextView) v.findViewById(R.id.usernaemimagetext);
         mLikeCountText = (TextView) v.findViewById(R.id.likecounttext);
         ImageView like = (ImageView) v.findViewById(R.id.likebutton);
+
+        images = mNewDataBase.imageUserLikeCount(ImageId);
 
         if (images != null) {
             String username = images.getUsername();
@@ -147,25 +145,17 @@ public class ImageDetailFragment extends BaseFragment
         Like like = new Like();
         like.setUserId(imageUserId);
         like.setDestId(images.getDestId());
-        Gson gson = new Gson();
-        String SerializedJsonString = gson.toJson(like);
+
+        String serializeString = like.serializeString();
         ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
-        tableDataList.add(new TableDataDTO("like", SerializedJsonString));
+        tableDataList.add(new TableDataDTO("like", serializeString, null));
         String currentUserID = SessionManager.Instance().getUserId();
-        String EmailId = SessionManager.Instance().getUserEmailId();
-        Log.d("EmailId", "" + EmailId);
-        String uploadData = gson.toJson(new Upload(new UploadUser(currentUserID, EmailId), tableDataList));
-        Log.d("UploadingLike", uploadData.toString());
-        newDataBase.updateLikeCount(imageUserId, images.getDestId(), images.getLikeCount());
+        mNewDataBase.insertOrUpdateLikeCount(imageUserId, images.getDestId(), images.getLikeCount());
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
-            newDataBase.getFromSync();
-            super.uploadToServer(uploadData, getActivity());
-            String UserId = SessionManager.Instance().getUserId();
-            //Log.d("UserId", UserId);
-            super.fetchData(UserId, true);//id 1=>download 2=>upload
+            mServerSyncManager.uploadDataToServer(tableDataList);
             return true;
         } else {
-            newDataBase.addDataToSync("Comment_and_like", currentUserID, uploadData);
+            mNewDataBase.addDataToSync("like", currentUserID, serializeString);
             LayoutInflater
                     layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);

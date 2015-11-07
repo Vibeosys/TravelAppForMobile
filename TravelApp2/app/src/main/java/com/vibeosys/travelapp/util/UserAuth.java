@@ -76,9 +76,10 @@ public class UserAuth {
                     /*}
                 }).run();
 */
-        NewDataBase newDataBase = new NewDataBase(context);
+        NewDataBase newDataBase = new NewDataBase(context, SessionManager.getInstance(context));
         boolean isRecordUpdated = newDataBase.updateUserAuthenticationInfo(userInfo);
-        return isRecordUpdated;
+        boolean isRecordAddedToAllUsers = newDataBase.addOrUpdateUserToAllUsers(userInfo);
+        return isRecordUpdated && isRecordAddedToAllUsers;
     }
 
     public static boolean CleanAuthenticationInfo() {
@@ -122,13 +123,13 @@ public class UserAuth {
                     }
 
                     if (code.equals("100")) {
-                        Log.e("Error", "User Not Authenticated..");
+                        Log.e("TravelAppError", "User Not Authenticated..");
                     }
                     if (code.equals("101")) {
-                        Log.e("Error", "User Id is Blanck");
+                        Log.e("TravelAppError", "User Id is Blanck");
                     }
                     if (code.equals("102")) {
-                        Log.e("Error", "Unknown Error");
+                        Log.e("TravelAppError", "Unknown TravelAppError");
                     }
 
 
@@ -142,7 +143,7 @@ public class UserAuth {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("UPLOADUSERDETAILSERROR", "Error [" + error.getMessage() + "]");
+                Log.e("UPLOADUSERDETAILSERROR", "TravelAppError [" + error.getMessage() + "]");
             }
 
         });

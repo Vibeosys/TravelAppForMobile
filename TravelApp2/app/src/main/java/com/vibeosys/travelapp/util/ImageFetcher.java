@@ -258,7 +258,7 @@ public class ImageFetcher extends ImageResizer {
     }
 
     /**
-     * Download a bitmap from a URL and write the content to an output stream.
+     * ServerSync a bitmap from a URL and write the content to an output stream.
      *
      * @param urlString The URL to fetch
      * @return true if successful, false otherwise
@@ -281,7 +281,7 @@ public class ImageFetcher extends ImageResizer {
             }
             return true;
         } catch (final IOException e) {
-            Log.e(TAG, "Error in downloadBitmap - " + e);
+            Log.e(TAG, "TravelAppError in downloadBitmap - " + e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

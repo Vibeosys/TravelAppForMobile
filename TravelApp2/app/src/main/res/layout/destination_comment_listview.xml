@@ -45,7 +45,7 @@
             android:inputType="text"
             android:lines="1"
             android:maxLines="10"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/submitButton"

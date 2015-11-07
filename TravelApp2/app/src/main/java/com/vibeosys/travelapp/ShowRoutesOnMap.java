@@ -23,7 +23,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import org.json.JSONArray;
@@ -38,7 +38,7 @@ import java.util.List;
  * Created by mahesh on 10/12/2015.
  */
 public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback {
-    NewDataBase newDataBase;
+    //NewDataBase newDataBase;
     List<Routes> mRouteList;
     //HashMap<Integer, DestLatLong> mHashMapRoutes;
     ArrayList<DestLatLong> mDestinationLatLongs;
@@ -48,13 +48,13 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.showroutes);
-        newDataBase = new NewDataBase(ShowRoutesOnMap.this);
+        //newDataBase = new NewDataBase(ShowRoutesOnMap.this);
         Intent mIntent = getIntent();
-        mDestinationNames = newDataBase.getDestNames();
+        mDestinationNames = mNewDataBase.getDestNames();
 
         String mRouteName = mIntent.getStringExtra("theRouteName");
         setTitle(mRouteName);
-        Routes mRoute = newDataBase.getRoute(mRouteName);
+        Routes mRoute = mNewDataBase.getRoute(mRouteName);
 
         //mHashMapRoutes = new HashMap<>();
         mDestinationLatLongs = new ArrayList<>();
@@ -204,11 +204,11 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
 
                 TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                 TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
-                int imagesCount = newDataBase.Images(mDestId, false).size();
-                List<SendQuestionAnswers> listofQuestion = newDataBase.mListQuestions(String.valueOf(mDestId));
+                int imagesCount = mNewDataBase.Images(mDestId, false).size();
+                List<SendQuestionAnswers> listofQuestion = mNewDataBase.mListQuestions(String.valueOf(mDestId));
                 int msgCount = 0;
                 int destCommentcount = 0;
-                List<CommentsAndLikes> destinationComment = newDataBase.DestinationComments(mDestId);
+                List<UserCommentDTO> destinationComment = mNewDataBase.getDestinationComments(mDestId);
                 if (destinationComment != null) destCommentcount = destinationComment.size();
                 if (listofQuestion != null) msgCount = listofQuestion.size();
 

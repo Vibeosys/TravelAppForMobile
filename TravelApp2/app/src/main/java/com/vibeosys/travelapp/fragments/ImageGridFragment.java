@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,14 +33,13 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.BuildConfig;
 import com.vibeosys.travelapp.ImageDetailActivity;
 import com.vibeosys.travelapp.R;
-import com.vibeosys.travelapp.databaseHelper.NewDataBase;
+import com.vibeosys.travelapp.tasks.BaseFragment;
 import com.vibeosys.travelapp.usersImages;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
@@ -56,7 +54,8 @@ import java.util.List;
  * cache is retained over configuration changes like orientation change so the images are populated
  * quickly if, for example, the user rotates the device.
  */
-public class ImageGridFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class ImageGridFragment extends BaseFragment
+        implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "ImageGridFragment";
     private static final String IMAGE_CACHE_DIR = "thumbs";
     private int mImageThumbSize;
@@ -64,7 +63,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
     private ImageAdapter mAdapter;
     private ImageFetcher mImageFetcher;
     int destId;
-    ListView other_photo_list;
+    //ListView other_photo_list;
     List<usersImages> mPhotoList = null;
 
     /**
@@ -81,10 +80,10 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         mImageThumbSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
 
 
-        NewDataBase newDataBase = new NewDataBase(getActivity());
-         destId = getActivity().getIntent().getExtras().getInt("DestId");
+        //NewDataBase newDataBase = new NewDataBase(getActivity());
+        destId = getActivity().getIntent().getExtras().getInt("DestId");
         Log.d("PhotosFromOthers", "" + destId);
-        mPhotoList = newDataBase.Images(destId,true);
+        mPhotoList = mNewDataBase.Images(destId, true);
         Log.d("ImageGridFragment", "" + mPhotoList.size());
         mAdapter = new ImageAdapter(getActivity(), mPhotoList);
         ImageCache.ImageCacheParams cacheParams =
@@ -186,9 +185,9 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         final Intent i = new Intent(getActivity(), ImageDetailActivity.class);
         i.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
-        i.putExtra("DestId",destId);
-        i.putExtra("ImageId", mPhotoList.get(position-3).getmImageId());
-        Log.d("ImageId",""+mPhotoList.get(position-3).getmImageId());
+        i.putExtra("DestId", destId);
+        i.putExtra("ImageId", mPhotoList.get(position - 3).getmImageId());
+        Log.d("ImageId", "" + mPhotoList.get(position - 3).getmImageId());
         if (Utils.hasJellyBean()) {
             // makeThumbnailScaleUpAnimation() looks kind of ugly here as the loading spinner may
             // show plus the thumbnail image in GridView is cropped. so using

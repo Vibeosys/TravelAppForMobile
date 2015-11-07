@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by mahesh on 10/22/2015.
  */
-public class Upload extends Download {
+public class Upload extends ServerSync {
     UploadUser user;
 
     public Upload(UploadUser user, List<TableDataDTO> tableDataList) {
