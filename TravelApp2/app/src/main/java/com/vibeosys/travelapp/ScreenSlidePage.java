@@ -60,7 +60,7 @@ public class ScreenSlidePage extends BaseFragment {
         super.onCreate(savedInstanceState);
         //newDataBase=new NewDataBase(getActivity());
         mListQuestions = mNewDataBase.listQuestions();
-        Log.d("Questions", "" + mListQuestions.size());
+        Log.d("getQuestions", "" + mListQuestions.size());
 
         if (mListQuestions != null && mListQuestions.size() > 0) {
             Options options = null;
@@ -95,7 +95,7 @@ public class ScreenSlidePage extends BaseFragment {
         answers = new ArrayList<>();
         // Set the title view to show the page number.
         TextView textView = (TextView) rootView.findViewById(R.id.questionText);
-        List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));//Questions List
+        List<String> keyList = Collections.list(Collections.enumeration(mListQuestionsAnswers.keySet()));//getQuestions List
         textView.setText(keyList.get(mPageNumber));
         RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.questionradiogroup);
         final ArrayList<Options> valueList = Collections.list(Collections.enumeration(mListQuestionsAnswers.values()));

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -74,7 +75,7 @@ public final class ImageFileUploader {
     private void uploadImage(final Map<String, String> dataMap) {
         RequestQueue rq = Volley.newRequestQueue(mContext);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+        StringRequest imageUploadRequest = new StringRequest(Request.Method.POST,
                 SessionManager.Instance().getUploadImagesUrl(), new Response.Listener<String>() {
 
             @Override
@@ -89,8 +90,7 @@ public final class ImageFileUploader {
                 if (mOnUploadErrorListener != null)
                     mOnUploadErrorListener.onUploadError(error);
             }
-        })
-        {
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 return dataMap;
@@ -98,7 +98,11 @@ public final class ImageFileUploader {
 
         };
 
-        rq.add(stringRequest);
+        imageUploadRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        rq.add(imageUploadRequest);
     }
 
     private Map<String, String> getDestinationImageParams

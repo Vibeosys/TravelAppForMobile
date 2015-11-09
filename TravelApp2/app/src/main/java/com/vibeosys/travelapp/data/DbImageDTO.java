@@ -1,37 +1,19 @@
 package com.vibeosys.travelapp.data;
 
-import com.vibeosys.travelapp.UserDetails;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by mahesh on 10/20/2015.
+ * Created by anand on 09-11-2015.
  */
-public class Images extends UserDetails {
+public class DbImageDTO extends BaseDTO {
     private String imageId;
     private String imagePath;
     private int destId;
+    private String userId;
     private boolean imageSeen;
-
-    public int getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(int likeCount) {
-        this.likeCount = likeCount;
-    }
-
-    int likeCount;
-
-    Images() {
-
-    }
-
-
-    public Images(String userName, int likeCount, int destId, String userId) {
-        this.Username = userName;
-        this.likeCount = likeCount;
-        this.UserId = userId;
-        this.destId = destId;
-    }
 
     public Boolean getImageSeen() {
         return imageSeen;
@@ -63,5 +45,24 @@ public class Images extends UserDetails {
 
     public void setDestId(int destId) {
         this.destId = destId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public static List<DbImageDTO> deserializeImages(List<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<DbImageDTO> imageList = new ArrayList<>();
+
+        for (String serializedString : serializedStringList) {
+            DbImageDTO deserializedImage = gson.fromJson(serializedString, DbImageDTO.class);
+            imageList.add(deserializedImage);
+        }
+        return imageList;
     }
 }

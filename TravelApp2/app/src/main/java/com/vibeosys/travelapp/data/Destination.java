@@ -1,7 +1,5 @@
 package com.vibeosys.travelapp.data;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -10,59 +8,53 @@ import java.util.List;
 /**
  * Created by mahesh on 10/20/2015.
  */
-public class Destination {
-int DestId;
-String DestName;
-double Lat;
-double Long;
+public class Destination extends BaseDTO {
+    private int destId;
+    private String destName;
+    private double latitude;
+    private double longitude;
 
     public int getDestId() {
-        return DestId;
+        return destId;
     }
 
     public void setDestId(int mDestId) {
-        this.DestId = DestId;
+        this.destId = destId;
     }
 
     public String getDestName() {
-        return DestName;
+        return destName;
     }
 
     public void setDestName(String DestName) {
-        this.DestName = DestName;
+        this.destName = DestName;
     }
 
-    public double getLat() {
-        return Lat;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setLat(double lat) {
-        Lat = lat;
+    public void setLatitude(double lat) {
+        this.latitude = lat;
     }
 
-    public double getLong() {
-        return Long;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLong(double aLong) {
-        Long = aLong;
+    public void setLongitude(double aLong) {
+        longitude = aLong;
     }
 
-    public static List<Destination> deserializeSting(ArrayList<String> serializedStringList) {
+    public static List<Destination> deserializeDestinations(List<String> serializedStringList) {
         Gson gson = new Gson();
-        ArrayList<Destination> destinationList=new ArrayList<>();
+        ArrayList<Destination> destinationList = new ArrayList<>();
 
-        for(String serializedString: serializedStringList){
-            Destination deserizedDestionation= gson.fromJson(serializedString, Destination.class);
+        for (String serializedString : serializedStringList) {
+            Destination deserizedDestionation = gson.fromJson(serializedString, Destination.class);
             destinationList.add(deserizedDestionation);
         }
         return destinationList;
     }
-    public static String serializeString(Destination destinationObj){
-        Gson gson = new Gson();
-        Destination destinationObj1=destinationObj;
-        String serializedString = gson.toJson(destinationObj1);
-        Log.d("Destination Serialized ", serializedString);
-        return serializedString;
-    }
+
 }

@@ -74,6 +74,23 @@ public abstract class BaseActivity extends AppCompatActivity
         mNewDataBase = new NewDataBase(getApplicationContext(), mSessionManager);
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+
+        if (mServerSyncManager != null && !mServerSyncManager.isDownloadInProgress())
+            mServerSyncManager.downloadDataFromServer(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mServerSyncManager != null && !mServerSyncManager.isDownloadInProgress())
+            mServerSyncManager.downloadDataFromServer(false);
+    }
+
+
     protected static void setProfileInfoInNavigationBar(View view) {
         // After successful Login
 
@@ -85,8 +102,8 @@ public abstract class BaseActivity extends AppCompatActivity
         userName.setText(SessionManager.Instance().getUserName());
         userEmail.setText(SessionManager.Instance().getUserEmailId());
 
-        if (SessionManager.Instance().getUserPhotoUrl() != null || SessionManager.Instance().getUserPhotoUrl() == "") {
-            downloadImageAsync(SessionManager.Instance().getUserPhotoUrl(), userProfileImage);
+        if (mSessionManager.getUserPhotoUrl() != null && !mSessionManager.getUserPhotoUrl().isEmpty()) {
+            downloadImageAsync(mSessionManager.getUserPhotoUrl(), userProfileImage);
         }
     }
 
@@ -134,7 +151,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
             @Override
             protected void onPostExecute(Bitmap result) {
-                imageView.setImageBitmap(result);
+                if (result != null)
+                    imageView.setImageBitmap(result);
             }
 
         };
@@ -217,6 +235,7 @@ public abstract class BaseActivity extends AppCompatActivity
         progressDialog.show();
 
         User theUser = new User();
+        theUser.setUserId(mSessionManager.getUserId());
         theUser.setLoginSource(RegistrationSourceTypes.GOOGLE_PLUS);
 
         try {

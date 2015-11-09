@@ -9,18 +9,22 @@ public class Destination {
     protected String mDestName;
     protected double mLat;
     protected double mLong;
-    Destination(int cDestId,String cDestName,double cLat,double cLong){
-        mDestId=cDestId;
-        mDestName=cDestName;
-        mLat=cLat;
-        mLong=cLong;
-    }
-Destination(){
 
-}
-    Destination(int cDestId,String cDestName){
+    Destination(int cDestId, String cDestName, double cLat, double cLong) {
+        mDestId = cDestId;
+        mDestName = cDestName;
+        mLat = cLat;
+        mLong = cLong;
+    }
+
+    Destination() {
 
     }
+
+    Destination(int cDestId, String cDestName) {
+
+    }
+
     public String getmDestName() {
         return mDestName;
     }

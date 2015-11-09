@@ -1,7 +1,5 @@
 package com.vibeosys.travelapp.data;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -10,7 +8,7 @@ import java.util.List;
 /**
  * Created by mahesh on 10/20/2015.
  */
-public class Comment {
+public class Comment extends BaseDTO{
     private String userId;
     private int destId;
     private String commentText;
@@ -43,24 +41,14 @@ public class Comment {
         this.commentText = commentText;
     }
 
-
-    public static List<Comment> deserializeSting(ArrayList<String> serializedStringList) {
+    public static List<Comment> deserializeComments(List<String> serializedStringList) {
         Gson gson = new Gson();
         ArrayList<Comment> commentList = new ArrayList<>();
 
         for (String serializedString : serializedStringList) {
-            Comment deserizeedComment = gson.fromJson(serializedString, Comment.class);
-            commentList.add(deserizeedComment);
+            Comment deserializedComment = gson.fromJson(serializedString, Comment.class);
+            commentList.add(deserializedComment);
         }
         return commentList;
     }
-
-    public static String serializeString(Comment comment) {
-        Gson gson = new Gson();
-        Comment comment1 = comment;
-        String serializedString = gson.toJson(comment1);
-        Log.d("Comment Serialized ", serializedString);
-        return serializedString;
-    }
-
 }

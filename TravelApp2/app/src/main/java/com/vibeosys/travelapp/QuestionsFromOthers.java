@@ -66,9 +66,9 @@ public class QuestionsFromOthers extends BaseFragment {
         View view = layoutInflater.inflate(R.layout.otherquestionlist_layout, null);
         questionslistView = (ExpandableListView) view.findViewById(R.id.listView2);
         //mNewDataBase = new NewDataBase(getActivity());
-        mListQuestions = mNewDataBase.mListQuestions(destId);
+        mListQuestions = mNewDataBase.getQuestionOptions(destId);
         if (mListQuestions != null && mListQuestions.size() > 0) {
-            Log.d("Questions", "" + mListQuestions.size());
+            Log.d("getQuestions", "" + mListQuestions.size());
             Options options = null;
             mListQuestionsAnswers = new HashMap<>();
             for (int i = 0; i < mListQuestions.size(); i++) {

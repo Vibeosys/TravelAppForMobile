@@ -244,6 +244,9 @@ public class GridViewPhotos extends BaseActivity
         if (mProgressDialog != null && mProgressDialog.isShowing())
             mProgressDialog.dismiss();
 
+        Toast.makeText(getApplicationContext(), "Image uploaded successfully",Toast.LENGTH_SHORT)
+                .show();
+
         this.finish();
     }
 

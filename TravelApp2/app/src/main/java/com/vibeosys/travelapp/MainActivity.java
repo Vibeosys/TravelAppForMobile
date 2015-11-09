@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity
             //String UserId = mSessionManager.getUserId();
             //Log.d("UserId", UserId);
             //super.fetchData(UserId, true);//id 1=>download 2=>upload
-            mServerSyncManager.downloadDataFromServer(true);
+            //mServerSyncManager.downloadDataFromServer(true);
             //mNewDataBase.updateUserInfo(String.valueOf(UserId));
         } else {
 
@@ -191,8 +191,8 @@ public class MainActivity extends BaseActivity
 
                 mNewDataBase.SaveMapInTemp(mCurrentDestinationData, mDestName);
 
-                destinationTempData = mNewDataBase.mGetLatLongFromTemp(
-                        mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
+                //destinationTempData = mNewDataBase.mGetLatLongFromTemp(
+                //        mCurrentDestinationData.get(0).getmDestId());//Get Last Known Lat Long from Temp
                 final CameraUpdate center = CameraUpdateFactory.newLatLng(
                         new LatLng(mCurrentDestinationData.get(0).getmLat(),
                                 mCurrentDestinationData.get(0).getmLong()));
@@ -370,16 +370,16 @@ public class MainActivity extends BaseActivity
                     TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                     TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
                     int imagesCount = mNewDataBase.Images(mDestId, false).size();
-                    List<SendQuestionAnswers> listofQuestion = mNewDataBase.mListQuestions(String.valueOf(mDestId));
+                    List<SendQuestionAnswers> listofQuestion = mNewDataBase.getQuestionOptions(String.valueOf(mDestId));
                     int msgCount = 0;
                     int destCommentcount = 0;
                     List<UserCommentDTO> destinationComment = mNewDataBase.getDestinationComments(mDestId);
                     if (destinationComment != null) destCommentcount = destinationComment.size();
                     if (listofQuestion != null) msgCount = listofQuestion.size();
 
-                    photoLabel.setText(String.valueOf(imagesCount) + " Photos uploaded");
-                    commentsLabel.setText(destCommentcount + " People have commented about the place.");
-                    rattingsLabel.setText(String.valueOf(msgCount) + " Reviews for this place");
+                    photoLabel.setText(String.valueOf(imagesCount) + " Photos uploaded ...");
+                    commentsLabel.setText(destCommentcount + " People have commented ...");
+                    rattingsLabel.setText(String.valueOf(msgCount) + " Reviews ..");
 
                     view.findViewById(R.id.overlay).setOnClickListener(
                             new View.OnClickListener() {

@@ -11,6 +11,7 @@ import java.util.List;
 public class Like extends BaseDTO {
     private String userId;
     private int destId;
+    private int likeCount;
 
     public String getUserId() {
         return userId;
@@ -28,15 +29,22 @@ public class Like extends BaseDTO {
         this.destId = destId;
     }
 
-    public static List<Like> deserializeSting(ArrayList<String> serializedStringList) {
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public static List<Like> deserializeLikes(List<String> serializedStringList) {
         Gson gson = new Gson();
         ArrayList<Like> likeList = new ArrayList<>();
 
         for (String serializedString : serializedStringList) {
-            Like deserizeedLike = gson.fromJson(serializedString, Like.class);
-            likeList.add(deserizeedLike);
+            Like deserializedComment = gson.fromJson(serializedString, Like.class);
+            likeList.add(deserializedComment);
         }
         return likeList;
     }
-
 }

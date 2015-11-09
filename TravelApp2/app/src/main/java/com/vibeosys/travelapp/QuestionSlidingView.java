@@ -62,7 +62,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         //UserId = mSessionManager.Instance().getUserId();
         //EmailId = mSessionManager.Instance().getUserEmailId();
         //newDataBase = new NewDataBase(this);
-        int pages = mNewDataBase.Questions(DestId);
+        int pages = mNewDataBase.getQuestions(DestId);
         NUM_PAGES = pages;
 
         // ...but notify us that it happened.

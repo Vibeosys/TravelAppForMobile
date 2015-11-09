@@ -205,7 +205,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                 TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
                 int imagesCount = mNewDataBase.Images(mDestId, false).size();
-                List<SendQuestionAnswers> listofQuestion = mNewDataBase.mListQuestions(String.valueOf(mDestId));
+                List<SendQuestionAnswers> listofQuestion = mNewDataBase.getQuestionOptions(String.valueOf(mDestId));
                 int msgCount = 0;
                 int destCommentcount = 0;
                 List<UserCommentDTO> destinationComment = mNewDataBase.getDestinationComments(mDestId);

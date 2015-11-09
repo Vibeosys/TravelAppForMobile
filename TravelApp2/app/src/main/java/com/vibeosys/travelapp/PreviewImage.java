@@ -130,7 +130,7 @@ public class PreviewImage extends BaseActivity
 
         } else {
             try {
-                mNewDataBase.addDataToSync("MyImages", mSessionManager.Instance().getUserId(), SerializedJsonString);
+                mNewDataBase.addDataToSync("MyImages", mSessionManager.getUserId(), SerializedJsonString);
                 LayoutInflater layoutInflater = getLayoutInflater();
                 View view = layoutInflater.inflate(R.layout.cust_toast, null);
                 Toast toast = new Toast(getApplicationContext());
@@ -159,6 +159,9 @@ public class PreviewImage extends BaseActivity
 
         if (mProgressDialog != null && mProgressDialog.isShowing())
             mProgressDialog.dismiss();
+
+        Toast.makeText(getApplicationContext(), "Image uploaded successfully",Toast.LENGTH_SHORT)
+                .show();
 
         this.finish();
     }

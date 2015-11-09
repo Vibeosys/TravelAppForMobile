@@ -8,32 +8,32 @@ import java.util.List;
 /**
  * Created by mahesh on 10/21/2015.
  */
-public class Question {
-int QuestionId;
-String QuestionText;
+public class Question extends BaseDTO {
+    int questionId;
+    String questionText;
 
     public int getQuestionId() {
-        return QuestionId;
+        return questionId;
     }
 
     public void setQuestionId(int questionId) {
-        QuestionId = questionId;
+        this.questionId = questionId;
     }
 
     public String getQuestionText() {
-        return QuestionText;
+        return questionText;
     }
 
     public void setQuestionText(String questionText) {
-        QuestionText = questionText;
+        this.questionText = questionText;
     }
 
-    public static List<Question> deserializeSting(ArrayList<String> serializedStringList) {
+    public static List<Question> deserializeQuestions(List<String> serializedStringList) {
         Gson gson = new Gson();
-        ArrayList<Question> questionsList=new ArrayList<>();
+        ArrayList<Question> questionsList = new ArrayList<>();
 
-        for(String serializedString: serializedStringList){
-            Question deserizeedQuestions= gson.fromJson(serializedString, Question.class);
+        for (String serializedString : serializedStringList) {
+            Question deserizeedQuestions = gson.fromJson(serializedString, Question.class);
             questionsList.add(deserizeedQuestions);
         }
         return questionsList;

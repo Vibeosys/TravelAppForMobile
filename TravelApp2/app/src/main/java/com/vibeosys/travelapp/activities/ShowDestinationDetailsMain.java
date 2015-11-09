@@ -16,7 +16,9 @@ public class ShowDestinationDetailsMain extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mServerSyncManager.syncDataWithServer(false);
+
+        if (mServerSyncManager != null && !mServerSyncManager.isDownloadInProgress())
+            mServerSyncManager.syncDataWithServer(false);
         //fetchData(SessionManager.Instance().getUserId(), false);
         setContentView(R.layout.show_destination_details);
         // Get the ViewPager and set it's PagerAdapter so that it can display itemsDN

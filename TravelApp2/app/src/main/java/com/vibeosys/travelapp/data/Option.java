@@ -8,62 +8,51 @@ import java.util.List;
 /**
  * Created by mahesh on 10/20/2015.
  */
-public class Option {
-    private String OptionId;
-    private String OptionText;
-    private int QuestionId;
-
-    public int[] getOptionsId() {
-        return OptionsId;
-    }
-
-    public void setOptionsId(int[] optionsId) {
-        OptionsId = optionsId;
-    }
-
-    private int []OptionsId;
+public class Option extends BaseDTO {
+    private String optionId;
+    private String optionText;
+    private int questionId;
 
     public Option() {
 
     }
 
     public Option(String optionId) {
-        this.OptionId = optionId;
+        this.optionId = optionId;
     }
 
     public String getOptionId() {
-        return OptionId;
+        return optionId;
     }
 
     public void setOptionId(String optionId) {
-        this.OptionId = optionId;
+        this.optionId = optionId;
     }
 
     public String getOptionText() {
-        return OptionText;
+        return optionText;
     }
 
     public void setOptionText(String optionText) {
-        this.OptionText = optionText;
+        this.optionText = optionText;
     }
 
     public int getQuestionId() {
-        return QuestionId;
+        return questionId;
     }
 
     public void setQuestionId(int questionId) {
-        this.QuestionId = questionId;
+        this.questionId = questionId;
     }
 
-    public static List<Option> deserializeSting(ArrayList<String> serializedStringList) {
+    public static List<Option> deserializeOptions(List<String> serializedStringList) {
         Gson gson = new Gson();
-        ArrayList<Option> optionsList = new ArrayList<>();
+        ArrayList<Option> optionList = new ArrayList<>();
 
         for (String serializedString : serializedStringList) {
-            Option deserizeedImages = gson.fromJson(serializedString, Option.class);
-            optionsList.add(deserizeedImages);
+            Option deserializedOption = gson.fromJson(serializedString, Option.class);
+            optionList.add(deserializedOption);
         }
-        return optionsList;
+        return optionList;
     }
-
 }

@@ -163,7 +163,8 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
 
             @Override
             protected void onPostExecute(Bitmap result) {
-                imageView.setImageBitmap(result);
+                if (result != null)
+                    imageView.setImageBitmap(result);
             }
 
         };

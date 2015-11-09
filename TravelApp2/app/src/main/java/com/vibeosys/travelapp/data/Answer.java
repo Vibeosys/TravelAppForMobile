@@ -1,6 +1,9 @@
 package com.vibeosys.travelapp.data;
+
 import android.util.Log;
+
 import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,23 +12,26 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Answer {
-    String answerId;
-    String userId;
-    String destId;
-    String optionId;
-    String createdDate;
+    private String answerId;
+    private String userId;
+    private String destId;
+    private String optionId;
+    private String createdDate;
 
-    public Answer(){
+    public Answer() {
 
     }
-    public Answer(String optionId){
-        this.optionId =optionId;
+
+    public Answer(String optionId) {
+        this.optionId = optionId;
     }
-    public Answer(String optionId,String DestId,String userId){
-        this.optionId =optionId;
-        this.destId =DestId;
-        this.userId=userId;
+
+    public Answer(String optionId, String DestId, String userId) {
+        this.optionId = optionId;
+        this.destId = DestId;
+        this.userId = userId;
     }
+
     public String getCreatedDate() {
         return createdDate;
     }
@@ -66,22 +72,21 @@ public class Answer {
         this.optionId = OptionId;
     }
 
-public static String serializeString(Answer answer){
-    Gson gson = new Gson();
-    Answer answer1=answer;
-    String serializedString = gson.toJson(answer1);
-    Log.d("Answer Serialized ",serializedString);
-    return serializedString;
-}
-
-
-
-   public static List<Answer> deserializeSting(ArrayList<String> serializedStringList) {
+    public static String serializeString(Answer answer) {
         Gson gson = new Gson();
-        ArrayList<Answer> answersList=new ArrayList<>();
+        Answer answer1 = answer;
+        String serializedString = gson.toJson(answer1);
+        Log.d("Answer Serialized ", serializedString);
+        return serializedString;
+    }
 
-        for(String serializedString: serializedStringList){
-         Answer deserizeedAnswer= gson.fromJson(serializedString, Answer.class);
+
+    public static List<Answer> deserializeAnswers(List<String> serializedStringList) {
+        Gson gson = new Gson();
+        ArrayList<Answer> answersList = new ArrayList<>();
+
+        for (String serializedString : serializedStringList) {
+            Answer deserizeedAnswer = gson.fromJson(serializedString, Answer.class);
             answersList.add(deserizeedAnswer);
         }
         return answersList;
