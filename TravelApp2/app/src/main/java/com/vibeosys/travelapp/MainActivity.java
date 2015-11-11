@@ -143,7 +143,7 @@ public class MainActivity extends BaseActivity
         setSupportActionBar(toolbar);
         text_dest = (AutoCompleteTextView) findViewById(R.id.dest_text);
         mDestList = new ArrayList<>();
-        UserDetails userDetails = new UserDetails();
+        //UserDetails userDetails = new UserDetails();
 
         // mNewDataBase.AddUser(UserId,UserName);
 //        mNewDataBase.GetUser();
@@ -175,7 +175,7 @@ public class MainActivity extends BaseActivity
                 text_dest.setText("");
                 text_dest.clearListSelection();
                 text_dest.clearFocus();
-                DestinationTempData destinationTempData = null;
+                //DestinationTempData destinationTempData = null;
                 String mDestName = null;
                 List<TempData> mCurrentDestinationData = new ArrayList<>();
                 mDestName = (String) parent.getItemAtPosition(position);

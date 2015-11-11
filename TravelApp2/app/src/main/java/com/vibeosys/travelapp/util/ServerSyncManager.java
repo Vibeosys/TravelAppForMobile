@@ -89,6 +89,11 @@ public class ServerSyncManager
         }
 
         final ProgressDialog progress = new ProgressDialog(mContext);
+        if (mSessionManager.getUserId() == null || mSessionManager.getUserEmailId() == null || mSessionManager.getUserName() == null ||
+                mSessionManager.getUserId().isEmpty() || mSessionManager.getUserEmailId().isEmpty() || mSessionManager.getUserName().isEmpty()) {
+            Log.e("UserNotAuth", "User is not authenticated before upload");
+            return;
+        }
         String uploadJson = prepareUploadJsonFromData(params);
         uploadJsonToServer(uploadJson, progress);
     }
@@ -107,6 +112,7 @@ public class ServerSyncManager
     }
 
     private String prepareUploadJsonFromData(TableDataDTO... params) {
+
         Upload uploadToServer = new Upload();
         uploadToServer.setUser(new UploadUser(
                 mSessionManager.getUserId(),

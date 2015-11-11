@@ -71,10 +71,10 @@ public class QuestionsFromOthers extends BaseFragment {
             Log.d("getQuestions", "" + mListQuestions.size());
             Options options = null;
             mListQuestionsAnswers = new HashMap<>();
-            for (int i = 0; i < mListQuestions.size(); i++) {
+            for (SendQuestionAnswers questionAnswer: mListQuestions) {
                 mListOptions = new ArrayList<>();
-                String m = mListQuestions.get(i).getmQuestionText();
-                mListOptions = mNewDataBase.mListOptions(mListQuestions.get(i).getmQuestionId(), Integer.parseInt(destId));
+                String m = questionAnswer.getmQuestionText();
+                mListOptions = mNewDataBase.mListOptions(questionAnswer.getmQuestionId(), Integer.parseInt(destId));
                 options = new Options();
                 String[] option = new String[mListOptions.size()];
                 int[] optionids = new int[mListOptions.size()];
@@ -180,7 +180,7 @@ public class QuestionsFromOthers extends BaseFragment {
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
             TextView theView = new TextView(mContext);
             questionslistView.expandGroup(groupPosition);
-            theView.setTextSize(15);
+            theView.setTextSize(16);
             theView.setTypeface(Typeface.DEFAULT_BOLD);
             theView.setText(keyList.get(groupPosition));
             return theView;
@@ -213,16 +213,16 @@ public class QuestionsFromOthers extends BaseFragment {
 
                 @Override
                 public void onClick(View v) {
-                    showUsersList(v.getId());
-                    Toast.makeText(getActivity(), "Clicked on first" + v.getId(), Toast.LENGTH_SHORT).show();
+                    userListDialog(v.getId());
+                    //Toast.makeText(getActivity(), "Clicked on first" + v.getId(), Toast.LENGTH_SHORT).show();
                 }
             });
 
             secondQuestion.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showUsersList(v.getId());
-                    Toast.makeText(getActivity(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
+                    userListDialog(v.getId());
+                    //Toast.makeText(getActivity(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -269,9 +269,9 @@ public class QuestionsFromOthers extends BaseFragment {
     }
 
 
-    private void showUsersList(int id) {
-        userListDialog(id);
-    }
+    //private void showUsersList(int id) {
+    //    userListDialog(id);
+    //}
 
     private void userListDialog(int questionId) {
         Log.d("DestId QS", "" + destId);

@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.vibeosys.travelapp.Destination;
 import com.vibeosys.travelapp.DestinationTempData;
 import com.vibeosys.travelapp.GetTemp;
 import com.vibeosys.travelapp.MyDestination;
@@ -41,16 +40,10 @@ import java.util.List;
  */
 
 public class NewDataBase extends SQLiteOpenHelper {
-    //private static final String DB_NAME = "/data/data/com.vibeosys.travelapp/app_databases/TravelApp";
-
-    //private final Context mContext;
 
     public NewDataBase(Context context, SessionManager sessionManager) {
-
         super(context, sessionManager.getDatabaseDeviceFullPath(), null, 1);
-        //this.mContext = context;
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -119,48 +112,27 @@ public class NewDataBase extends SQLiteOpenHelper {
         return syncTableData;
     }
 
-    public boolean addDataToSync(String tableName, String UserId, String JsonSync) {
+    public boolean addDataToSync(String tableName, String userId, String jsonSync) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
-        long id = -1;
+        long rowsAffected = -1;
         try {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
-            contentValues.put("UserId", UserId);
-            contentValues.put("JsonSync", JsonSync);
+            contentValues.put("UserId", userId);
+            contentValues.put("JsonSync", jsonSync);
             contentValues.put("TableName", tableName);
-            id = sqLiteDatabase.insert("Sync", null, contentValues);
+            rowsAffected = sqLiteDatabase.insert("Sync", null, contentValues);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("SyncInsert", "Error occurred while inserting in Sync table " + e.toString());
+        } finally {
+            if (contentValues != null)
+                contentValues.clear();
+
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
-        sqLiteDatabase.close();
-        if (id != -1) {
-            Log.d("SyncTable Updated Value", "" + id);
-            return true;
-        } else return false;
-    }
-
-
-    public int LikeCount(int DestId, String UserId, SQLiteDatabase sqLiteDatabase1) {
-        int likeCount = 0;
-        SQLiteDatabase sqLiteDatabase = sqLiteDatabase1;
-        Cursor cursor = null;
-        try {
-            sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select LikeCount from comment_and_like where destid=? and userid=?", new String[]{String.valueOf(DestId), String.valueOf(UserId)});
-            if (cursor != null) {
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    likeCount = cursor.getInt(cursor.getColumnIndex("LikeCount"));
-                }
-                cursor.close();
-
-            }
-            Log.d("Like Table Like Count", "" + likeCount);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return likeCount + 1;
+        return rowsAffected != -1;
     }
 
     public boolean insertComments(List<Comment> commentList) {
@@ -170,20 +142,15 @@ public class NewDataBase extends SQLiteOpenHelper {
         try {
             database = getWritableDatabase();
             for (Comment dbComment : commentList) {
-                //String[] commentWhereClause = new String[]{dbComment.getUserId(), String.valueOf(dbComment.getDestId())};
-
                 contentValues = new ContentValues();
                 contentValues.put("CommentText", dbComment.getCommentText());
                 contentValues.put("DestId", dbComment.getDestId());
                 contentValues.put("UserId", dbComment.getUserId());
-                //if (affectedRows == 0)
                 affectedRows = database.insert("Comment_and_like", null, contentValues);
-                //else
-                //    affectedRows = database.update("Comment_and_like", contentValues, "userid=? and DestId=?", commentWhereClause);
                 contentValues.clear();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("CommentInsert", "Error occurred while inserting into comments table " + e.toString());
         } finally {
             if (database != null)
                 database.close();
@@ -205,14 +172,11 @@ public class NewDataBase extends SQLiteOpenHelper {
                 contentValues.put("CommentText", dbComment.getCommentText());
                 contentValues.put("DestId", dbComment.getDestId());
                 contentValues.put("UserId", dbComment.getUserId());
-                //if (affectedRows == 0)
-                //affectedRows = database.insert("Comment_and_like", null, contentValues);
-                //else
                 affectedRows = database.update("Comment_and_like", contentValues, "userid=? and DestId=?", commentWhereClause);
                 contentValues.clear();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("CommentInsert", "Error occurred while updating comments table " + e.toString());
         } finally {
             if (database != null)
                 database.close();
@@ -222,36 +186,24 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
     public boolean insertLikes(List<Like> likeList) {
-        //List<Like> mListLikes = null;
         SQLiteDatabase sqLiteDatabase = null;
-        //SQLiteDatabase sqLiteDatabase1 = null;
-        //mListLikes = listLikes;
         ContentValues contentValues = null;
-        //long id = -1;
         long affectedRows = 0;
         try {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
             for (Like dbLike : likeList) {
-                //countvalue = LikeCount(dbLike.getDestId(), dbLike.getUserId(), sqLiteDatabase1);
-                //contentValues = new ContentValues();
                 contentValues.put("UserId", dbLike.getUserId());
                 contentValues.put("DestId", dbLike.getDestId());
                 contentValues.put("LikeCount", dbLike.getLikeCount());
-                //id = sqLiteDatabase.update("Comment_and_like", contentValues, "userid=? and DestId=?", new String[]{mListLikes.get(i).getUserId(),
-                //        String.valueOf(mListLikes.get(i).getDestId())});
                 affectedRows = sqLiteDatabase.insert("Comment_and_like", null, contentValues);
-                //Log.d("Updated Databse", String.valueOf(id));
                 contentValues.clear();
             }
-
-
         } catch (Exception e) {
             Log.e("DbOperationLike", "Error occurred while adding likes " + e.toString());
         } finally {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
-
         }
         return affectedRows != -1;
     }
@@ -264,14 +216,9 @@ public class NewDataBase extends SQLiteOpenHelper {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
             for (Like dbLike : likeList) {
-                //contentValues.put("UserId", dbLike.getUserId());
-                //contentValues.put("DestId", dbLike.getDestId());
                 contentValues.put("LikeCount", dbLike.getLikeCount());
-                //id = sqLiteDatabase.update("Comment_and_like", contentValues, "userid=? and DestId=?", new String[]{mListLikes.get(i).getUserId(),
-                //        String.valueOf(mListLikes.get(i).getDestId())});
                 affectedRows = sqLiteDatabase.update("Comment_and_like", contentValues, "userid=? and DestId=?",
                         new String[]{dbLike.getUserId(), String.valueOf(dbLike.getDestId())});
-                //Log.d("Updated Databse", String.valueOf(id));
                 contentValues.clear();
             }
         } catch (Exception e) {
@@ -303,9 +250,10 @@ public class NewDataBase extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e("DbOperation", "Exception while adding destination " + e.toString());
         } finally {
-            sqLiteDatabase.close();
+            if (sqLiteDatabase != null) {
+                sqLiteDatabase.close();
+            }
         }
-        //Log.d("Destination Table", "Inserted in Destination" + count);
         return count != -1;
     }
 
@@ -318,7 +266,6 @@ public class NewDataBase extends SQLiteOpenHelper {
             contentValues = new ContentValues();
 
             for (com.vibeosys.travelapp.data.Destination dbDestination : destList) {
-                //contentValues.put("DestId", dbDestination.getDestId());
                 contentValues.put("DestName", dbDestination.getDestName());
                 contentValues.put("Lat", dbDestination.getLatitude());
                 contentValues.put("Long", dbDestination.getLongitude());
@@ -330,17 +277,16 @@ public class NewDataBase extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e("DbOperation", "Exception while updating destination " + e.toString());
         } finally {
-            sqLiteDatabase.close();
+            if (sqLiteDatabase != null) {
+                sqLiteDatabase.close();
+            }
         }
-        //Log.d("Destination Table", "Inserted in Destination" + count);
         return count != -1;
     }
 
     public boolean insertImages(List<DbImageDTO> imageList) {
-        //List<Images> mImagesList = null;
-        //mImagesList = ImagesList;
         SQLiteDatabase sqLiteDatabase = null;
-        ContentValues contentValues = null;
+        ContentValues contentValues;
         long count = -1;
         try {
             sqLiteDatabase = getWritableDatabase();
@@ -356,7 +302,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 contentValues.clear();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationImgIns", "Error occurred while inserting into images " + e.toString());
         } finally {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
@@ -385,7 +331,6 @@ public class NewDataBase extends SQLiteOpenHelper {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
         }
-        //Log.d("User Table", "Inserted in User Table" + count);
         return count != -1;
     }
 
@@ -397,7 +342,6 @@ public class NewDataBase extends SQLiteOpenHelper {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
             for (DbUserDTO dbUser : usersList) {
-                //contentValues.put("UserId", dbUser.getUserId());
                 contentValues.put("UserName", dbUser.getUserName());
                 contentValues.put("PhotoURL", dbUser.getPhotoUrl());
                 count = sqLiteDatabase.update("User", contentValues, "userid=?",
@@ -410,13 +354,10 @@ public class NewDataBase extends SQLiteOpenHelper {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
         }
-        //Log.d("User Table", "Inserted in User Table" + count);
         return count != -1;
     }
 
     public boolean insertQuestions(List<com.vibeosys.travelapp.data.Question> questionList) {
-        //List<com.vibeosys.travelapp.data.Question> mQuestionsList = null;
-        //mQuestionsList = QuestionsList;
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         long count = -1;
@@ -441,8 +382,6 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
     public boolean updateQuestions(List<com.vibeosys.travelapp.data.Question> questionList) {
-        //List<com.vibeosys.travelapp.data.Question> mQuestionsList = null;
-        //mQuestionsList = QuestionsList;
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         long count = -1;
@@ -450,15 +389,13 @@ public class NewDataBase extends SQLiteOpenHelper {
             sqLiteDatabase = getWritableDatabase();
             contentValues = new ContentValues();
             for (Question dbQuestion : questionList) {
-                //contentValues.put("QuestionId", dbQuestion.getQuestionId());
                 contentValues.put("QuestionText", dbQuestion.getQuestionText());
                 count = sqLiteDatabase.update("Question", contentValues, "questionid=?",
                         new String[]{String.valueOf(dbQuestion.getQuestionId())});
                 contentValues.clear();
             }
-            //Log.d("Inserted in Question", "Question Table" + count);
         } catch (Exception e) {
-            Log.e("DbOperationQuestion", "Error while adding questions " + e.toString());
+            Log.e("DbOperationQueUpd", "Error while adding questions " + e.toString());
         } finally {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
@@ -468,8 +405,6 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
     public boolean insertOptions(List<Option> optionList) {
-        //List<Option> mOptionsList = null;
-        //mOptionsList = OptionsList;
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         long count = -1;
@@ -485,18 +420,15 @@ public class NewDataBase extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationOptionIns", "Error while adding options " + e.toString());
         } finally {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
         }
-        //Log.d("Qptions Table ", "Inserted in Option Table" + count);
         return count != -1;
     }
 
     public boolean updateOptions(List<Option> optionList) {
-        //List<Option> mOptionsList = null;
-        //mOptionsList = OptionsList;
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         long count = -1;
@@ -506,25 +438,21 @@ public class NewDataBase extends SQLiteOpenHelper {
             for (Option option : optionList) {
                 contentValues.put("QuestionId", option.getQuestionId());
                 contentValues.put("OptionText", option.getOptionText());
-                //contentValues.put("OptionId", option.getOptionId());
                 count = sqLiteDatabase.update("Options", contentValues, "optionid=?",
                         new String[]{String.valueOf(option.getOptionId())});
                 contentValues.clear();
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationOptionIns", "Error while updating options " + e.toString());
         } finally {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
         }
-        //Log.d("Qptions Table ", "Inserted in Option Table" + count);
         return count != -1;
     }
 
     public boolean insertAnswers(List<Answer> answerList) {
-        //List<Answer> mAnswersList = null;
-        //mAnswersList = AnswersList;
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
         long count = -1;
@@ -540,13 +468,12 @@ public class NewDataBase extends SQLiteOpenHelper {
                 contentValues.clear();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationAnswerIns", "Error while adding answers " + e.toString());
         } finally {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
         }
-        Log.d("Answer Table", "Inserted in Answer Table" + count);
-        return false;
+        return count != -1;
     }
 
     public boolean insertOrUpdateLikeCount(String userId, int destId, int previousLikeCount) {
@@ -573,7 +500,7 @@ public class NewDataBase extends SQLiteOpenHelper {
             contentValues.clear();
 
         } catch (Exception e) {
-            Log.e("UPDATELIKECOUNTEx", e.toString());
+            Log.e("DbOperationLikeCount", "Error occurred while ins or upd of like count" + e.toString());
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -589,12 +516,12 @@ public class NewDataBase extends SQLiteOpenHelper {
         Images images = null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            String qurey = "select UserName, comment_and_like.LikeCount,user.UserId, images.DestId " +
+            String query = "select UserName, comment_and_like.LikeCount,user.UserId, images.DestId " +
                     " from Images left outer join comment_and_like on images.DestId = comment_and_like.DestId " +
                     " and images.UserId = comment_and_like.UserId " +
                     " inner join user on images.UserId = user.UserId" +
                     " where images.ImageId = ?";
-            cursor = sqLiteDatabase.rawQuery(qurey, new String[]{imageId});
+            cursor = sqLiteDatabase.rawQuery(query, new String[]{imageId});
 
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
@@ -611,7 +538,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationImgSelec", "Error occured while selecting images with like count " + e.toString());
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -629,7 +556,7 @@ public class NewDataBase extends SQLiteOpenHelper {
             sqLiteDatabase = getReadableDatabase();
             String qureyToAppend = " and ImageSeen = 'false'";
             String mainQurey = "select * from Images natural join user where user.userid=images.userid and destid=? ";
-            if (showSeenImages == false) {
+            if (!showSeenImages) {
                 mainQurey += qureyToAppend;
             }
             cursor = sqLiteDatabase.rawQuery(mainQurey,
@@ -690,15 +617,17 @@ public class NewDataBase extends SQLiteOpenHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationCommentSel", "Error occurred while selecting comments " + e.toString());
         } finally {
-            cursor.close();
-            sqLiteDatabase.close();
+            if (cursor != null)
+                cursor.close();
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
         return DestComments;
     }
 
-    public int getQuestions(int DestId) {
+    public int getQuestions() {
         int noOfQuestions = 0;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
@@ -753,7 +682,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 sqLiteDatabase.close();
         }
 
-        return rowsAffected == 1;
+        return rowsAffected != -1;
     }
 
 
@@ -767,15 +696,15 @@ public class NewDataBase extends SQLiteOpenHelper {
             contentValues.put("UserId", userId);
             count = sqLiteDatabase.insert("MyUser", null, contentValues);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationUserIns", "Error occurred while creating new user in db for " + userId + " " + e.toString());
         } finally {
-            contentValues.clear();
-            sqLiteDatabase.close();
+            if (contentValues != null)
+                contentValues.clear();
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
 
-        if (count == -1) return false;
-        else return true;
-
+        return count != -1;
     }
 
     public boolean updateUserAuthenticationInfo(User userAuthInfo) {
@@ -795,69 +724,16 @@ public class NewDataBase extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            contentValues.clear();
-            sqLiteDatabase.close();
+
+            if (contentValues != null) {
+                contentValues.clear();
+            }
+            if (sqLiteDatabase != null) {
+                sqLiteDatabase.close();
+            }
         }
 
         return rowsAffected != 0;
-    }
-
-
-    public int MsgCount(int cDestId) {
-        int count = 0;
-        SQLiteDatabase sqLiteDatabase = null;
-        Cursor cursor = null;
-        try {
-            sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select * from answer where DestId=?", new String[]{String.valueOf(cDestId)});
-            count = cursor.getCount();
-            cursor.close();
-            sqLiteDatabase.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
-
-
-    public void GetUser() {
-        SQLiteDatabase db = null;
-        Cursor cursor = null;
-        try {
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("select * from User ", null);
-            cursor.moveToFirst();
-            Log.d("USERID", cursor.getString(0));
-            Log.d("USERNAME", cursor.getString(1));
-            db.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addDestinations(List<Destination> cList) {
-        List<Destination> theDestList;
-        theDestList = cList;
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues theContent = new ContentValues();
-
-        for (int i = 0; i < theDestList.size(); i++) {
-            theContent.put("DestId", theDestList.get(i).getmDestId());
-            theContent.put("DestName", theDestList.get(i).getmDestName());
-            theContent.put("Lat", theDestList.get(i).getmLat());
-            theContent.put("Long", theDestList.get(i).getmLong());
-            db.insert("Destination", null, theContent);
-            Log.d("DestId", String.valueOf(theDestList.get(i).getmDestId()));
-            Log.d("DestName", String.valueOf(theDestList.get(i).getmDestId()));
-            theContent.remove("DestId");
-            theContent.remove("DestName");
-            theContent.remove("Lat");
-            theContent.remove("Long");
-        }
-
-        db.close();
     }
 
     public HashMap<String, Integer> getDestNames() {
@@ -877,9 +753,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 sqLiteDatabase.close();
                 return mListDestNames;
             }
-        } catch (CursorIndexOutOfBoundsException e) {
-            Log.e("Exception", e.toString());
-        } catch (SQLiteException e) {
+        } catch (CursorIndexOutOfBoundsException | SQLiteException e) {
             Log.e("Exception", e.toString());
         }
         return null;
@@ -919,7 +793,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         SQLiteDatabase mSaveinTemp = null;
         try {
             mSaveinTemp = getWritableDatabase();
-            TempData mTempDatainMap = new TempData();
+            //TempData mTempDatainMap = new TempData();
             ContentValues mSaveinTempValues = new ContentValues();
             mSaveinTempValues.put("DestId", mSaveList.get(0).getmDestId());
             mSaveinTempValues.put("DestName", mDestName);
@@ -1059,16 +933,18 @@ public class NewDataBase extends SQLiteOpenHelper {
         Cursor cursor = null;
         List<UserLikeDTO> answerUsersList = null;
         try {
+            String query = "select IFNULL(user.UserName,'') UserName, user.UserId, IFNULL(LikeCount,0) LikeCount " +
+                    "from  answer inner join user on user.userid=answer.userid  " +
+                    "left outer join comment_and_like  on comment_and_like.DestId=answer.DestId and comment_and_like.UserId = answer.UserId " +
+                    "where optionid=? and answer.destid=? ";
             answerUsersList = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select distinct user.UserName, user.UserId, LikeCount " +
-                            "from  answer inner join user on user.userid=answer.userid  " +
-                            "inner join comment_and_like  on comment_and_like.DestId=answer.DestId and comment_and_like.UserId = answer.UserId " +
-                            "where optionid=? and answer.destid=? ",
+            cursor = sqLiteDatabase.rawQuery(query,
                     new String[]{String.valueOf(optionId), destId});
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
+
                     UserLikeDTO userLikes = new UserLikeDTO();
                     userLikes.setUserName(cursor.getString(cursor.getColumnIndex("UserName")));
                     userLikes.setUserId(cursor.getString(cursor.getColumnIndex("UserId")));
@@ -1112,7 +988,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         List<SendQuestionAnswers> theListAskQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
-        int mQuestionId = cQuestionId;
+        //int mQuestionId = cQuestionId;
         try {
             theListAskQuestions = new ArrayList<>();
             sqLiteDatabase = getReadableDatabase();
@@ -1204,18 +1080,22 @@ public class NewDataBase extends SQLiteOpenHelper {
 
 
     public boolean saveInMyImages(String cImagePath, String cDate) {
+        long rowsAffected = -1;
+        SQLiteDatabase thesqLiteDatabase = null;
         try {
-            SQLiteDatabase thesqLiteDatabase = getWritableDatabase();
+            thesqLiteDatabase = getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put("ImagePath", cImagePath);
             contentValues.put("CreateDate", cDate);
-            long rows = thesqLiteDatabase.insert("MyImages", null, contentValues);
+            rowsAffected = thesqLiteDatabase.insert("MyImages", null, contentValues);
             thesqLiteDatabase.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DbOperationSaveImg", "Error occurred while saving image " + e.toString());
+        } finally {
+            if (thesqLiteDatabase != null)
+                thesqLiteDatabase.close();
         }
-        return true;
-
+        return rowsAffected != -1;
     }
 
     public void DeleteTempMaps() {
@@ -1228,7 +1108,6 @@ public class NewDataBase extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         Log.d("TEMPTABLE", "DELETED TEMP DATA");
-
     }
 
     public List<GetTemp> GetFromTemp() {

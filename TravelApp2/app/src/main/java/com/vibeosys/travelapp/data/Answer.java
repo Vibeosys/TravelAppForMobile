@@ -72,10 +72,10 @@ public class Answer {
         this.optionId = OptionId;
     }
 
-    public static String serializeString(Answer answer) {
+    public String serializeString() {
         Gson gson = new Gson();
-        Answer answer1 = answer;
-        String serializedString = gson.toJson(answer1);
+        //Answer answer1 = answer;
+        String serializedString = gson.toJson(this);
         Log.d("Answer Serialized ", serializedString);
         return serializedString;
     }
