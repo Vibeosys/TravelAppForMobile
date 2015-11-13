@@ -16,6 +16,7 @@ public final class PropertyTypeConstants {
     public static final String VERSION_NUMBER = "version.number";
     public static final String API_UPLOAD_IMAGE_URL = "api.upload.image.url";
     public static final String API_UPDATE_USERS_DETAILS_URL = "api.upload.update.userdetails.url";
+    public static final String API_SEND_OTP_URL = "api.send.otp.url";
 
     //Specific to Shared Pref for Session Manager to consume
     public static final String USER_ID = "user.id";

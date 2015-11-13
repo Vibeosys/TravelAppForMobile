@@ -54,6 +54,10 @@ public class PropertyFileReader {
         return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_UPLOAD_URL);
     }
 
+    public String getSendOtpUrl() {
+        return getEndPointUri() + mProperties.getProperty(PropertyTypeConstants.API_SEND_OTP_URL);
+    }
+
     public String getDatabaseDeviceFullPath() {
         return mProperties.getProperty(PropertyTypeConstants.DATABASE_DEVICE_FULLPATH);
     }

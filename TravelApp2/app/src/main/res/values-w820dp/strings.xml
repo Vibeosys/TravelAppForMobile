@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="OtpMessage">You will receive OTP on your email address, Please enter OTP below to verify your email address</string>
+</resources>

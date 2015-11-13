@@ -38,10 +38,10 @@ import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;
 import com.vibeosys.travelapp.data.TableDataDTO;
 import com.vibeosys.travelapp.tasks.BaseFragment;
+import com.vibeosys.travelapp.util.DbTableNameConstants;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.ImageWorker;
 import com.vibeosys.travelapp.util.NetworkUtils;
-import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.UserAuth;
 import com.vibeosys.travelapp.util.Utils;
 
@@ -147,15 +147,16 @@ public class ImageDetailFragment extends BaseFragment
         like.setDestId(images.getDestId());
 
         String serializeString = like.serializeString();
-        ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
-        tableDataList.add(new TableDataDTO("like", serializeString, null));
-        String currentUserID = SessionManager.Instance().getUserId();
+        //ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
+        //tableDataList.add(new TableDataDTO("like", serializeString, null));
+        //String currentUserID = SessionManager.Instance().getUserId();
         mNewDataBase.insertOrUpdateLikeCount(imageUserId, images.getDestId(), images.getLikeCount());
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
-            mServerSyncManager.uploadDataToServer(tableDataList);
+            TableDataDTO tableDataDTO = new TableDataDTO(DbTableNameConstants.LIKE, serializeString, null);
+            mServerSyncManager.uploadDataToServer(tableDataDTO);
             return true;
         } else {
-            mNewDataBase.addDataToSync("like", currentUserID, serializeString);
+            mNewDataBase.addDataToSync(DbTableNameConstants.LIKE, mSessionManager.getUserId(), serializeString);
             LayoutInflater
                     layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);

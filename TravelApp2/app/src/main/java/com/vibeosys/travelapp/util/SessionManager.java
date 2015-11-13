@@ -84,6 +84,7 @@ public class SessionManager {
         editor.putString(PropertyTypeConstants.DATABASE_DEVICE_FULLPATH, mPropertyFileReader.getDatabaseDeviceFullPath());
         editor.putString(PropertyTypeConstants.DATABASE_DIR_PATH, mPropertyFileReader.getDatabaseDirPath());
         editor.putString(PropertyTypeConstants.DATABASE_FILE_NAME, mPropertyFileReader.getDatabaseFileName());
+        editor.putString(PropertyTypeConstants.API_SEND_OTP_URL, mPropertyFileReader.getSendOtpUrl());
         editor.putString(PropertyTypeConstants.VERSION_NUMBER, String.valueOf(mPropertyFileReader.getVersion()));
         editor.commit();
         return true;
@@ -119,6 +120,10 @@ public class SessionManager {
 
     public String getUploadUrl() {
         return mProjectSharedPref.getString(PropertyTypeConstants.API_UPLOAD_URL, null);
+    }
+
+    public String getSendOtpUrl() {
+        return mProjectSharedPref.getString(PropertyTypeConstants.API_SEND_OTP_URL, null);
     }
 
     public String getDatabaseDeviceFullPath() {

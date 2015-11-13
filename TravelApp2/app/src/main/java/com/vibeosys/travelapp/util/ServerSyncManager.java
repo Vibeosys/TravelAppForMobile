@@ -3,7 +3,6 @@ package com.vibeosys.travelapp.util;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -22,10 +21,10 @@ import com.vibeosys.travelapp.data.TableJsonCollectionDTO;
 import com.vibeosys.travelapp.data.TravelAppError;
 import com.vibeosys.travelapp.data.Upload;
 import com.vibeosys.travelapp.data.UploadUser;
+import com.vibeosys.travelapp.data.UploadUserOtp;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.tasks.BackgroundTaskCallback;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -95,7 +94,8 @@ public class ServerSyncManager
             return;
         }
         String uploadJson = prepareUploadJsonFromData(params);
-        uploadJsonToServer(uploadJson, progress);
+        String uploadURL = mSessionManager.getUploadUrl();
+        uploadJsonToServer(uploadJson, uploadURL, progress);
     }
 
     public void uploadDataToServer(List<TableDataDTO> tableDataList) {
@@ -105,6 +105,15 @@ public class ServerSyncManager
         }
         TableDataDTO[] tableDataArray = Arrays.copyOf(tableDataList.toArray(), tableDataList.size(), TableDataDTO[].class);
         uploadDataToServer(tableDataArray);
+    }
+
+    public boolean sendOtpToUser(String emailId) {
+        final ProgressDialog progress = new ProgressDialog(mContext);
+        UploadUserOtp uploadUserOtp = new UploadUserOtp(mSessionManager.getUserId(), emailId, null, null);
+        String uploadJson = uploadUserOtp.serializeString();
+        String sendOtpUrl = mSessionManager.getSendOtpUrl();
+        uploadJsonToServer(uploadJson, sendOtpUrl, progress);
+        return true;
     }
 
     public boolean isDownloadInProgress() {
@@ -123,30 +132,26 @@ public class ServerSyncManager
         return uploadJson;
     }
 
-    private void uploadJsonToServer(String uploadJson, final ProgressDialog progress) {
+    private void uploadJsonToServer(String uploadJson, String uploadUrl, final ProgressDialog progress) {
         RequestQueue vollyRequest = Volley.newRequestQueue(mContext);
-        String uploadURL = mSessionManager.getUploadUrl();
+
         JsonObjectRequest uploadRequest = new JsonObjectRequest(Request.Method.POST,
-                uploadURL, uploadJson, new Response.Listener<JSONObject>() {
+                uploadUrl, uploadJson, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
                 Log.d("Upload Response", "" + response.toString());
-                try {
-                    if (response.getInt("errorCode") == 0) {
-                        Toast.makeText(mContext, "Data Updated Successfully", Toast.LENGTH_SHORT).show();
-                    } else {
-                        //Toast.makeText(getApplicationContext(),"TravelAppError Occoured Please try again",Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
+
+                if (progress != null)
+                    progress.dismiss();
+
             }
 
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("UPLOADERROR", "TravelAppError [" + error.getMessage() + "]");
+                //Log.e("UPLOADERROR", "TravelAppError [" + error.getMessage() + "]");
 
                 if (progress != null)
                     progress.dismiss();
@@ -269,7 +274,6 @@ public class ServerSyncManager
         mIsWorkInProgress = false;
     }
 
-
     class BackgroundTask extends android.os.AsyncTask<SyncDataDTO, Void, String> {
 
         private boolean mShowProgressDlg;
@@ -312,7 +316,8 @@ public class ServerSyncManager
                 while ((dataLine = br.readLine()) != null) {
                     dataBuffer.append(dataLine);
                 }
-                uploadJsonToServer(syncDataParam.getUploadJson(), null);
+
+                uploadJsonToServer(syncDataParam.getUploadJson(), syncDataParam.getUploadUrl(), null);
                 downloadedJson = dataBuffer.toString();
 
             } catch (Exception e) {
@@ -330,4 +335,5 @@ public class ServerSyncManager
             }*/
         }
     }
+
 }

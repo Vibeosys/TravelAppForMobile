@@ -1,10 +1,6 @@
 package com.vibeosys.travelapp.data;
 
-import com.google.gson.Gson;
 import com.vibeosys.travelapp.util.RegistrationSourceTypes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by mahesh on 10/20/2015.
@@ -17,6 +13,7 @@ public class User {
     private String mApiKey;
     private RegistrationSourceTypes mLoginSource;
     private String mThirdPartyUserId;
+    private String mPassword;
 
     public String getEmailId() {
         return mEmailId;
@@ -74,6 +71,14 @@ public class User {
         mThirdPartyUserId = thirdPartyUserId;
     }
 
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public void setPassword(String password) {
+        this.mPassword = password;
+    }
+
 
     public User() {
     }
@@ -81,6 +86,12 @@ public class User {
     public User(String userId, String userName, String userEmailId,
                 RegistrationSourceTypes userLoginSource,
                 String apiKey, String thirdPartyUserId) {
+        this(userId, userName, userEmailId, userLoginSource, apiKey, thirdPartyUserId, null);
+    }
+
+    public User(String userId, String userName, String userEmailId,
+                RegistrationSourceTypes userLoginSource,
+                String apiKey, String thirdPartyUserId, String password) {
         this.mApiKey = apiKey;
         this.mUserId = userId;
         this.mUserName = userName;
@@ -88,16 +99,7 @@ public class User {
         this.mEmailId = userEmailId;
         this.mLoginSource = userLoginSource;
         this.mThirdPartyUserId = thirdPartyUserId;
-    }
-
-    public static List<User> deserializeSting(ArrayList<String> serializedStringList) {
-        Gson gson = new Gson();
-        ArrayList<User> userssList = new ArrayList<>();
-        for (String serializedString : serializedStringList) {
-            User deserizeedUsers = gson.fromJson(serializedString, User.class);
-            userssList.add(deserizeedUsers);
-        }
-        return userssList;
+        this.mPassword = password;
     }
 
 }

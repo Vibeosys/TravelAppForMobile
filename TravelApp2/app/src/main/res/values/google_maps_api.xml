@@ -4,7 +4,7 @@
 
     To get one, follow this link, follow the directions and press "Create" at the end:
 
-https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=82:9F:5A:83:3A:F5:EF:88:64:FC:68:38:AE:1D:5A:B3:48:5D:2B:6D%3Bcom.example.mahesh.simplemap
+https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=F8:28:E0:4C:C6:B9:CF:28:AA:17:9E:BB:EB:EC:E7:E0:16:6F:E4:F5;com.vibeosys.travelapp
 
     You can also add your credentials to an existing key, using this line:
     82:9F:5A:83:3A:F5:EF:88:64:FC:68:38:AE:1D:5A:B3:48:5D:2B:6D;com.example.mahesh.simplemap
@@ -13,5 +13,5 @@ https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend
     string in this file.
     -->
     <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
-  AIzaSyCZFKfoikU5RNmDUp9Esii61JfW9K3daco
+  AIzaSyAGNthPjLbhbMpwNz64Ixov5D0bsxMVFNQ
     </string></resources>

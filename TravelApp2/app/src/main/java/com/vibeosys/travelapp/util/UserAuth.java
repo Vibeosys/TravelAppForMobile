@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -13,6 +14,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.LoginActivity;
 import com.vibeosys.travelapp.data.UploadUser;
+import com.vibeosys.travelapp.data.UploadUserOtp;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 
@@ -23,6 +25,8 @@ import org.json.JSONObject;
  * Created by anand on 02-11-2015.
  */
 public class UserAuth {
+
+    private OnUpdateUserResultReceived mOnUpdateUserResultReceived;
 
     public static boolean isUserLoggedIn(Context context, String userName, String userEmailId) {
         if (userEmailId == null || userEmailId == "" || userName == null || userName == "") {
@@ -53,13 +57,13 @@ public class UserAuth {
         return true;
     }
 
-    public static boolean saveAuthenticationInfo(User userInfo, final Context context) {
+    public void saveAuthenticationInfo(User userInfo, final Context context) {
         if (userInfo == null)
-            return false;
+            return;
 
         if (userInfo.getEmailId() == null || userInfo.getEmailId() == "" ||
                 userInfo.getUserName() == null || userInfo.getUserName() == "")
-            return false;
+            return;
 
         SessionManager theSessionManager = SessionManager.getInstance(context);
         theSessionManager.setUserName(userInfo.getUserName());
@@ -68,14 +72,10 @@ public class UserAuth {
         theSessionManager.setUserLoginRegdSoure(userInfo.getLoginSource());
         theSessionManager.setUserRegdApiKey(userInfo.getApiKey());
 
-                /*new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {*/
-        updateUserDetailsOnServer(context);
-                    /*}
-                }).run();
-*/
+        updateUserDetailsOnServer(context, userInfo);
+    }
+
+    private boolean postUserUpdate(User userInfo, Context context) {
         NewDataBase newDataBase = new NewDataBase(context, SessionManager.getInstance(context));
         boolean isRecordUpdated = newDataBase.updateUserAuthenticationInfo(userInfo);
         boolean isRecordAddedToAllUsers = newDataBase.addOrUpdateUserToAllUsers(userInfo);
@@ -94,14 +94,13 @@ public class UserAuth {
         return true;
     }
 
-    public static void updateUserDetailsOnServer(Context context) {
+    private void updateUserDetailsOnServer(final Context context, final User userInfo) {
         Gson gson = new Gson();
-        String UserId = SessionManager.Instance().getUserId();
-        String EmailId = SessionManager.Instance().getUserEmailId();
-
-        String UserName = SessionManager.Instance().getUserName();
-        UploadUser uploadUser = new UploadUser(UserId, EmailId, UserName);
-
+        UploadUser uploadUser = new UploadUserOtp(
+                userInfo.getUserId(),
+                userInfo.getEmailId(),
+                userInfo.getUserName(),
+                userInfo.getPassword());
         final String encodedString = gson.toJson(uploadUser);
         //RequestQueue rq = Volley.newRequestQueue(this);
         String updateUsersDetailsUrl = SessionManager.Instance().getUpdateUserDetailsUrl();
@@ -112,32 +111,20 @@ public class UserAuth {
 
             @Override
             public void onResponse(JSONObject response) {
+                String resultantCode = null;
                 try {
-                    JSONObject jresponse = response;//.getJSONObject(0);
-                    Log.i("updateUserDetails", jresponse.toString());
-
-                    String res = jresponse.getString("message");
-                    String code = jresponse.getString("errorCode");
-                    if (code.equals("0")) {
-                        Log.i("UpdateUserDetails", response.toString());
-                    }
-
-                    if (code.equals("100")) {
-                        Log.e("TravelAppError", "User Not Authenticated..");
-                    }
-                    if (code.equals("101")) {
-                        Log.e("TravelAppError", "User Id is Blanck");
-                    }
-                    if (code.equals("102")) {
-                        Log.e("TravelAppError", "Unknown TravelAppError");
-                    }
-
-
+                    resultantCode = response.getString("errorCode");
                 } catch (JSONException e) {
                     Log.e("JSON Exception", e.toString());
-
                 }
 
+                Integer errorCode = Integer.parseInt(resultantCode);
+                if (errorCode == 0) {
+                    postUserUpdate(userInfo, context);
+                }
+
+                if (mOnUpdateUserResultReceived != null)
+                    mOnUpdateUserResultReceived.onUpdateUserResult(errorCode);
             }
 
         }, new Response.ErrorListener() {
@@ -148,7 +135,18 @@ public class UserAuth {
 
         });
 
+        jsonArrayRequest.setRetryPolicy(new DefaultRetryPolicy(2000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         rq.add(jsonArrayRequest);
     }
 
+    public void setOnUpdateUserResultReceived(OnUpdateUserResultReceived onUpdateUserResultReceived) {
+        this.mOnUpdateUserResultReceived = onUpdateUserResultReceived;
+    }
+
+    public interface OnUpdateUserResultReceived {
+        void onUpdateUserResult(int errorCode);
+    }
 }

@@ -13,4 +13,5 @@
     <string name="no_network_connection_toast">No Network Connection</string>
     <string name="Toast">Error While Connecting to Internet</string>
     <string name="facebook_app_id">1628100937478183</string>
+    <string name="OtpMessage">You will receive OTP on your email address, Please enter OTP below to verify your email address</string>
 </resources>

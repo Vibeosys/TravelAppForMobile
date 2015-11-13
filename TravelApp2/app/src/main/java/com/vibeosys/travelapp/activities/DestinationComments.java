@@ -4,14 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.vibeosys.travelapp.Adaptors.ShowDestinationCommentsAdaptor;
@@ -20,8 +18,8 @@ import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.TableDataDTO;
 import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseFragment;
+import com.vibeosys.travelapp.util.DbTableNameConstants;
 import com.vibeosys.travelapp.util.NetworkUtils;
-import com.vibeosys.travelapp.util.SessionManager;
 import com.vibeosys.travelapp.util.UserAuth;
 
 import java.util.ArrayList;
@@ -118,11 +116,11 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
 
         String serializedJsonString = gson.toJson(comment1);
 
-        ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
+        //ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
 
-        tableDataList.add(new TableDataDTO("comment", serializedJsonString, null));
-        String EmailId = SessionManager.Instance().getUserEmailId();
-        Log.d("EmailId", "" + EmailId);
+        //tableDataList.add(new TableDataDTO(DbTableNameConstants.COMMENT, serializedJsonString, null));
+        //String EmailId = SessionManager.Instance().getUserEmailId();
+        //Log.d("EmailId", "" + EmailId);
         //String uploadData = gson.toJson(new Upload(new UploadUser(userId, EmailId), tableDataList));
 
         //Log.d("Uploading", uploadData.toString());
@@ -131,18 +129,19 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
 
             //super.UploadUserDetails();
             //newDataBase.getFromSync();
-            mServerSyncManager.uploadDataToServer(tableDataList);
+            TableDataDTO tableDataDTO = new TableDataDTO(DbTableNameConstants.COMMENT, serializedJsonString, null);
+            mServerSyncManager.uploadDataToServer(tableDataDTO);
 
         } else {
-            mNewDataBase.addDataToSync("comment", userId, serializedJsonString);
-            LayoutInflater
+            mNewDataBase.addDataToSync(DbTableNameConstants.COMMENT, userId, serializedJsonString);
+            /*LayoutInflater
                     layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.cust_toast, null);
             Toast toast = new Toast(getActivity());
             toast.setDuration(Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.setView(view);//setting the view of custom toast layout
-            toast.show();
+            toast.show();*/
         }
 
     }

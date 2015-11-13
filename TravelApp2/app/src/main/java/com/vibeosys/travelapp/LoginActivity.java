@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -36,17 +37,11 @@ import java.util.Arrays;
  * Created by mahesh on 10/2/2015.
  */
 public class LoginActivity
-        extends BaseActivity {
-
-    //Facebook
-
-
-    private Activity mFromactivitycall;
-
+        extends BaseActivity
+        implements UserAuth.OnUpdateUserResultReceived, View.OnClickListener {
 
     public LoginActivity() {
         // Required empty public constructor
-
     }
 
     @Override
@@ -54,7 +49,7 @@ public class LoginActivity
         setTitle("Login");
         super.onCreate(savedInstanceState);
         //Facebook SDK Initialization
-        FacebookLoginAPIInit(LoginActivity.this);
+        facebookLoginAPIInit(LoginActivity.this);
 
         //Google Plus API Initialization
         googlePlusAPIInit();
@@ -65,7 +60,7 @@ public class LoginActivity
         findViewById(R.id.btn_GPLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GooglePlusLogin(LoginActivity.this);
+                googlePlusLogin(LoginActivity.this);
             }
         });
 
@@ -74,21 +69,58 @@ public class LoginActivity
         btn_fb_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FacebookLogin(LoginActivity.this);
+                facebookLogin(LoginActivity.this);
             }
         });
+
+        //TextView otpMessageTextView = (TextView) findViewById(R.id.link_signup);
+        EditText otpTextView = (EditText) findViewById(R.id.input_otp);
+        Button btnVerifyOtpTemp = (Button) findViewById(R.id.btn_verifyotp);
+
+        //otpMessageTextView.setVisibility(View.INVISIBLE);
+        otpTextView.setVisibility(View.INVISIBLE);
+        btnVerifyOtpTemp.setVisibility(View.INVISIBLE);
+
+        Button btnSendOtp = (Button) findViewById(R.id.btn_sendotp);
+        btnSendOtp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText emailIdTextView = (EditText) findViewById(R.id.input_email);
+                EditText nameTextView = (EditText) findViewById(R.id.input_name);
+                String emailText = emailIdTextView.getText().toString();
+                String nameText = nameTextView.getText().toString();
+
+                if (emailText.isEmpty() || nameText.isEmpty()) {
+                    createAlertDialog("OTP","Email address and Display name is compulsory");
+                    return;
+                }
+
+                mServerSyncManager.sendOtpToUser(emailText);
+
+                //TextView otpMessageTextView = (TextView) findViewById(R.id.link_signup);
+                EditText otpTextView = (EditText) findViewById(R.id.input_otp);
+                Button btnVerifyOtp = (Button) findViewById(R.id.btn_verifyotp);
+
+                //otpMessageTextView.setVisibility(View.VISIBLE);
+                otpTextView.setVisibility(View.VISIBLE);
+                btnVerifyOtp.setVisibility(View.VISIBLE);
+            }
+        });
+
+        Button btnVerifyOtp = (Button) findViewById(R.id.btn_verifyotp);
+        btnVerifyOtp.setOnClickListener(this);
 
         //mProgressDialog = new ProgressDialog(this.getApplicationContext());
     }
 
     //-------------Facebook API calls--------------------------------//
-    public void FacebookLogin(final Activity act) {
+    public void facebookLogin(final Activity act) {
         //Facebook call authentication
         LoginManager.getInstance().logInWithReadPermissions(act, Arrays.asList("public_profile", "user_friends", "email"));
     }
 
 
-    public void FacebookLoginAPIInit(final Context cx) {
+    public void facebookLoginAPIInit(final Context cx) {
         FacebookSdk.sdkInitialize(cx);
         mCallbackManager = CallbackManager.Factory.create();
 
@@ -133,20 +165,23 @@ public class LoginActivity
                             Log.e("LoginFacebook", "JSON exception from facebook data deserialization");
                         }
 
-                        boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
-                        if (!userAdded) {
-                            Toast.makeText(getApplicationContext(), "User is not able to login successfully.", Toast.LENGTH_SHORT);
-                            Log.e("LoginFacebook", "User is not Added successfully " + object.toString());
-                        }
+                        UserAuth userAuth = new UserAuth();
+                        userAuth.saveAuthenticationInfo(theUser, getApplicationContext());
+                        userAuth.setOnUpdateUserResultReceived(
+                                new UserAuth.OnUpdateUserResultReceived() {
+                                    @Override
+                                    public void onUpdateUserResult(int errorCode) {
+                                        //if (errorCode == 0) {
+                                        //    downloadImgFromFbGPlusAndUploadToAws(profilePic.toString());
+                                            //progressDialog.dismiss();
+                                        //}
+                                    }
+                                }
+                        );
+
                         downloadImgFromFbGPlusAndUploadToAws(profilePic.toString());
 
-                        //Intent intent = new Intent(cx, MainActivity.class);
-                        /*intent.putExtra("Profiledetails", object.toString());
-                        intent.putExtra("ProfileImg", profilePic.toString());*/
-                        //startActivity(intent);
-                        progressDialog.dismiss();
                         Log.d("JSON Data", object.toString());
-                        //finish();
                     }
                 });
 
@@ -166,23 +201,65 @@ public class LoginActivity
             public void onError(FacebookException exception) {
                 // App code
                 Toast.makeText(getApplicationContext(), "Authentication failed.Please check the Internet connection!", Toast.LENGTH_LONG).show();
-                Log.e("LoginFacebook",exception.getMessage());
+                Log.e("LoginFacebook", exception.getMessage());
             }
         });
     }
 
 //-------------Google API Call----------------------------------//
 
-    protected void GooglePlusLogin(Activity act) {
+    protected void googlePlusLogin(Activity act) {
         // User clicked the sign-in button, so begin the sign-in process and automatically
         // attempt to resolve any errors that occur.
 
         mShouldResolve = true;
         mGoogleApiClient.connect();
-        mFromactivitycall = act;
+        //mFromactivitycall = act;
     }
 
+    @Override
+    public void onUpdateUserResult(int errorCode) {
+        if (errorCode == 119) {
+            createAlertDialog("OTP Verification", "OTP verification failed, please try again");
 
+            EditText emailIdTextView = (EditText) findViewById(R.id.input_email);
+            EditText nameTextView = (EditText) findViewById(R.id.input_name);
+            //EditText otpTextView = (EditText) findViewById(R.id.input_otp);
 
+            emailIdTextView.setEnabled(true);
+            nameTextView.setEnabled(true);
+            //otpTextView.set
+        } else {
+            finish();
+        }
+    }
 
+    @Override
+    public void onClick(View v) {
+        EditText emailIdTextView = (EditText) findViewById(R.id.input_email);
+        EditText nameTextView = (EditText) findViewById(R.id.input_name);
+        EditText otpTextView = (EditText) findViewById(R.id.input_otp);
+        String emailText = emailIdTextView.getText().toString();
+        String nameText = nameTextView.getText().toString();
+        String otpText = otpTextView.getText().toString();
+
+        emailIdTextView.setEnabled(false);
+        nameTextView.setEnabled(false);
+        if (otpText.isEmpty()) {
+            createAlertDialog("OTP","OTP cannot be left blank");
+            return;
+        }
+
+        User theUser = new User(SessionManager.Instance().getUserId(),
+                nameText,
+                emailText,
+                RegistrationSourceTypes.EMAIL,
+                null,
+                null,
+                otpText);
+
+        UserAuth userAuth = new UserAuth();
+        userAuth.saveAuthenticationInfo(theUser, v.getContext());
+        userAuth.setOnUpdateUserResultReceived(this);
+    }
 }

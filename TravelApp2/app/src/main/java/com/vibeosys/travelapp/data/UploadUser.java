@@ -3,10 +3,10 @@ package com.vibeosys.travelapp.data;
 /**
  * Created by mahesh on 10/23/2015.
  */
-public class UploadUser {
-    private String userId;
-    private String emailId;
-    private String userName;
+public class UploadUser extends BaseDTO {
+    protected String userId;
+    protected String emailId;
+    protected String userName;
 
     public UploadUser() {
 

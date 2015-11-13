@@ -1,6 +1,8 @@
 package com.vibeosys.travelapp.tasks;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
@@ -230,7 +232,7 @@ public abstract class BaseActivity extends AppCompatActivity
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
-        ProgressDialog progressDialog = new ProgressDialog(this);
+        final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Setting up your account");
         progressDialog.show();
 
@@ -262,19 +264,24 @@ public abstract class BaseActivity extends AppCompatActivity
                 theUser.setUserName(userEmailId.substring(0, userEmailId.indexOf("@")));
 
             }
-
-            Boolean userAdded = UserAuth.saveAuthenticationInfo(theUser, getApplicationContext());
-
-            if (!userAdded) {
-                Log.e("LoginGoogle+", "User is not Added successfully ");
-            }
+            UserAuth userAuth = new UserAuth();
+            userAuth.saveAuthenticationInfo(theUser, getApplicationContext());
+            userAuth.setOnUpdateUserResultReceived(new UserAuth.OnUpdateUserResultReceived() {
+                @Override
+                public void onUpdateUserResult(int errorCode) {
+                    //if(errorCode == 0)
+                    //{
+                    finish();
+                    //}
+                    progressDialog.dismiss();
+                }
+            });
 
 
         } catch (Exception ex) {
             Log.d(TAG, "TravelAppError:" + ex.getMessage());
         } finally {
-            progressDialog.dismiss();
-            this.finish();
+
         }
 
     }
@@ -349,6 +356,19 @@ public abstract class BaseActivity extends AppCompatActivity
 
         //Clean Authentication data from share preference
         UserAuth.CleanAuthenticationInfo();
+    }
+
+    protected void createAlertDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // whatever...
+                    }
+                }).create().show();
     }
 
 }
