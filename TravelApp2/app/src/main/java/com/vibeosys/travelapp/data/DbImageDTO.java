@@ -15,6 +15,9 @@ public class DbImageDTO extends BaseDTO {
     private String userId;
     private boolean imageSeen;
 
+    public DbImageDTO() {
+    }
+
     public Boolean getImageSeen() {
         return imageSeen;
     }

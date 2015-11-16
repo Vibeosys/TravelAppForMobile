@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.TableDataDTO;
@@ -30,13 +31,8 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     private static int NUM_PAGES;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
-    //Button mPrevButton, mNextButton;
-    //NewDataBase newDataBase = null;
-    //String UserId;
     int DestId;
-    //String EmailId;
     List<String> mListOptions;
-    //SessionManager mSessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +49,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         //  this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         DestId = getIntent().getExtras().getInt("DestId");
         mListOptions = new ArrayList<>();
-        //UserId = mSessionManager.Instance().getUserId();
-        //EmailId = mSessionManager.Instance().getUserEmailId();
-        //newDataBase = new NewDataBase(this);
+
         int pages = mNewDataBase.getQuestions();
         NUM_PAGES = pages;
 
@@ -64,49 +58,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
                 WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-        //mPrevButton = (Button) findViewById(R.id.prevButton);
-        //mNextButton = (Button) findViewById(R.id.nextButton);
-        //mPrevButton.setVisibility(View.INVISIBLE);
-        //mNextButton.setVisibility(View.INVISIBLE);
 
-        /*mPrevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
-            }
-        });*/
-
-        Log.d("Size ", "" + mListOptions.size());
-        /*mNextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!UserAuth.isUserLoggedIn(getApplicationContext()))
-                    return;
-
-                String theUserId = SessionManager.Instance().getUserId();
-                String theUserEmailId = SessionManager.Instance().getUserEmailId();
-
-                mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
-
-                if ((mViewPager.getCurrentItem() + 1 == mPagerAdapter.getCount())) {
-                    Log.d("Calling Finish", "");
-                }
-                String uploadData;
-                if ((mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1)) {
-                    if (mListOptions.size() > 0) {
-
-
-                        //uploadData = gson.toJson(new Upload(new UploadUser(theUserId, theUserEmailId), tableDataList));
-                        //Log.d("Like Data to Uplaod", uploadData);
-
-                        //saveAnswer(theUserEmailId);
-                        finish();
-                    }
-                }
-            }
-        });
-
-        mNextButton.setText("Next");*/
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -120,7 +72,6 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     }
 
     private void saveAnswer(String optionId) {
-        //Gson gson = new Gson();
         Answer answer = new Answer(optionId, String.valueOf(DestId), mSessionManager.getUserId());
         String serializedJsonString = answer.serializeString();
         Log.d("Option Data", serializedJsonString);
@@ -195,6 +146,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
         //Log.d("Data From Fragment", data);
         //Log.d("Size of List", "" + mListOptions.size());
         if (mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1) {
+            Toast.makeText(getApplicationContext(), "Thanks for your feedback", Toast.LENGTH_SHORT).show();
             finish();
         } else {
             if (!UserAuth.isUserLoggedIn(getApplicationContext()))

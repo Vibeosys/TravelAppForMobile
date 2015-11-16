@@ -1,70 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/custom"
-    >
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="5dp">
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="#ffffff"
-        android:orientation="horizontal"
         android:id="@+id/userphoto"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_margin="2dp"
+        android:orientation="horizontal"
         android:weightSum="1">
 
         <!-- icon -->
         <ImageView
-           android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_margin="20dp"
-            android:src="@drawable/flight"
             android:id="@+id/imageView2"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:src="@drawable/flight" />
 
         <!-- title -->
-   <LinearLayout
-       android:layout_width="wrap_content"
-       android:layout_height="match_parent"
-       android:orientation="vertical"
-       android:layout_weight="1">
-       <TextView
-           android:id="@+id/item_title"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:textStyle="bold"
-           android:textSize="18dp"
-           android:gravity="center"
-           android:textColor="#55acee"
-          />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="5dp"
+            android:paddingRight="5dp"
+            android:paddingStart="5dp">
 
-       <TextView
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:textSize="12dp"
-           android:id="@+id/to_destination"
-           android:textStyle="bold"
-           android:textColor="#55acee"
-           android:layout_gravity="center_horizontal" />
-   </LinearLayout>
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textStyle="bold"
-    android:textColor="#55acee"
-    android:text="Plans On"/>
-<TextView
-    android:layout_width="96dp"
-    android:layout_height="match_parent"
-    android:id="@+id/textdate"
-    android:textColor="#55acee"
-    />
-</LinearLayout>
+            <TextView
+                android:id="@+id/item_title"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:textColor="#55acee"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/to_destination"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical|start"
+                android:textColor="#55acee"
+                android:textSize="12dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="5dp"
+            android:paddingRight="5dp"
+            android:paddingStart="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Planned On"
+                android:textColor="#55acee"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textdate"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="#55acee" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

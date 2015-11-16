@@ -70,7 +70,7 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
         Log.d("DestinationComment", String.valueOf(mDestinationComments.size()));
         //UserId = SessionManager.Instance().getUserId();
         //UserName = SessionManager.Instance().getUserName();
-        showDestinationCommentsAdaptor = new ShowDestinationCommentsAdaptor(getActivity(), mDestinationComments, DestId);
+        showDestinationCommentsAdaptor = new ShowDestinationCommentsAdaptor(getActivity(), mDestinationComments);
         mDestinationCommentListView.setAdapter(showDestinationCommentsAdaptor);
         return view;
     }

@@ -13,15 +13,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.RoundedImageView;
 import com.vibeosys.travelapp.data.UserCommentDTO;
-import com.vibeosys.travelapp.util.SessionManager;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,20 +29,11 @@ import java.util.List;
  * Created by mahesh on 10/15/2015.
  */
 public class ShowDestinationCommentsAdaptor extends BaseAdapter {
-    Context mContext;
-    List<MyImageDB> mUserImagesList = null;
-    int DestId;
-    List<UserCommentDTO> mListDestinationComments = new ArrayList<>();
-    //SharedPreferences sharedPref;
-    //public static final String MyPREFERENCES = "MyPrefs";
-    String UserId;
-    String UserName;
+    private Context mContext;
+    private List<UserCommentDTO> mListDestinationComments = new ArrayList<>();
 
-    public ShowDestinationCommentsAdaptor(Context destinationComments, List<UserCommentDTO> mListDestination, int destId) {
-        this.mContext = destinationComments;
-        this.DestId = destId;
-        UserId = SessionManager.Instance().getUserId();
-        UserName = SessionManager.Instance().getUserName();
+    public ShowDestinationCommentsAdaptor(Context destinationComments, List<UserCommentDTO> mListDestination) {
+        mContext = destinationComments;
         updateResults(mListDestination);
     }
 
@@ -94,22 +85,21 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View viewrow = convertView;
+        //View viewrow = convertView;
         ViewHolder viewHolder = null;
-        if (viewrow == null) {
+        if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            viewrow = layoutInflater.inflate(R.layout.destination_comment, null);
+            convertView = layoutInflater.inflate(R.layout.destination_comment, null);
             viewHolder = new ViewHolder();
-            viewHolder.textView = (TextView) viewrow.findViewById(R.id.userNametext1);
-            viewHolder.textView1 = (TextView) viewrow.findViewById(R.id.userNameComment2);
-            viewHolder.imageView = (RoundedImageView) viewrow.findViewById(R.id.userimagedest);
+            viewHolder.textView = (TextView) convertView.findViewById(R.id.userNametext1);
+            viewHolder.textView1 = (TextView) convertView.findViewById(R.id.userNameComment2);
+            viewHolder.imageView = (RoundedImageView) convertView.findViewById(R.id.userimagedest);
 
-            viewrow.setTag(viewHolder);
+            convertView.setTag(viewHolder);
         } else {
-            viewHolder = (ViewHolder) viewrow.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Log.d("UserId", "" + UserId);
         viewHolder.textView1.setText(mListDestinationComments.get(position).getCommentText());
         viewHolder.textView.setText(mListDestinationComments.get(position).getUserName());
         RoundedImageView roundedImageView = (RoundedImageView) viewHolder.imageView;
@@ -118,7 +108,7 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
             downloadImageAsync(photoUrl, roundedImageView);
         }
 
-        return viewrow;
+        return convertView;
     }
 
     @Override
@@ -146,17 +136,28 @@ public class ShowDestinationCommentsAdaptor extends BaseAdapter {
 
             @Override
             public Bitmap doInBackground(Void... params) {
-                URL imageUrl = null;
+                URL imageUrl;
                 Bitmap imageBitmap = null;
+                URLConnection imageUrlConnection;
+                InputStream imageInputStream = null;
                 try {
+
                     imageUrl = new URL(url);
-                    imageBitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+                    imageUrlConnection = imageUrl.openConnection();
+                    imageInputStream = imageUrlConnection.getInputStream();
+
+                    imageBitmap = BitmapFactory.decodeStream(imageInputStream);
                 } catch (MalformedURLException e) {
-                    Log.e("DownloadImgBkgErr", "TravelAppError occurred while downloading profile image in background " + e.toString());
-                } catch (IOException e) {
                     Log.e("DownloadImgBkgErr", "TravelAppError occurred while downloading profile image in background " + e.toString());
                 } catch (Exception e) {
                     Log.e("DownloadImgBkgErr", "TravelAppError occurred while downloading profile image in background " + e.toString());
+                } finally {
+                    try {
+                        if (imageInputStream != null)
+                            imageInputStream.close();
+                    } catch (IOException e) {
+                        Log.e("StreamClose", "Error occurred while closing input stream for profile image");
+                    }
                 }
                 return imageBitmap;
             }

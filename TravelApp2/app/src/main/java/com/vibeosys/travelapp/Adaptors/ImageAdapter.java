@@ -2,7 +2,6 @@ package com.vibeosys.travelapp.Adaptors;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,48 +64,18 @@ public class ImageAdapter extends BaseAdapter {
 
         //bmp = decodeURI(myImageDBs.get(position).getmImagePath());
         //BitmapFactory.decodeFile(mUrls[position].getPath());
-        String theDate=myImageDBs.get(position).getmCreatedDate();
-        String[] splited=theDate.split(",");
-        String[] dateYear=splited[1].split("\\s+");
-        Log.d("MyPhotos", dateYear[0]);
+        String theDate = myImageDBs.get(position).getmCreatedDate();
+        //String[] splited = theDate.split(",");
+        //String[] dateYear = splited[1].split("\\s+");
+        //Log.d("MyPhotos", dateYear[0]);
         Log.d("MyPhotos", myImageDBs.get(position).getmCreatedDate());
-        viewHolder.textView.setText(splited[0]);
-        viewHolder.imageView.loadImageFromFile("file:"+myImageDBs.get(position).getmImagePath());
+        viewHolder.textView.setText(theDate);
+        viewHolder.imageView.loadImageFromFile("file:" + myImageDBs.get(position).getmImagePath());
         return row;
-
-
     }
-
 
     private static class ViewHolder {
         LoaderImageView imageView;
         TextView textView;
     }
-
-    public Bitmap decodeURI(String filePath) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(filePath, options);
-
-        // Only scale if we need to
-        // (16384 buffer for img processing)
-        Boolean scaleByHeight = Math.abs(options.outHeight - 100) >= Math.abs(options.outWidth - 100);
-        if (options.outHeight * options.outWidth * 2 >= 16384) {
-            // Load, scaling to smallest power of 2 that'll get it <= desired dimensions
-            double sampleSize = scaleByHeight
-                    ? options.outHeight / 100
-                    : options.outWidth / 100;
-            options.inSampleSize =
-                    (int) Math.pow(2d, Math.floor(
-                            Math.log(sampleSize) / Math.log(2d)));
-        }
-
-        // Do the actual decoding
-        options.inJustDecodeBounds = false;
-        options.inTempStorage = new byte[512];
-        Bitmap output = BitmapFactory.decodeFile(filePath, options);
-
-        return output;
-    }
-
 }

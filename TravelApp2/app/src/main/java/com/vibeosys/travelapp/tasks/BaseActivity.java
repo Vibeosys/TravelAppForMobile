@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * Base Activity will give the basic implementation with async task support and other things
@@ -204,7 +205,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
 
     @Override
-    public void onUploadComplete(String uploadJsonResponse) {
+    public void onUploadComplete(String uploadJsonResponse, Map<String, String> inputParameters) {
         try {
             JSONObject jsonObject = new JSONObject(uploadJsonResponse);
             String imageUrl = jsonObject.getString("message");

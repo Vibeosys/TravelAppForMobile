@@ -3,7 +3,6 @@ package com.vibeosys.travelapp;
 import android.app.Dialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -21,7 +20,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;
@@ -122,14 +120,14 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
 
         }
 */
-        for (int i = 0; i < theLatLongList.size() - 1; i++) {
+        /*for (int i = 0; i < theLatLongList.size() - 1; i++) {
             googleMap.addPolyline(new PolylineOptions().geodesic(true)
                             .add(new LatLng(theLatLongList.get(i).getmLat(), theLatLongList.get(i).getmLong()))
                             .add(new LatLng(theLatLongList.get(i + 1).getmLat(),
                                     theLatLongList.get(i + 1).getmLong())).width(5).color(Color.BLACK));
 
 
-        }
+        }*/
 
       googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 

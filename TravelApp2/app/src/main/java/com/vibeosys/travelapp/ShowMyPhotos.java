@@ -29,7 +29,7 @@ public class ShowMyPhotos extends BaseActivity {
         showphoto_view = (ListView) findViewById(R.id.grid_images);
 
         try {
-            mUserImagesList = mNewDataBase.mUserImagesList();
+            mUserImagesList = mNewDataBase.getMyPhotos();
             showphoto_view.setAdapter(new ImageAdapter(this, mUserImagesList));
         } catch (NullPointerException e) {
             e.printStackTrace();

@@ -28,7 +28,6 @@ public class ScreenSlidePage extends BaseFragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
     ArrayList<Option> answers;
-    //NewDataBase newDataBase=null;
     List<SendQuestionAnswers> mListQuestions = null;
     List<SendQuestionAnswers> mListOptions = null;
     HashMap<String, Options> mListQuestionsAnswers = null;

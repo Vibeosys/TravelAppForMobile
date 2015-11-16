@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
-import android.widget.ListView;
 
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
@@ -50,7 +49,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     private ViewPager mPager;
     int mDestId;
     String imageId;
-    ListView other_photo_list;
+    //ListView other_photo_list;
     List<usersImages> mPhotoList = null;
     NewDataBase newDataBase;
     List<Images> listImages;

@@ -32,6 +32,7 @@ import com.vibeosys.travelapp.usersImages;
 import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -650,6 +651,31 @@ public class NewDataBase extends SQLiteOpenHelper {
         return noOfQuestions;
     }
 
+    public boolean insertImage(DbImageDTO awsReceivedImage) {
+        SQLiteDatabase sqLiteDatabase = null;
+        ContentValues contentValues;
+        long count = -1;
+        try {
+            sqLiteDatabase = getWritableDatabase();
+            contentValues = new ContentValues();
+            contentValues.put("DestId", awsReceivedImage.getDestId());
+            contentValues.put("UserId", awsReceivedImage.getUserId());
+            contentValues.put("ImageID", awsReceivedImage.getImageId());
+            contentValues.put("ImagePath", awsReceivedImage.getImagePath());
+            contentValues.put("ImageSeen", awsReceivedImage.getImageSeen());
+            count = sqLiteDatabase.insert("Images", null, contentValues);
+            contentValues.clear();
+            //}
+        } catch (Exception e) {
+            Log.e("DbOperationImgIns", "Error occurred while inserting into images " + e.toString());
+        } finally {
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
+        }
+
+        return count != -1;
+    }
+
     public boolean addOrUpdateUserToAllUsers(User userInfo) {
         SQLiteDatabase sqLiteDatabase = null;
         ContentValues contentValues = null;
@@ -812,7 +838,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         }
     }
 
-    public List<MyImageDB> mUserImagesList() {
+    public List<MyImageDB> getMyPhotos() {
         List<MyImageDB> theUserImagesList = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
@@ -828,13 +854,14 @@ public class NewDataBase extends SQLiteOpenHelper {
                     );
                     theUserImagesList.add(theMyImages);
                 } while (cursor.moveToNext());
-
             }
-            cursor.close();
-            sqLiteDatabase.close();
-
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("GetMyPhotos", "Error occured while getting images from DB "+ e.toString());
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
         return theUserImagesList;
     }
@@ -1079,14 +1106,14 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public boolean saveInMyImages(String cImagePath, String cDate) {
+    public boolean saveInMyImages(String cImagePath, Date cDate) {
         long rowsAffected = -1;
         SQLiteDatabase thesqLiteDatabase = null;
         try {
             thesqLiteDatabase = getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put("ImagePath", cImagePath);
-            contentValues.put("CreateDate", cDate);
+            contentValues.put("CreateDate", cDate.toString());
             rowsAffected = thesqLiteDatabase.insert("MyImages", null, contentValues);
             thesqLiteDatabase.close();
         } catch (Exception e) {

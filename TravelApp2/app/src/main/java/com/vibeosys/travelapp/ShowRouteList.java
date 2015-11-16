@@ -25,7 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -137,10 +141,17 @@ public class ShowRouteList extends BaseActivity
             detail = (TextView) row.findViewById(R.id.to_destination);
             textdatetext = (TextView) row.findViewById(R.id.textdate);
             title.setText(theRouteList.get(position).getmRouteName());
-            String date = theRouteList.get(position).getmRouteDate();
+            String dateInString = theRouteList.get(position).getmRouteDate();
             //SimpleDateFormat simpleDateFormat=new SimpleDateFormat();
-
-            textdatetext.setText(date.substring(0, 14));
+            String formattedDate = null;
+            try {
+                Date plannedDate = DateFormat.getDateInstance().parse(dateInString);
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+                formattedDate= sdf.format(plannedDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            textdatetext.setText(formattedDate);
             List<String> theRouteNames = new ArrayList<>();
             JSONArray theJsonArray;
             JSONObject jsonObject;

@@ -98,15 +98,6 @@ public class ServerSyncManager
         uploadJsonToServer(uploadJson, uploadURL, progress);
     }
 
-    public void uploadDataToServer(List<TableDataDTO> tableDataList) {
-        if (tableDataList == null || tableDataList.size() <= 0) {
-            Log.e("UploadNoData", "No data for upload was given by the respective method");
-            return;
-        }
-        TableDataDTO[] tableDataArray = Arrays.copyOf(tableDataList.toArray(), tableDataList.size(), TableDataDTO[].class);
-        uploadDataToServer(tableDataArray);
-    }
-
     public boolean sendOtpToUser(String emailId) {
         final ProgressDialog progress = new ProgressDialog(mContext);
         UploadUserOtp uploadUserOtp = new UploadUserOtp(mSessionManager.getUserId(), emailId, null, null);
@@ -286,7 +277,7 @@ public class ServerSyncManager
         @Override
         protected void onPostExecute(String downloadedJson) {
             super.onPostExecute(downloadedJson);
-            if (mProgressDialog != null) {
+            if (mShowProgressDlg && mProgressDialog != null) {
                 mProgressDialog.dismiss();
             }
 

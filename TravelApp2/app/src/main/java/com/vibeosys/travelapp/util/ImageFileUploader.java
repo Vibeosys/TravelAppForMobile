@@ -14,6 +14,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +83,7 @@ public final class ImageFileUploader {
             @Override
             public void onResponse(String response) {
                 if (mOnUploadCompleteListener != null)
-                    mOnUploadCompleteListener.onUploadComplete(response);
+                    mOnUploadCompleteListener.onUploadComplete(response, dataMap);
             }
 
         }, new Response.ErrorListener() {
@@ -109,14 +111,16 @@ public final class ImageFileUploader {
             (String encodedString, String filename, String destId,
              String userId, String userEmailId, String userName) {
         UUID uuid = UUID.randomUUID();
+        JSONObject object;
+
         Map<String, String> params = new HashMap<>();
-        params.put("imageId", uuid.toString());
-        params.put("upload", encodedString);
-        params.put("imagename", filename);
-        params.put("destId", String.valueOf(destId));
-        params.put("userId", userId);
-        params.put("emailId", userEmailId);
-        params.put("userName", userName);
+        params.put(ImageUploadNameConstants.IMAGE_ID, uuid.toString());
+        params.put(ImageUploadNameConstants.UPLOAD, encodedString);
+        params.put(ImageUploadNameConstants.IMAGE_NAME, filename);
+        params.put(ImageUploadNameConstants.DEST_ID, String.valueOf(destId));
+        params.put(ImageUploadNameConstants.USER_ID, userId);
+        params.put(ImageUploadNameConstants.EMAIL_ID, userEmailId);
+        params.put(ImageUploadNameConstants.USER_NAME, userName);
         return params;
     }
 
@@ -125,12 +129,12 @@ public final class ImageFileUploader {
              String userId, String userEmailId, String userName) {
         UUID uuid = UUID.randomUUID();
         Map<String, String> params = new HashMap<>();
-        params.put("imageId", uuid.toString());
-        params.put("upload", encodedString);
-        params.put("imagename", filename);
-        params.put("userId", userId);
-        params.put("emailId", userEmailId);
-        params.put("userName", userName);
+        params.put(ImageUploadNameConstants.IMAGE_ID, uuid.toString());
+        params.put(ImageUploadNameConstants.UPLOAD, encodedString);
+        params.put(ImageUploadNameConstants.IMAGE_NAME, filename);
+        params.put(ImageUploadNameConstants.USER_ID, userId);
+        params.put(ImageUploadNameConstants.EMAIL_ID, userEmailId);
+        params.put(ImageUploadNameConstants.USER_NAME, userName);
         return params;
     }
 
@@ -143,7 +147,7 @@ public final class ImageFileUploader {
     }
 
     public interface OnUploadCompleteListener {
-        void onUploadComplete(String uploadJsonResponse);
+        void onUploadComplete(String uploadJsonResponse, Map<String, String> inputParameters);
     }
 
     public interface OnUploadErrorListener {
