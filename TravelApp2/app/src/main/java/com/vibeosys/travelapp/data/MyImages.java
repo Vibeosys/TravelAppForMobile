@@ -1,12 +1,15 @@
 package com.vibeosys.travelapp.data;
 
+import java.util.Date;
+
 /**
  * Created by mahesh on 10/14/2015.
  */
 public class MyImages {
-protected int mImageId;
+    protected int mImageId;
     protected String mImagePath;
     protected String mCreatedDate;
+    protected Date mCreationDate;
     protected int mUserId;
     protected int mDestId;
     protected boolean mImageSeen;
@@ -57,5 +60,13 @@ protected int mImageId;
 
     public void setmCreatedDate(String mCreatedDate) {
         this.mCreatedDate = mCreatedDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.mCreationDate = creationDate;
+    }
+
+    public Date getCreationDate() {
+        return this.mCreationDate;
     }
 }

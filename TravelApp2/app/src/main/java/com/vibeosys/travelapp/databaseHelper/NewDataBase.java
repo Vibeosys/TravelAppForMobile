@@ -905,16 +905,20 @@ public class NewDataBase extends SQLiteOpenHelper {
         List<MyImageDB> theUserImagesList = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
+        //SimpleDateFormat sdf = new SimpleDateFormat();
         try {
             sqLiteDatabase = getReadableDatabase();
             cursor = sqLiteDatabase.rawQuery("select ImageId,ImagePath,CreateDate from MyImages Order By CreateDate Desc", null);
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    MyImageDB theMyImages = new MyImageDB(
-                            cursor.getInt(cursor.getColumnIndex("ImageId")),
-                            cursor.getString(cursor.getColumnIndex("ImagePath")),
-                            cursor.getString(cursor.getColumnIndex("CreateDate"))
-                    );
+                    //String sDate = cursor.getString(cursor.getColumnIndex("CreateDate"));
+                    //Date imageDate= sdf.parse(sDate);
+
+                    MyImageDB theMyImages = new MyImageDB();
+                    theMyImages.setmImageId(cursor.getInt(cursor.getColumnIndex("ImageId")));
+                    theMyImages.setmImagePath(cursor.getString(cursor.getColumnIndex("ImagePath")));
+                    theMyImages.setmCreatedDate(cursor.getString(cursor.getColumnIndex("CreateDate")));
+                    //theMyImages.setCreationDate(imageDate);
                     theUserImagesList.add(theMyImages);
                 } while (cursor.moveToNext());
             }
@@ -1087,20 +1091,19 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public int CountOfUsers(int cOptionId, String destId) {
+    public long getReviewUserCount(int cOptionId, String destId) {
         SQLiteDatabase sqLiteDatabase = null;
-        Cursor cursor = null;
-        int count = 0;
+        long count = 0;
         try {
             sqLiteDatabase = getReadableDatabase();
-            cursor = sqLiteDatabase.rawQuery("select * from answer where optionid=? and destid=?", new String[]{String.valueOf(cOptionId), destId});
-            if (cursor != null && cursor.getCount() > 0) {
-                count = cursor.getCount();
-            }
-            cursor.close();
-            sqLiteDatabase.close();
+            String sql = "select count(distinct UserId) from answer where optionid=" + cOptionId + " and destid=" + destId;
+            SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(sql);
+            count = sqLiteStatement.simpleQueryForLong();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("UserReviewCount", "Error while getting user count for review " + e.toString());
+        } finally {
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
         return count;
     }

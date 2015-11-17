@@ -64,29 +64,29 @@ public class QuestionsFromOthers extends BaseFragment {
 
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.otherquestionlist_layout, null);
-        questionslistView = (ExpandableListView) view.findViewById(R.id.listView2);
+        questionslistView = (ExpandableListView) view.findViewById(R.id.reviewList);
         //mNewDataBase = new NewDataBase(getActivity());
         mListQuestions = mNewDataBase.getQuestionOptions(destId);
         if (mListQuestions != null && mListQuestions.size() > 0) {
             Log.d("getQuestions", "" + mListQuestions.size());
             Options options = null;
             mListQuestionsAnswers = new HashMap<>();
-            for (SendQuestionAnswers questionAnswer: mListQuestions) {
+            for (SendQuestionAnswers questionAnswer : mListQuestions) {
                 mListOptions = new ArrayList<>();
                 String m = questionAnswer.getmQuestionText();
                 mListOptions = mNewDataBase.getAnsweredAnswers(questionAnswer.getmQuestionId(), Integer.parseInt(destId));
                 options = new Options();
                 String[] option = new String[mListOptions.size()];
                 int[] optionids = new int[mListOptions.size()];
-                int[] UsersCount = new int[mListOptions.size()];
+                long[] userCountArray = new long[mListOptions.size()];
                 for (int j = 0; j < mListOptions.size(); j++) {
                     option[j] = mListOptions.get(j).getmOptionText();
                     optionids[j] = mListOptions.get(j).getmOptionId();
-                    UsersCount[j] = mNewDataBase.CountOfUsers(mListOptions.get(j).getmOptionId(), destId);
+                    userCountArray[j] = mNewDataBase.getReviewUserCount(mListOptions.get(j).getmOptionId(), destId);
                 }
                 options.setmOptionText(option);
                 options.setmOptionIds(optionids);
-                options.setmUserCounts(UsersCount);
+                options.setmUserCounts(userCountArray);
                 mListQuestionsAnswers.put(m, options);
             }
 
@@ -188,41 +188,51 @@ public class QuestionsFromOthers extends BaseFragment {
 
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            childPosition = childPosition * 2;
+            String[] optionTextArray = valueList.get(groupPosition).getmOptionText();
+            long[] userCountArray = valueList.get(groupPosition).getmUserCounts();
+            int[] optionIdArray = valueList.get(groupPosition).getmOptionIds();
+
+            int firstElementPosition = 0;
+            int secondElementPosition = 1;
+            if (childPosition > 0) {
+                firstElementPosition = childPosition + 1;
+                secondElementPosition = childPosition + 2;
+            }
+
+            //childPosition = childPosition * 2;
             LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View aView = layoutInflater.inflate(R.layout.answer, null);
             TextView theText = (TextView) aView.findViewById(R.id.text);
             LinearLayout firstQuestion = (LinearLayout) aView.findViewById(R.id.firstquestion);
             LinearLayout secondQuestion = (LinearLayout) aView.findViewById(R.id.secondquestion);
             TextView showTextto = (TextView) aView.findViewById(R.id.textView);
-            String optionText = valueList.get(groupPosition).getmOptionText()[childPosition];
-            String count = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]);
-            // theCount.setText(String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition]));
-            //showText.setText("Says");
-            firstQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition]);
+            String optionText = optionTextArray[firstElementPosition];
+            String count = String.valueOf(userCountArray[firstElementPosition]);
+            firstQuestion.setId(optionIdArray[firstElementPosition]);
             theText.setText(Html.fromHtml("<font color='#27ACD4'> " + count + "  Says  " + "</font>  <font color='#27ACD4'>" + optionText + "</font>"));
             //theText.setTextColor(Color.RED);
-            if (getChildrenCount(groupPosition) > childPosition + 1) {
-                String optionTextq = valueList.get(groupPosition).getmOptionText()[childPosition + 1];
-                String countq = String.valueOf(valueList.get(groupPosition).getmUserCounts()[childPosition + 1]);
+            if (optionTextArray.length >= secondElementPosition + 1) {
+                //if (getChildrenCount(groupPosition) > childPosition + 1) {
+                String optionTextq = optionTextArray[secondElementPosition];
+                String countq = String.valueOf(userCountArray[secondElementPosition]);
                 showTextto.setText(Html.fromHtml("<font color='#27ACD4'> " + countq + "  Says  " + "</font> <font color='#27ACD4'>" + optionTextq + "</font>"));
-                secondQuestion.setId(valueList.get(groupPosition).getmOptionIds()[childPosition + 1]);
-            }
+                secondQuestion.setId(optionIdArray[secondElementPosition]);
 
+                secondQuestion.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        userListDialog(v.getId());
+                        //Toast.makeText(getActivity(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                //}
+            }
             firstQuestion.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
                     userListDialog(v.getId());
                     //Toast.makeText(getActivity(), "Clicked on first" + v.getId(), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            secondQuestion.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    userListDialog(v.getId());
-                    //Toast.makeText(getActivity(), "Clicked on second" + v.getId(), Toast.LENGTH_SHORT).show();
                 }
             });
 

@@ -7,7 +7,7 @@ public class Options {
     int mOptionId;
     String mOptionText[];
     int mOptionIds[];
-    int mUserCounts[];
+    long mUserCounts[];
     int mUserCount;
 
 
@@ -19,11 +19,11 @@ public class Options {
         this.mUserCount = mUserCount;
     }
 
-    public int[] getmUserCounts() {
+    public long[] getmUserCounts() {
         return mUserCounts;
     }
 
-    public void setmUserCounts(int[] mUserCounts) {
+    public void setmUserCounts(long[] mUserCounts) {
         this.mUserCounts = mUserCounts;
     }
 

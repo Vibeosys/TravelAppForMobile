@@ -133,13 +133,13 @@ public class ShowRouteList extends BaseActivity
         public View getView(int position, View convertView, ViewGroup parent) {
 
             LayoutInflater inflater = getLayoutInflater();
-            View row;
-            row = inflater.inflate(R.layout.cust_routes, parent, false);
+            //View row = convertView;
+            convertView = inflater.inflate(R.layout.cust_routes, parent, false);
             TextView title, detail, textdatetext;
 
-            title = (TextView) row.findViewById(R.id.item_title);
-            detail = (TextView) row.findViewById(R.id.to_destination);
-            textdatetext = (TextView) row.findViewById(R.id.textdate);
+            title = (TextView) convertView.findViewById(R.id.item_title);
+            detail = (TextView) convertView.findViewById(R.id.to_destination);
+            textdatetext = (TextView) convertView.findViewById(R.id.textdate);
             title.setText(theRouteList.get(position).getmRouteName());
             String dateInString = theRouteList.get(position).getmRouteDate();
             //SimpleDateFormat simpleDateFormat=new SimpleDateFormat();
@@ -172,7 +172,7 @@ public class ShowRouteList extends BaseActivity
 
             }
 
-            return row;
+            return convertView;
         }
 
     }
