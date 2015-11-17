@@ -4,12 +4,11 @@ package com.vibeosys.travelapp;
  * Created by mahesh on 10/17/2015.
  */
 public class Options {
-int mOptionId;
-String mOptionText[];
-int mOptionIds[];
-int mUserCounts[];
-int mUserCount;
-
+    int mOptionId;
+    String mOptionText[];
+    int mOptionIds[];
+    int mUserCounts[];
+    int mUserCount;
 
 
     public int getmUserCount() {

@@ -40,7 +40,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
 import com.vibeosys.travelapp.activities.ViewProfileActivity;
-import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.UserAuth;
@@ -369,17 +368,17 @@ public class MainActivity extends BaseActivity
 
                     TextView commentsLabel = (TextView) view.findViewById(R.id.comments_label);
                     TextView rattingsLabel = (TextView) view.findViewById(R.id.ratings_label);
-                    int imagesCount = mNewDataBase.Images(mDestId, false).size();
-                    List<SendQuestionAnswers> listofQuestion = mNewDataBase.getQuestionOptions(String.valueOf(mDestId));
-                    int msgCount = 0;
-                    int destCommentcount = 0;
-                    List<UserCommentDTO> destinationComment = mNewDataBase.getDestinationComments(mDestId);
-                    if (destinationComment != null) destCommentcount = destinationComment.size();
-                    if (listofQuestion != null) msgCount = listofQuestion.size();
+                    long imagesCount = mNewDataBase.getImageCount(mDestId, false);
+                    long reviewCount = mNewDataBase.getReviewCount(String.valueOf(mDestId));
+                    //int msgCount = 0;
+                    //int destCommentcount = 0;
+                    long commentCount = mNewDataBase.getCommentCount(mDestId);
+                    //if (destinationComment != null) destCommentcount = destinationComment.size();
+                    //reviewCount  = listofQuestion.size();
 
-                    photoLabel.setText(String.valueOf(imagesCount) + " Photos uploaded ...");
-                    commentsLabel.setText(destCommentcount + " People have commented ...");
-                    rattingsLabel.setText(String.valueOf(msgCount) + " Reviews ..");
+                    photoLabel.setText(imagesCount + " Photos uploaded ...");
+                    commentsLabel.setText(commentCount + " People have commented ...");
+                    rattingsLabel.setText(reviewCount + " Reviews ..");
 
                     view.findViewById(R.id.overlay).setOnClickListener(
                             new View.OnClickListener() {

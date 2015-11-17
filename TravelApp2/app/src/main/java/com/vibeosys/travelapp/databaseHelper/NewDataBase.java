@@ -7,6 +7,7 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import com.vibeosys.travelapp.DestinationTempData;
@@ -580,7 +581,7 @@ public class NewDataBase extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("ImageCountDisplay", "Error occurred while selecting images from db for dest " + cDestId);
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -589,6 +590,68 @@ public class NewDataBase extends SQLiteOpenHelper {
         }
 
         return cImagePaths;
+    }
+
+    public long getImageCount(int cDestId, Boolean showSeenImages) {
+        SQLiteDatabase sqLiteDatabase = null;
+        long imgCount = 0;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            //String qureyToAppend = " and ImageSeen = 'false'";
+            String mainQurey = "select count(*) from Images natural join user where user.userid=images.userid and destid=" + cDestId;
+            //if (!showSeenImages) {
+            //    mainQurey += qureyToAppend;
+            //}
+            SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(mainQurey);
+            imgCount = sqLiteStatement.simpleQueryForLong();
+
+        } catch (Exception e) {
+            Log.e("ImageCountDisplay", "Error occurred while selecting images from db for dest " + cDestId);
+        } finally {
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
+        }
+
+        return imgCount;
+    }
+
+    public long getCommentCount(int destId) {
+        //List<UserCommentDTO> DestComments = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        long commentCount = 0;
+        //Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            //DestComments = new ArrayList<>();
+            String sql = "select count(user.userid) " +
+                    "from comment_and_like inner join user " +
+                    " on comment_and_like.userid = user.userid where destid=" + destId;
+            SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(sql);
+            commentCount = sqLiteStatement.simpleQueryForLong();
+            //cursor = sqLiteDatabase.rawQuery(,
+            //        new String[]{String.valueOf(DestId)});
+            /*if (cursor != null) {
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    do {
+                        UserCommentDTO commentsAndLikes = new UserCommentDTO();
+                        commentsAndLikes.setUserId(cursor.getString(0));
+                        commentsAndLikes.setDestId(cursor.getInt(4));
+                        commentsAndLikes.setCommentText(cursor.getString(3));
+                        commentsAndLikes.setUserName(cursor.getString(1));
+                        commentsAndLikes.setUserPhotoUrl(cursor.getString(2));
+                        DestComments.add(commentsAndLikes);
+
+                    } while (cursor.moveToNext());
+                }
+            }*/
+        } catch (Exception e) {
+            Log.e("DbOperationCommentSel", "Error occurred while selecting comments " + e.toString());
+        } finally {
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
+        }
+        return commentCount;
     }
 
     public List<UserCommentDTO> getDestinationComments(int DestId) {
@@ -856,7 +919,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
-            Log.e("GetMyPhotos", "Error occured while getting images from DB "+ e.toString());
+            Log.e("GetMyPhotos", "Error occured while getting images from DB " + e.toString());
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -927,6 +990,41 @@ public class NewDataBase extends SQLiteOpenHelper {
         return mListQuestions;
     }
 
+    public long getReviewCount(String destId) {
+        //List<SendQuestionAnswers> mListQuestions = null;
+        SQLiteDatabase sqLiteDatabase = null;
+        long reviewCount = 0;
+        //Cursor cursor = null;
+        try {
+            sqLiteDatabase = getReadableDatabase();
+            //mListQuestions = new ArrayList<>();
+            String query = "select count(distinct Question.QuestionId)" +
+                    " from Question inner join options on Question.questionId=Options.questionId " +
+                    " inner join answer on options.optionid=answer.OptionId " +
+                    " where answer.destid=" + destId;
+            SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(query);
+            reviewCount = sqLiteStatement.simpleQueryForLong();
+            //cursor = sqLiteDatabase.rawQuery(qurey, new String[]{destId});
+            /*SendQuestionAnswers sendQuestionAnswers;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    sendQuestionAnswers = new SendQuestionAnswers();
+                    sendQuestionAnswers.setmQuestionId(cursor.getInt(cursor.getColumnIndex("QuestionId")));
+                    sendQuestionAnswers.setmQuestionText(cursor.getString(cursor.getColumnIndex("QuestionText")));
+                    mListQuestions.add(sendQuestionAnswers);
+                } while (cursor.moveToNext());
+            }*/
+        } catch (Exception e) {
+            Log.e("GetQuestionOptions", "Error occurred while getting options for question " + e.toString());
+        } finally {
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
+
+        }
+        return reviewCount;
+    }
+
     public List<SendQuestionAnswers> listQuestions() {
         List<SendQuestionAnswers> listQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
@@ -955,12 +1053,12 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public List<UserLikeDTO> answerlikesUsers(int optionId, String destId) {
+    public List<UserLikeDTO> getReviewUserList(int optionId, String destId) {
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         List<UserLikeDTO> answerUsersList = null;
         try {
-            String query = "select IFNULL(user.UserName,'') UserName, user.UserId, IFNULL(LikeCount,0) LikeCount " +
+            String query = "select distinct IFNULL(user.UserName,'') UserName, user.UserId, IFNULL(LikeCount,0) LikeCount " +
                     "from  answer inner join user on user.userid=answer.userid  " +
                     "left outer join comment_and_like  on comment_and_like.DestId=answer.DestId and comment_and_like.UserId = answer.UserId " +
                     "where optionid=? and answer.destid=? ";
@@ -968,25 +1066,22 @@ public class NewDataBase extends SQLiteOpenHelper {
             sqLiteDatabase = getReadableDatabase();
             cursor = sqLiteDatabase.rawQuery(query,
                     new String[]{String.valueOf(optionId), destId});
-            if (cursor != null) {
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
                     UserLikeDTO userLikes = new UserLikeDTO();
                     userLikes.setUserName(cursor.getString(cursor.getColumnIndex("UserName")));
                     userLikes.setUserId(cursor.getString(cursor.getColumnIndex("UserId")));
                     userLikes.setUserLikeCount(cursor.getInt(cursor.getColumnIndex("LikeCount")));
                     answerUsersList.add(userLikes);
-
                 }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("getReviewUserList", "Error occurred while getting review user list" + e.toString());
         } finally {
             if (cursor != null)
                 cursor.close();
-            sqLiteDatabase.close();
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
         return answerUsersList;
     }
@@ -1045,7 +1140,7 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public List<SendQuestionAnswers> mListOptions(int cQuestionId, int destId) {
+    public List<SendQuestionAnswers> getAnsweredAnswers(int cQuestionId, int destId) {
         List<SendQuestionAnswers> theListAskQuestions = null;
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
@@ -1068,11 +1163,15 @@ public class NewDataBase extends SQLiteOpenHelper {
                     } while (cursor.moveToNext());
                 }
             }
-            cursor.close();
-            sqLiteDatabase.close();
+
             Log.d("theListAskQuestions", "" + theListAskQuestions.size());
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("GetAnswerFromOthers", "Error while getting answers from others" + e.toString());
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (sqLiteDatabase != null)
+                sqLiteDatabase.close();
         }
         return theListAskQuestions;
     }

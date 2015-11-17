@@ -144,7 +144,7 @@ public class QuestionSlidingView extends BaseActivity implements ScreenSlidePage
     public void onDataPass(String data) {
         mListOptions.add(data);
         //Log.d("Data From Fragment", data);
-        //Log.d("Size of List", "" + mListOptions.size());
+        //Log.d("Size of List", "" + getAnsweredAnswers.size());
         if (mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1) {
             Toast.makeText(getApplicationContext(), "Thanks for your feedback", Toast.LENGTH_SHORT).show();
             finish();

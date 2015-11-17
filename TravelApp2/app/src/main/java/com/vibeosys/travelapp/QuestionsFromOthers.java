@@ -74,7 +74,7 @@ public class QuestionsFromOthers extends BaseFragment {
             for (SendQuestionAnswers questionAnswer: mListQuestions) {
                 mListOptions = new ArrayList<>();
                 String m = questionAnswer.getmQuestionText();
-                mListOptions = mNewDataBase.mListOptions(questionAnswer.getmQuestionId(), Integer.parseInt(destId));
+                mListOptions = mNewDataBase.getAnsweredAnswers(questionAnswer.getmQuestionId(), Integer.parseInt(destId));
                 options = new Options();
                 String[] option = new String[mListOptions.size()];
                 int[] optionids = new int[mListOptions.size()];
@@ -280,11 +280,11 @@ public class QuestionsFromOthers extends BaseFragment {
         dialog.setTitle("Reviews from users");
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        listUsersDetails = mNewDataBase.answerlikesUsers(questionId, destId);
+        listUsersDetails = mNewDataBase.getReviewUserList(questionId, destId);
         //likeCount=
         dialog.show();
         ListView usersListView = (ListView) dialog.findViewById(R.id.userlistview);
-        usersListView.setAdapter(new UserListAdaptor(QuestionsFromOthers.this, listUsersDetails));
+        usersListView.setAdapter(new UserListAdaptor(listUsersDetails));
 
     }
 
@@ -293,7 +293,7 @@ public class QuestionsFromOthers extends BaseFragment {
         List<UserLikeDTO> userDetailsList;
         Context mContext;
 
-        public UserListAdaptor(QuestionsFromOthers questionsFromOthers, List<UserLikeDTO> listUsersDetails) {
+        public UserListAdaptor(List<UserLikeDTO> listUsersDetails) {
             userDetailsList = listUsersDetails;
             mContext = getActivity();
         }
