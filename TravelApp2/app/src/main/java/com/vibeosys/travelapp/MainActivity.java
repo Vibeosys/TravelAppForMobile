@@ -159,7 +159,7 @@ public class MainActivity extends BaseActivity
 
         ArrayAdapter<String> arrayAdapter = null;
         try {
-            arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+            arrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,
                     Collections.list(Collections.enumeration(mDestinationNames.keySet())));
         } catch (NullPointerException e) {
             e.printStackTrace();

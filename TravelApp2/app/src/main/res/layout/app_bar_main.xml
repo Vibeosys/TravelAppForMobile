@@ -33,7 +33,7 @@
                     android:drawableLeft="@drawable/search"
                     android:hint=" Search Destination"
                     android:inputType="textFilter"
-                    android:popupBackground="#ffffff"
+                    android:popupBackground="#95e60000"
                     android:textSize="14dp" />
 
             </LinearLayout>
