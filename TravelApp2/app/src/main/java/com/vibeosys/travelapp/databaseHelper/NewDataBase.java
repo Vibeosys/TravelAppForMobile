@@ -597,11 +597,7 @@ public class NewDataBase extends SQLiteOpenHelper {
         long imgCount = 0;
         try {
             sqLiteDatabase = getReadableDatabase();
-            //String qureyToAppend = " and ImageSeen = 'false'";
             String mainQurey = "select count(*) from Images natural join user where user.userid=images.userid and destid=" + cDestId;
-            //if (!showSeenImages) {
-            //    mainQurey += qureyToAppend;
-            //}
             SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(mainQurey);
             imgCount = sqLiteStatement.simpleQueryForLong();
 
@@ -616,35 +612,15 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
     public long getCommentCount(int destId) {
-        //List<UserCommentDTO> DestComments = null;
         SQLiteDatabase sqLiteDatabase = null;
         long commentCount = 0;
-        //Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            //DestComments = new ArrayList<>();
             String sql = "select count(user.userid) " +
                     "from comment_and_like inner join user " +
                     " on comment_and_like.userid = user.userid where destid=" + destId;
             SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(sql);
             commentCount = sqLiteStatement.simpleQueryForLong();
-            //cursor = sqLiteDatabase.rawQuery(,
-            //        new String[]{String.valueOf(DestId)});
-            /*if (cursor != null) {
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    do {
-                        UserCommentDTO commentsAndLikes = new UserCommentDTO();
-                        commentsAndLikes.setUserId(cursor.getString(0));
-                        commentsAndLikes.setDestId(cursor.getInt(4));
-                        commentsAndLikes.setCommentText(cursor.getString(3));
-                        commentsAndLikes.setUserName(cursor.getString(1));
-                        commentsAndLikes.setUserPhotoUrl(cursor.getString(2));
-                        DestComments.add(commentsAndLikes);
-
-                    } while (cursor.moveToNext());
-                }
-            }*/
         } catch (Exception e) {
             Log.e("DbOperationCommentSel", "Error occurred while selecting comments " + e.toString());
         } finally {
