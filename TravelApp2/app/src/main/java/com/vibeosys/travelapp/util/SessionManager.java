@@ -21,7 +21,7 @@ public class SessionManager {
      * Method is supposed to called once at beginning of the APP.
      *
      * @param context Context of any base or current activity, Needs to be called at only once.
-     * @return
+     * @return SessionManager session manager instance
      */
 
     public static SessionManager getInstance(Context context) {
@@ -86,7 +86,7 @@ public class SessionManager {
         editor.putString(PropertyTypeConstants.DATABASE_FILE_NAME, mPropertyFileReader.getDatabaseFileName());
         editor.putString(PropertyTypeConstants.API_SEND_OTP_URL, mPropertyFileReader.getSendOtpUrl());
         editor.putString(PropertyTypeConstants.VERSION_NUMBER, String.valueOf(mPropertyFileReader.getVersion()));
-        editor.commit();
+        editor.apply();
         return true;
     }
 
@@ -95,7 +95,7 @@ public class SessionManager {
     }
 
     public String getDownloadDbUrl(String userId) {
-        if (userId == null || userId == "")
+        if (userId == null || userId.equals(""))
             Log.e("SessionManager", "User id in download DB URL is blank");
 
         String downloadDbUrl = mProjectSharedPref.getString(PropertyTypeConstants.API_DOWNLOAD_DB_URI, null);
@@ -103,7 +103,7 @@ public class SessionManager {
     }
 
     public String getDownloadUrl(String userId) {
-        if (userId == null || userId == "")
+        if (userId == null || userId.equals(""))
             Log.e("SessionManager", "User id in download URL is blank");
 
         String downloadUrl = mProjectSharedPref.getString(PropertyTypeConstants.API_DOWNLOAD_URI, null);
@@ -178,7 +178,7 @@ public class SessionManager {
         return mProjectSharedPref.getString(PropertyTypeConstants.USER_REGD_API_KEY, null);
     }
 
-    public void setUserLoginRegdSoure(RegistrationSourceTypes registrationSourceType) {
+    public void setUserLoginRegdSource(RegistrationSourceTypes registrationSourceType) {
         setValuesInSharedPrefs(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE,
                 registrationSourceType.name());
     }
@@ -186,7 +186,7 @@ public class SessionManager {
     public RegistrationSourceTypes getUserLoginRegdSoure() {
         String enumString = mProjectSharedPref.getString(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE, null);
         RegistrationSourceTypes registrationSourceTypes = RegistrationSourceTypes.NONE;
-        if (enumString != null || enumString != "")
+        if (enumString != null && !enumString.isEmpty())
             registrationSourceTypes = Enum.valueOf(RegistrationSourceTypes.class, enumString);
         return registrationSourceTypes;
     }
@@ -194,6 +194,6 @@ public class SessionManager {
     private static void setValuesInSharedPrefs(String sharedPrefKey, String sharedPrefValue) {
         SharedPreferences.Editor editor = mProjectSharedPref.edit();
         editor.putString(sharedPrefKey, sharedPrefValue);
-        editor.commit();
+        editor.apply();
     }
 }

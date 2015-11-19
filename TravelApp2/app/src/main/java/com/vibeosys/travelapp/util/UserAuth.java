@@ -69,7 +69,7 @@ public class UserAuth {
         theSessionManager.setUserName(userInfo.getUserName());
         theSessionManager.setUserEmailId(userInfo.getEmailId());
         theSessionManager.setUserPhotoUrl(userInfo.getPhotoURL());
-        theSessionManager.setUserLoginRegdSoure(userInfo.getLoginSource());
+        theSessionManager.setUserLoginRegdSource(userInfo.getLoginSource());
         theSessionManager.setUserRegdApiKey(userInfo.getApiKey());
 
         updateUserDetailsOnServer(context, userInfo);
@@ -88,7 +88,7 @@ public class UserAuth {
         theSessionManager.setUserName(null);
         theSessionManager.setUserEmailId(null);
         theSessionManager.setUserPhotoUrl(null);
-        theSessionManager.setUserLoginRegdSoure(RegistrationSourceTypes.NONE);
+        theSessionManager.setUserLoginRegdSource(RegistrationSourceTypes.NONE);
         theSessionManager.setUserRegdApiKey(null);
 
         return true;
