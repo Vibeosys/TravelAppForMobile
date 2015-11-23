@@ -20,6 +20,11 @@
 -keep public class com.google.android.gms.**
 -keep class com.android.volley.toolbox.**
 -keep class android.net.http.AndroidHttpClient
+-keepclasseswithmembernames class com.vibeosys.travelapp.** { *;}
+-keep class com.google.gson.examples.android.model.** { *; }
+-keepattributes Signature
+-keep class sun.misc.Unsafe { *; }
+-dontwarn com.vibeosys.travelapp.**
 -dontwarn com.android.volley.toolbox.**
 -dontwarn com.google.android.gms.**
 -dontwarn android.support.v7.**

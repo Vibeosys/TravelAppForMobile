@@ -170,7 +170,7 @@ public class PreviewImage extends BaseActivity
         Log.i("DestinationUploadJSON", uploadJsonResponse);
 
         TravelAppError travelAppError = new Gson().fromJson(uploadJsonResponse, TravelAppError.class);
-        if (travelAppError != null && !travelAppError.getMessage().isEmpty()) {
+        if (travelAppError != null && travelAppError.getMessage() != null && !travelAppError.getMessage().isEmpty()) {
             DbImageDTO awsReceivedImage = new DbImageDTO();
             awsReceivedImage.setImageId(inputParameters.get(ImageUploadNameConstants.IMAGE_ID));
             awsReceivedImage.setImagePath(travelAppError.getMessage());

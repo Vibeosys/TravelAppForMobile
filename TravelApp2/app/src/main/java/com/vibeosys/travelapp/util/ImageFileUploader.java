@@ -26,13 +26,11 @@ import java.util.UUID;
  */
 public final class ImageFileUploader {
     private Context mContext;
-    //private Activity mActivity;
     private OnUploadCompleteListener mOnUploadCompleteListener;
     private OnUploadErrorListener mOnUploadErrorListener;
 
     public ImageFileUploader(Context context) {
         mContext = context;
-        //mActivity = activity;
     }
 
     public void uploadDestinationImage(final String filePath,
@@ -54,13 +52,7 @@ public final class ImageFileUploader {
 
     private String getBase64EncodedStringFromImage(String filePath) {
         Bitmap bitmapFile = BitmapFactory.decodeFile(filePath);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        // Must compress the Image to reduce image size to make upload easy
-        bitmapFile.compress(Bitmap.CompressFormat.PNG, 50, stream);
-        byte[] byte_arr = stream.toByteArray();
-        // Encode Image to String
-        String encodedString = Base64.encodeToString(byte_arr, 0);
-        return encodedString;
+        return getBase64EncodedStringFromImage(bitmapFile);
     }
 
     private String getBase64EncodedStringFromImage(Bitmap bitmapFile) {
