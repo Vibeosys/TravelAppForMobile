@@ -12,8 +12,8 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.vibeosys.travelapp.Options;
-import com.vibeosys.travelapp.QuestionsFromOthers;
+import com.vibeosys.travelapp.data.Options;
+import com.vibeosys.travelapp.fragments.QuestionsFromOthers;
 import com.vibeosys.travelapp.R;
 
 import java.util.ArrayList;

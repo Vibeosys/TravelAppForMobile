@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.data;
 
 /**
  * Created by mahesh on 10/17/2015.
@@ -45,6 +45,14 @@ public class Options {
 
     public String[] getmOptionText() {
         return mOptionText;
+    }
+
+    public String getOptionText(int index) {
+        return mOptionText[index];
+    }
+
+    public int getOptionId(int index) {
+        return mOptionIds[index];
     }
 
     public void setmOptionText(String mOptionText[]) {

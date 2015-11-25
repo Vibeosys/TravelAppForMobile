@@ -9,10 +9,10 @@ import java.util.List;
  * Created by mahesh on 10/20/2015.
  */
 public class Destination extends BaseDTO {
-    private int destId;
-    private String destName;
-    private double latitude;
-    private double longitude;
+    protected int destId;
+    protected String destName;
+    protected double latitude;
+    protected double longitude;
 
     public int getDestId() {
         return destId;

@@ -1,7 +1,5 @@
 package com.vibeosys.travelapp.data;
 
-import com.vibeosys.travelapp.UserDetails;
-
 /**
  * Created by mahesh on 10/20/2015.
  */

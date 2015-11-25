@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,7 +10,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.Option;
+import com.vibeosys.travelapp.data.Options;
+import com.vibeosys.travelapp.data.SendQuestionAnswers;
 import com.vibeosys.travelapp.tasks.BaseFragment;
 
 import java.util.ArrayList;
@@ -103,8 +106,8 @@ public class ScreenSlidePage extends BaseFragment {
 
         for (int i = 0; i < theRadioButtonlen; i++) {
             RadioButton theRadioButton = new RadioButton(getContext());
-            theRadioButton.setText(valueList.get(mPageNumber).mOptionText[i]);
-            theRadioButton.setId(valueList.get(mPageNumber).mOptionIds[i]);
+            theRadioButton.setText(valueList.get(mPageNumber).getOptionText(i));
+            theRadioButton.setId(valueList.get(mPageNumber).getOptionId(i));
             radioGroup.addView(theRadioButton);
         }
 

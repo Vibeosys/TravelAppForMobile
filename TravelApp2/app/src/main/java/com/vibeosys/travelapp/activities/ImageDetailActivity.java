@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
@@ -30,9 +30,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 
+import com.vibeosys.travelapp.BuildConfig;
+import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.databaseHelper.NewDataBase;
 import com.vibeosys.travelapp.fragments.ImageDetailFragment;
+import com.vibeosys.travelapp.data.usersImages;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.SessionManager;

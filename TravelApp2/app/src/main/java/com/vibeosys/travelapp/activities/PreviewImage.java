@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
+import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.DbImageDTO;
 import com.vibeosys.travelapp.data.ImageUploadDTO;
 import com.vibeosys.travelapp.data.TravelAppError;

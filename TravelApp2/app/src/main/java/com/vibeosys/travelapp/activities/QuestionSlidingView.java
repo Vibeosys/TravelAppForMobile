@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,9 @@ import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.vibeosys.travelapp.MainActivity;
+import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.fragments.ScreenSlidePage;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.TableDataDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;

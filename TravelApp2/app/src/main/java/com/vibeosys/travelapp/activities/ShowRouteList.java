@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.data.Routes;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import org.json.JSONArray;

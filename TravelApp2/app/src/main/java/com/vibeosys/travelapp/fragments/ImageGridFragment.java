@@ -37,10 +37,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.BuildConfig;
-import com.vibeosys.travelapp.ImageDetailActivity;
+import com.vibeosys.travelapp.activities.ImageDetailActivity;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.tasks.BaseFragment;
-import com.vibeosys.travelapp.usersImages;
+import com.vibeosys.travelapp.data.usersImages;
 import com.vibeosys.travelapp.util.ImageCache;
 import com.vibeosys.travelapp.util.ImageFetcher;
 import com.vibeosys.travelapp.util.Utils;

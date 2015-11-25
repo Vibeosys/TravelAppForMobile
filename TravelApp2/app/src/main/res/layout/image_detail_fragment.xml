@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
 
-        <com.vibeosys.travelapp.RecyclingImageView
+        <com.vibeosys.travelapp.view.RecyclingImageView
             android:id="@+id/usersimageView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

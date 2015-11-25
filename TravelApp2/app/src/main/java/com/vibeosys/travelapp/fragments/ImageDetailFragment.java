@@ -32,7 +32,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vibeosys.travelapp.ImageDetailActivity;
+import com.vibeosys.travelapp.activities.ImageDetailActivity;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;

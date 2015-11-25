@@ -13,7 +13,7 @@
         android:animateLayoutChanges="true"
         android:gravity="bottom|center_horizontal">
 
-        <com.vibeosys.travelapp.RoundedImageView
+        <com.vibeosys.travelapp.view.RoundedImageView
             android:id="@+id/userViewProfileImage"
             android:layout_width="70dp"
             android:layout_height="70dp"

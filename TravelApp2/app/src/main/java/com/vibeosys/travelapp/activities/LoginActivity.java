@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -21,6 +21,7 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.RegistrationSourceTypes;

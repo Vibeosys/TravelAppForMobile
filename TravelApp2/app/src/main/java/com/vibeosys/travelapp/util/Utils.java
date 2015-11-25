@@ -19,8 +19,8 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.StrictMode;
-import com.vibeosys.travelapp.ImageDetailActivity;
-import com.vibeosys.travelapp.DestinationUsersImages;
+import com.vibeosys.travelapp.activities.ImageDetailActivity;
+import com.vibeosys.travelapp.activities.DestinationUsersImages;
 
 /**
  * Class containing some static utility methods.

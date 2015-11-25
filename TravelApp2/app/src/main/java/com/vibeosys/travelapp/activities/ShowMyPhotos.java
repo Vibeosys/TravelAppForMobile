@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -6,6 +6,8 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.vibeosys.travelapp.Adaptors.ImageAdapter;
+import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.data.MyImages;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public class ShowMyPhotos extends BaseActivity {
     ListView showphoto_view;
-    List<MyImageDB> mUserImagesList = null;
+    List<MyImages> mUserImagesList = null;
     //NewDataBase newDataBase;
 
     @Override

@@ -13,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.vibeosys.travelapp.RecyclingImageView;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 

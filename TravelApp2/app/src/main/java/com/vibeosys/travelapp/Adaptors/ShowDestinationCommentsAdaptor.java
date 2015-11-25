@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vibeosys.travelapp.R;
-import com.vibeosys.travelapp.RoundedImageView;
+import com.vibeosys.travelapp.view.RoundedImageView;
 import com.vibeosys.travelapp.data.UserCommentDTO;
 
 import java.io.IOException;

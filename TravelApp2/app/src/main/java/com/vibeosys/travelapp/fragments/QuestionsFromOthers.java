@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -16,7 +16,10 @@ import android.widget.Toast;
 
 import com.vibeosys.travelapp.Adaptors.OthersQuestionsAdaptor;
 import com.vibeosys.travelapp.Adaptors.UserListAdaptor;
+import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.Like;
+import com.vibeosys.travelapp.data.Options;
+import com.vibeosys.travelapp.data.SendQuestionAnswers;
 import com.vibeosys.travelapp.data.TableDataDTO;
 import com.vibeosys.travelapp.data.UserLikeDTO;
 import com.vibeosys.travelapp.tasks.BaseFragment;

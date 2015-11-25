@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.activities;
 
 import android.app.Dialog;
 import android.app.TaskStackBuilder;
@@ -20,7 +20,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.vibeosys.travelapp.activities.ShowDestinationDetailsMain;
+import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.data.DestLatLong;
+import com.vibeosys.travelapp.data.Routes;
+import com.vibeosys.travelapp.data.SendQuestionAnswers;
 import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 
@@ -92,19 +95,19 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        List<LatLong> theLatLongList = new ArrayList<>();
-        LatLong theLatLong;
+        //List<LatLong> theLatLongList = new ArrayList<>();
+        //LatLong theLatLong;
         LatLng theCurrentLatLong = null;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000), 5));
 
         for(DestLatLong theDestLatLong : mDestinationLatLongs)
         {
-            theLatLong = new LatLong();
+            //theLatLong = new LatLong();
             //DestLatLong theDestLatLong = entry.getValue();
-            theLatLong.setmLat(theDestLatLong.getLatitude());
-            theLatLong.setmLong(theDestLatLong.getLongitude());
+            //theLatLong.setmLat(theDestLatLong.getLatitude());
+            //theLatLong.setmLong(theDestLatLong.getLongitude());
             theCurrentLatLong = new LatLng(theDestLatLong.getLatitude(), theDestLatLong.getLongitude());
-            theLatLongList.add(theLatLong);
+            //theLatLongList.add(theLatLong);
             googleMap.addMarker(new MarkerOptions().position(theCurrentLatLong).title(theDestLatLong.getmDestName()));
         }
 /*

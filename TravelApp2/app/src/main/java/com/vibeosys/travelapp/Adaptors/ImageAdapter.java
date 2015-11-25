@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.vibeosys.travelapp.MyImageDB;
 import com.vibeosys.travelapp.R;
+import com.vibeosys.travelapp.data.MyImages;
 import com.vibeosys.travelapp.view.LoaderImageView;
 
 import java.util.List;
@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
-    private List<MyImageDB> myImageDBs;
+    private List<MyImages> myImageDBs;
 
-    public ImageAdapter(Context context, List<MyImageDB> myimages) {
+    public ImageAdapter(Context context, List<MyImages> myimages) {
         mContext = context;
         myImageDBs = myimages;
     }

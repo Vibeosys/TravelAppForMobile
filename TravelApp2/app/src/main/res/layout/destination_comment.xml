@@ -13,7 +13,7 @@
         android:paddingRight="10dp"
         android:paddingTop="15dp">
 
-        <com.vibeosys.travelapp.RoundedImageView
+        <com.vibeosys.travelapp.view.RoundedImageView
             android:id="@+id/userimagedest"
             android:layout_width="50dp"
             android:layout_height="50dp"

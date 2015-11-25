@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.vibeosys.travelapp.MainActivity;
 import com.vibeosys.travelapp.R;
-import com.vibeosys.travelapp.RoundedImageView;
+import com.vibeosys.travelapp.view.RoundedImageView;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.SessionManager;
 

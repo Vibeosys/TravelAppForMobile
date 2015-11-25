@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

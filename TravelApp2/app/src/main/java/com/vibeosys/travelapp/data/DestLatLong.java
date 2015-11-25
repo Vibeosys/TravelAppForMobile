@@ -1,4 +1,4 @@
-package com.vibeosys.travelapp;
+package com.vibeosys.travelapp.data;
 
 /**
  * Created by mahesh on 10/3/2015.
@@ -17,7 +17,7 @@ public class DestLatLong {
     private double latitude;
     private double longitude;
 
-    DestLatLong() {
+    public DestLatLong() {
 
     }
 

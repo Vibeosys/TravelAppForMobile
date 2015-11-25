@@ -10,26 +10,26 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.vibeosys.travelapp.DestinationTempData;
-import com.vibeosys.travelapp.GetTemp;
-import com.vibeosys.travelapp.MyDestination;
-import com.vibeosys.travelapp.MyImageDB;
-import com.vibeosys.travelapp.Routes;
-import com.vibeosys.travelapp.SendQuestionAnswers;
-import com.vibeosys.travelapp.TempData;
+import com.vibeosys.travelapp.data.GetTemp;
+import com.vibeosys.travelapp.data.Routes;
+import com.vibeosys.travelapp.data.SendQuestionAnswers;
+import com.vibeosys.travelapp.data.TempData;
 import com.vibeosys.travelapp.data.Answer;
 import com.vibeosys.travelapp.data.Comment;
 import com.vibeosys.travelapp.data.DbImageDTO;
 import com.vibeosys.travelapp.data.DbUserDTO;
+import com.vibeosys.travelapp.data.Destination;
+import com.vibeosys.travelapp.data.DestinationTempData;
 import com.vibeosys.travelapp.data.Images;
 import com.vibeosys.travelapp.data.Like;
+import com.vibeosys.travelapp.data.MyImages;
 import com.vibeosys.travelapp.data.Option;
 import com.vibeosys.travelapp.data.Question;
 import com.vibeosys.travelapp.data.Sync;
 import com.vibeosys.travelapp.data.User;
 import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.data.UserLikeDTO;
-import com.vibeosys.travelapp.usersImages;
+import com.vibeosys.travelapp.data.usersImages;
 import com.vibeosys.travelapp.util.SessionManager;
 
 import java.util.ArrayList;
@@ -876,8 +876,8 @@ public class NewDataBase extends SQLiteOpenHelper {
         }
     }
 
-    public List<MyImageDB> getMyPhotos() {
-        List<MyImageDB> theUserImagesList = new ArrayList<>();
+    public List<MyImages> getMyPhotos() {
+        List<MyImages> theUserImagesList = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         //SimpleDateFormat sdf = new SimpleDateFormat();
@@ -889,7 +889,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                     //String sDate = cursor.getString(cursor.getColumnIndex("CreateDate"));
                     //Date imageDate= sdf.parse(sDate);
 
-                    MyImageDB theMyImages = new MyImageDB();
+                    MyImages theMyImages = new MyImages();
                     theMyImages.setmImageId(cursor.getInt(cursor.getColumnIndex("ImageId")));
                     theMyImages.setmImagePath(cursor.getString(cursor.getColumnIndex("ImagePath")));
                     theMyImages.setmCreatedDate(cursor.getString(cursor.getColumnIndex("CreateDate")));
@@ -1155,21 +1155,21 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
 
-    public List<MyDestination> GetFromTempLatLong() {
-        List<MyDestination> mGetTempList = new ArrayList<>();
+    public List<Destination> GetFromTempLatLong() {
+        List<Destination> mGetTempList = new ArrayList<>();
         SQLiteDatabase mGetFromTemp = getReadableDatabase();
-        MyDestination mgetTemp;
+        Destination mgetTemp;
         try {
             Cursor metTempCursor = mGetFromTemp.rawQuery("select * from TempData", null);
             metTempCursor.moveToFirst();
             if (metTempCursor.getCount() > 0) {
                 do {
-                    mgetTemp = new MyDestination();
+                    mgetTemp = new Destination();
                     // mgetTemp.setDestId(metTempCursor.getInt(metTempCursor.getColumnIndex("DestId")));
                     mgetTemp.setDestName(metTempCursor.getString(metTempCursor.getColumnIndex("DestName")));
                     //mgetTemp.setId(metTempCursor.getInt(metTempCursor.getColumnIndex("Id")));
-                    mgetTemp.setLat(metTempCursor.getDouble(metTempCursor.getColumnIndex("Lat")));
-                    mgetTemp.setLong(metTempCursor.getDouble(metTempCursor.getColumnIndex("Long")));
+                    mgetTemp.setLatitude(metTempCursor.getDouble(metTempCursor.getColumnIndex("Lat")));
+                    mgetTemp.setLongitude(metTempCursor.getDouble(metTempCursor.getColumnIndex("Long")));
                     mGetTempList.add(mgetTemp);
                 } while (metTempCursor.moveToNext());
                 metTempCursor.close();

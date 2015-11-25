@@ -4,7 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.astuetz.PagerSlidingTabStrip;
-import com.vibeosys.travelapp.QuestionsFromOthers;
+import com.vibeosys.travelapp.fragments.QuestionsFromOthers;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.activities.DestinationComments;
 import com.vibeosys.travelapp.fragments.ImageGridFragment;
