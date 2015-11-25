@@ -3,6 +3,7 @@ package com.vibeosys.travelapp.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,31 +23,22 @@ import com.vibeosys.travelapp.util.DbTableNameConstants;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.UserAuth;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by mahesh on 10/15/2015.
  */
-public class DestinationComments extends BaseFragment implements View.OnClickListener {
-    ListView mDestinationCommentListView;
-    List<UserCommentDTO> mDestinationComments = null;
-    //NewDataBase newDataBase = null;
-    EditText editTextCommentByUser;
-    Button submitBtn;
-    List<Comment> listComment;
-    int DestId;
-    //String UserId;
-    //String UserName;
-    //List<Sync> syncDataToUpload = null;
-    ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
+public class DestinationComments extends BaseFragment
+        implements View.OnClickListener {
 
-    //protected SessionManager sessionManager=SessionManager.Instance();
+    private List<UserCommentDTO> mDestinationComments = null;
+    private EditText editTextCommentByUser;
+    private int DestId;
+    private ShowDestinationCommentsAdaptor showDestinationCommentsAdaptor;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Nullable
@@ -54,22 +46,17 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.destination_comment_listview, null);
-        mDestinationCommentListView = (ListView) view.findViewById(R.id.commenntlistview);
-        submitBtn = (Button) view.findViewById(R.id.submitButton);
-        submitBtn.setOnClickListener(this);
-        mDestinationComments = new ArrayList<>();
+        ListView mDestinationCommentListView = (ListView) view.findViewById(R.id.commenntlistview);
+        Button submitBtn = (Button) view.findViewById(R.id.submitButton);
 
+        submitBtn.setOnClickListener(this);
         DestId = getActivity().getIntent().getExtras().getInt("DestId");
         Log.d("DestId Comments", "" + DestId);
         editTextCommentByUser = (EditText) view.findViewById(R.id.commnetbyUser);
-        //newDataBase = new NewDataBase(getActivity());
-        mDestinationComments = new ArrayList<>();
-        listComment = new ArrayList<>();
         mDestinationComments = mNewDataBase.getDestinationComments(DestId);
 
         Log.d("DestinationComment", String.valueOf(mDestinationComments.size()));
-        //UserId = SessionManager.Instance().getUserId();
-        //UserName = SessionManager.Instance().getUserName();
+
         showDestinationCommentsAdaptor = new ShowDestinationCommentsAdaptor(getActivity(), mDestinationComments);
         mDestinationCommentListView.setAdapter(showDestinationCommentsAdaptor);
         return view;
@@ -81,16 +68,17 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
         if (!UserAuth.isUserLoggedIn(this.getContext()))
             return;
 
-        //int Destinatinid = DestId;
-        if (editTextCommentByUser.getText().toString().length() > 0 && editTextCommentByUser.getText().toString() != null) {
-            String comment = editTextCommentByUser.getText().toString();
+        Editable commentByUserText = editTextCommentByUser.getText();
+
+        if (!commentByUserText.toString().isEmpty()) {
+            String comment = commentByUserText.toString();
             UploadComment(DestId, mSessionManager.getUserId(), comment);
 
             Comment comment1 = new Comment();
             comment1.setUserId(mSessionManager.getUserId());
             comment1.setCommentText(comment);
             comment1.setDestId(DestId);
-            //listComment.add(comment1);
+
             mNewDataBase.insertOrUpdateComment(comment1);
             mDestinationComments.clear();
             mDestinationComments = mNewDataBase.getDestinationComments(DestId);
@@ -99,7 +87,6 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
             editTextCommentByUser.clearAnimation();
             editTextCommentByUser.clearFocus();
 
-            // Toast.makeText(getApplicationContext(), "Enterted comement" + editTextCommentByUser.getText().toString(), Toast.LENGTH_SHORT).show();
         } else {
             editTextCommentByUser.setError("Please Enter some Text");
         }
@@ -107,28 +94,16 @@ public class DestinationComments extends BaseFragment implements View.OnClickLis
     }
 
 
-    private void UploadComment(int destinatinid, String userId, String comment) {
+    private void UploadComment(int destId, String userId, String comment) {
         Comment comment1 = new Comment();
         comment1.setCommentText(comment);
-        comment1.setDestId(destinatinid);
+        comment1.setDestId(destId);
         comment1.setUserId(userId);
         Gson gson = new Gson();
 
         String serializedJsonString = gson.toJson(comment1);
 
-        //ArrayList<TableDataDTO> tableDataList = new ArrayList<TableDataDTO>();
-
-        //tableDataList.add(new TableDataDTO(DbTableNameConstants.COMMENT, serializedJsonString, null));
-        //String EmailId = SessionManager.Instance().getUserEmailId();
-        //Log.d("EmailId", "" + EmailId);
-        //String uploadData = gson.toJson(new Upload(new UploadUser(userId, EmailId), tableDataList));
-
-        //Log.d("Uploading", uploadData.toString());
-
         if (NetworkUtils.isActiveNetworkAvailable(getActivity())) {
-
-            //super.UploadUserDetails();
-            //newDataBase.getFromSync();
             TableDataDTO tableDataDTO = new TableDataDTO(DbTableNameConstants.COMMENT, serializedJsonString, null);
             mServerSyncManager.uploadDataToServer(tableDataDTO);
 

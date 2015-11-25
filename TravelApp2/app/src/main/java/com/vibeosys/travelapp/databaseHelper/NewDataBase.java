@@ -631,12 +631,11 @@ public class NewDataBase extends SQLiteOpenHelper {
     }
 
     public List<UserCommentDTO> getDestinationComments(int DestId) {
-        List<UserCommentDTO> DestComments = null;
+        List<UserCommentDTO> destComments = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = null;
         Cursor cursor = null;
         try {
             sqLiteDatabase = getReadableDatabase();
-            DestComments = new ArrayList<>();
             cursor = sqLiteDatabase.rawQuery("select user.userid, user.userName, user.photourl, comment_and_like.commentText, comment_and_like.destid " +
                             "from comment_and_like inner join user " +
                             " on comment_and_like.userid = user.userid where destid=?",
@@ -651,7 +650,7 @@ public class NewDataBase extends SQLiteOpenHelper {
                         commentsAndLikes.setCommentText(cursor.getString(3));
                         commentsAndLikes.setUserName(cursor.getString(1));
                         commentsAndLikes.setUserPhotoUrl(cursor.getString(2));
-                        DestComments.add(commentsAndLikes);
+                        destComments.add(commentsAndLikes);
 
                     } while (cursor.moveToNext());
                 }
@@ -664,7 +663,7 @@ public class NewDataBase extends SQLiteOpenHelper {
             if (sqLiteDatabase != null)
                 sqLiteDatabase.close();
         }
-        return DestComments;
+        return destComments;
     }
 
     public int getQuestions() {
