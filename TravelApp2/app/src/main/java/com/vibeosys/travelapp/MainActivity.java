@@ -48,6 +48,7 @@ import com.vibeosys.travelapp.activities.ViewProfileActivity;
 import com.vibeosys.travelapp.data.DeviceBuildInfo;
 import com.vibeosys.travelapp.data.GetTemp;
 import com.vibeosys.travelapp.data.TempData;
+import com.vibeosys.travelapp.service.SyncService;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.NetworkUtils;
 import com.vibeosys.travelapp.util.UserAuth;
@@ -119,6 +120,9 @@ public class MainActivity extends BaseActivity
             toast.setView(view);//setting the view of custom toast layout
             toast.show();
         }
+
+        Intent syncServiceIntent = new Intent(Intent.ACTION_SYNC, null, this, SyncService.class);
+        startService(syncServiceIntent);
 
         setContentView(R.layout.activity_main);
 

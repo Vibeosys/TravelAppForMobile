@@ -133,6 +133,10 @@
         <activity
             android:name=".activities.ViewProfileActivity"
             android:parentActivityName=".MainActivity"></activity>
+
+        <service
+            android:name=".service.SyncService"
+            android:exported="false" />
     </application>
 
 </manifest>

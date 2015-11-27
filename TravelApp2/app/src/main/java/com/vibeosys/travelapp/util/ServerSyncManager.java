@@ -2,6 +2,7 @@ package com.vibeosys.travelapp.util;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -33,8 +34,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by anand on 07-11-2015.
@@ -46,12 +49,13 @@ public class ServerSyncManager
     private SessionManager mSessionManager;
     private Context mContext;
     private boolean mIsWorkInProgress;
+    private OnDownloadReceived mOnDownloadReceived;
 
     public ServerSyncManager() {
 
     }
 
-    public ServerSyncManager(Context context, SessionManager sessionManager) {
+    public ServerSyncManager(@NonNull Context context, @NonNull SessionManager sessionManager) {
         mContext = context;
         mSessionManager = sessionManager;
         mNewDataBase = new NewDataBase(mContext, mSessionManager);
@@ -109,6 +113,10 @@ public class ServerSyncManager
 
     public boolean isDownloadInProgress() {
         return mIsWorkInProgress;
+    }
+
+    public void setOnDownloadReceived(OnDownloadReceived onDownloadReceived) {
+        mOnDownloadReceived = onDownloadReceived;
     }
 
     private String prepareUploadJsonFromData(TableDataDTO... params) {
@@ -201,6 +209,7 @@ public class ServerSyncManager
         }
 
         Log.d("TableDataDTO", "" + downloadData.toString());
+        HashMap<String, Integer> downloadResults = new HashMap<>();
         //Log.d("TableDataDTO Size", "" + downloadDTO.getTableData().size());
         Hashtable<String, TableJsonCollectionDTO> theTableData = new Hashtable<>();
         for (TableDataDTO tableData : downloadData.getTableData()) {
@@ -224,11 +233,15 @@ public class ServerSyncManager
 
         if (theTableData.containsKey(DbTableNameConstants.DESTINATION)) {
             TableJsonCollectionDTO tableValue = theTableData.get(DbTableNameConstants.DESTINATION);
-            dbOperations.addOrUpdateDestinations(tableValue.getInsertJsonList(), tableValue.getUpdateJsonList());
+            ArrayList<String> jsonInsertList = tableValue.getInsertJsonList();
+            downloadResults.put(DbTableNameConstants.DESTINATION, jsonInsertList.size());
+            dbOperations.addOrUpdateDestinations(jsonInsertList, tableValue.getUpdateJsonList());
         }
 
         if (theTableData.containsKey(DbTableNameConstants.USER)) {
             TableJsonCollectionDTO tableValue = theTableData.get(DbTableNameConstants.USER);
+            ArrayList<String> jsonInsertList = tableValue.getInsertJsonList();
+            downloadResults.put(DbTableNameConstants.USER, jsonInsertList.size());
             dbOperations.addOrUpdateUsers(tableValue.getInsertJsonList(), tableValue.getUpdateJsonList());
         }
 
@@ -261,6 +274,9 @@ public class ServerSyncManager
             TableJsonCollectionDTO tableValue = theTableData.get(DbTableNameConstants.ANSWER);
             dbOperations.addOrUpdateAnswers(tableValue.getInsertJsonList());
         }
+
+        if (mOnDownloadReceived != null)
+            mOnDownloadReceived.onDownloadResultReceived(downloadResults);
 
         mIsWorkInProgress = false;
     }
@@ -325,6 +341,10 @@ public class ServerSyncManager
                 mProgressDialog.show();
             }*/
         }
+    }
+
+    public interface OnDownloadReceived {
+        void onDownloadResultReceived(@NonNull Map<String, Integer> results);
     }
 
 }

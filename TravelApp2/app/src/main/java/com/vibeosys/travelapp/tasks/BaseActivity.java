@@ -61,11 +61,6 @@ public abstract class BaseActivity extends AppCompatActivity
     //Google Plus
     protected boolean mIsResolving = false;
     protected boolean mShouldResolve = false;
-
-
-    //private int id;
-    //protected ProgressDialog mProgressDialog = null;
-
     protected final static String TAG = "com.vibeosys";
 
     @Override
@@ -76,23 +71,6 @@ public abstract class BaseActivity extends AppCompatActivity
         mServerSyncManager = new ServerSyncManager(getApplicationContext(), mSessionManager);
         mNewDataBase = new NewDataBase(getApplicationContext(), mSessionManager);
     }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-
-        if (mServerSyncManager != null && !mServerSyncManager.isDownloadInProgress())
-            mServerSyncManager.downloadDataFromServer(false);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (mServerSyncManager != null && !mServerSyncManager.isDownloadInProgress())
-            mServerSyncManager.downloadDataFromServer(false);
-    }
-
 
     protected static void setProfileInfoInNavigationBar(View view) {
         // After successful Login
