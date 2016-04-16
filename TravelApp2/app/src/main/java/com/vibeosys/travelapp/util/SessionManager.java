@@ -178,6 +178,10 @@ public class SessionManager {
         return mProjectSharedPref.getString(PropertyTypeConstants.USER_REGD_API_KEY, null);
     }
 
+    public boolean getIsSendData() {
+        return mProjectSharedPref.getBoolean(PropertyTypeConstants.IS_SEND_DATA, false);
+    }
+
     public void setUserLoginRegdSource(RegistrationSourceTypes registrationSourceType) {
         setValuesInSharedPrefs(PropertyTypeConstants.USER_LOGIN_REGD_SOURCE,
                 registrationSourceType.name());

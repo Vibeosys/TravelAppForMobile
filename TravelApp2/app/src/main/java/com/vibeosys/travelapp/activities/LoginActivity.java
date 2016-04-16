@@ -2,13 +2,20 @@ package com.vibeosys.travelapp.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -21,8 +28,11 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.vibeosys.travelapp.R;
 import com.vibeosys.travelapp.data.User;
+import com.vibeosys.travelapp.gcmutils.RegistrationIntentService;
 import com.vibeosys.travelapp.tasks.BaseActivity;
 import com.vibeosys.travelapp.util.RegistrationSourceTypes;
 import com.vibeosys.travelapp.util.SessionManager;
@@ -40,6 +50,10 @@ import java.util.Arrays;
 public class LoginActivity
         extends BaseActivity
         implements UserAuth.OnUpdateUserResultReceived, View.OnClickListener {
+    private ProgressBar mRegistrationProgressBar;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private boolean isReceiverRegistered;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     public LoginActivity() {
         // Required empty public constructor
@@ -56,6 +70,29 @@ public class LoginActivity
         googlePlusAPIInit();
 
         setContentView(R.layout.login_layout);
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean("IsSendData", false);
+                if (sentToken) {
+                    //mInformationTextView.setText("message send");
+                } else {
+                    // mInformationTextView.setText("error at message");
+                }
+            }
+        };
+
+        registerReceiver();
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
 
         //GooglePlus Authentication after clicking button
         findViewById(R.id.btn_GPLogin).setOnClickListener(new View.OnClickListener() {
@@ -92,7 +129,7 @@ public class LoginActivity
                 String nameText = nameTextView.getText().toString();
 
                 if (emailText.isEmpty() || nameText.isEmpty()) {
-                    createAlertDialog("OTP","Email address and Display name is compulsory");
+                    createAlertDialog("OTP", "Email address and Display name is compulsory");
                     return;
                 }
 
@@ -120,6 +157,26 @@ public class LoginActivity
         LoginManager.getInstance().logInWithReadPermissions(act, Arrays.asList("public_profile", "user_friends", "email"));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        isReceiverRegistered = false;
+        super.onPause();
+    }
+
+    private void registerReceiver() {
+        if (!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter("RegistrationComplete"));
+            isReceiverRegistered = true;
+        }
+    }
 
     public void facebookLoginAPIInit(final Context cx) {
         FacebookSdk.sdkInitialize(cx);
@@ -174,7 +231,7 @@ public class LoginActivity
                                     public void onUpdateUserResult(int errorCode) {
                                         //if (errorCode == 0) {
                                         //    downloadImgFromFbGPlusAndUploadToAws(profilePic.toString());
-                                            //progressDialog.dismiss();
+                                        //progressDialog.dismiss();
                                         //}
                                     }
                                 }
@@ -247,7 +304,7 @@ public class LoginActivity
         emailIdTextView.setEnabled(false);
         nameTextView.setEnabled(false);
         if (otpText.isEmpty()) {
-            createAlertDialog("OTP","OTP cannot be left blank");
+            createAlertDialog("OTP", "OTP cannot be left blank");
             return;
         }
 
@@ -262,5 +319,21 @@ public class LoginActivity
         UserAuth userAuth = new UserAuth();
         userAuth.saveAuthenticationInfo(theUser, v.getContext());
         userAuth.setOnUpdateUserResultReceived(this);
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "##This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 }

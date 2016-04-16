@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -39,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -62,6 +64,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected boolean mIsResolving = false;
     protected boolean mShouldResolve = false;
     protected final static String TAG = "com.vibeosys";
+    private static ImageView userProfileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,14 +80,14 @@ public abstract class BaseActivity extends AppCompatActivity
 
         TextView userName = (TextView) view.findViewById(R.id.userName);
         TextView userEmail = (TextView) view.findViewById(R.id.userEmailID);
-        ImageView userProfileImage = (ImageView) view.findViewById(R.id.userProfileImage);
+        userProfileImage = (ImageView) view.findViewById(R.id.userProfileImage);
 
         //Setting values from JSON Object
         userName.setText(SessionManager.Instance().getUserName());
         userEmail.setText(SessionManager.Instance().getUserEmailId());
 
         if (mSessionManager.getUserPhotoUrl() != null && !mSessionManager.getUserPhotoUrl().isEmpty()) {
-            downloadImageAsync(mSessionManager.getUserPhotoUrl(), userProfileImage);
+            new LoadProfileImage(userProfileImage).execute(mSessionManager.getUserPhotoUrl());
         }
     }
 
@@ -165,10 +168,10 @@ public abstract class BaseActivity extends AppCompatActivity
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API)
-                .addScope(new Scope(Scopes.PROFILE))
-                .addScope(new Scope(Scopes.PLUS_LOGIN))
-                .addScope(new Scope(Scopes.EMAIL))
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
                 .build();
+        //.addScope(new Scope(Scopes.EMAIL))
+
     }
 
     protected void facebookLogout() {
@@ -230,15 +233,16 @@ public abstract class BaseActivity extends AppCompatActivity
                 String name = currentPerson.getDisplayName();
                 String imageURL = currentPerson.getImage().getUrl();
                 String gId = currentPerson.getId();
-                /*imageURL = imageURL.substring(0,
+                imageURL = imageURL.substring(0,
                         imageURL.length() - 2)
-                        + 150;*/
+                        + 150;
 
-                downloadImgFromFbGPlusAndUploadToAws(imageURL);
-
+                // downloadImgFromFbGPlusAndUploadToAws(imageURL);
+                new LoadProfileImage(userProfileImage).execute(imageURL);
                 theUser.setUserName(name);
                 theUser.setThirdPartyUserId(gId);
-
+                theUser.setPhotoURL(imageURL);
+                progressDialog.dismiss();
             } else {
                 theUser.setUserName(userEmailId.substring(0, userEmailId.indexOf("@")));
 
@@ -252,7 +256,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     //{
                     finish();
                     //}
-                    progressDialog.dismiss();
+
                 }
             });
 
@@ -348,6 +352,34 @@ public abstract class BaseActivity extends AppCompatActivity
                         // whatever...
                     }
                 }).create().show();
+    }
+
+    /**
+     * Background Async task to load user profile picture from url
+     */
+    private static class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public LoadProfileImage(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 
 }
