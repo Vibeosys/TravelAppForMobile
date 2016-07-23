@@ -5,16 +5,21 @@ import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -26,6 +31,7 @@ import com.vibeosys.travelapp.data.Routes;
 import com.vibeosys.travelapp.data.SendQuestionAnswers;
 import com.vibeosys.travelapp.data.UserCommentDTO;
 import com.vibeosys.travelapp.tasks.BaseActivity;
+import com.vibeosys.travelapp.tasks.BaseFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,70 +44,55 @@ import java.util.List;
 /**
  * Created by mahesh on 10/12/2015.
  */
-public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback {
+public class ShowRoutesOnMap extends BaseFragment implements OnMapReadyCallback {
     //NewDataBase newDataBase;
     List<Routes> mRouteList;
     //HashMap<Integer, DestLatLong> mHashMapRoutes;
     ArrayList<DestLatLong> mDestinationLatLongs;
     HashMap<String, Integer> mDestinationNames = new HashMap<>();
 
-    @Override
+   /* @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.showroutes);
         //newDataBase = new NewDataBase(ShowRoutesOnMap.this);
-        Intent mIntent = getIntent();
+
+    }*/
+
+    SupportMapFragment mapFragment;
+    GoogleMap map;
+    MapView mapView;
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.showroutes, container, false);
+        Intent mIntent = getActivity().getIntent();
         mDestinationNames = mNewDataBase.getDestNames();
-
+        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        MapsInitializer.initialize(getActivity());
         String mRouteName = mIntent.getStringExtra("theRouteName");
-        setTitle(mRouteName);
-        Routes mRoute = mNewDataBase.getRoute(mRouteName);
-
+        //setTitle(mRouteName);
         //mHashMapRoutes = new HashMap<>();
-        mDestinationLatLongs = new ArrayList<>();
+
         //for (int i = 0; i < mRouteList.size(); i++) {
         //if (mRouteName.equals(mRouteList.get(i).getmRouteName())) {
-            JSONArray theJsonArray;
-            JSONObject jsonObject;
-            DestLatLong mDestLatLong;
-            try {
-                theJsonArray = new JSONArray(mRoute.getmRoutetripsNames());
-                Log.d("SHOWROUTELIST :- JSON", theJsonArray.toString());
-                for (int j = 0; j < theJsonArray.length(); j++) {
-                    jsonObject = theJsonArray.getJSONObject(j);
-                    mDestLatLong = new DestLatLong();
-                    mDestLatLong.setLatitude(jsonObject.getDouble("Lat"));
-                    mDestLatLong.setLongitude(jsonObject.getDouble("Long"));
-                    mDestLatLong.setmDestName(jsonObject.getString("DestName"));
-                    //int id = jsonObject.getInt("Id");
-                    //mHashMapRoutes.put(id, mDestLatLong);
-                    mDestinationLatLongs.add(mDestLatLong);
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (NullPointerException er) {
-                er.printStackTrace();
-            }
-            //}
+        updateArticleView(mRouteName);
         //}
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapNameText);
-        mapFragment.getMapAsync(this);
-
+        //}
+        return v;
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         //List<LatLong> theLatLongList = new ArrayList<>();
         //LatLong theLatLong;
+        googleMap.clear();
         LatLng theCurrentLatLong = null;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.0000, 78.0000), 5));
 
-        for(DestLatLong theDestLatLong : mDestinationLatLongs)
-        {
+        for (DestLatLong theDestLatLong : mDestinationLatLongs) {
             //theLatLong = new LatLong();
             //DestLatLong theDestLatLong = entry.getValue();
             //theLatLong.setmLat(theDestLatLong.getLatitude());
@@ -132,12 +123,12 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
 
         }*/
 
-      googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
             @Override
             public boolean onMarkerClick(final Marker marker) {
-                final Dialog dlg = new Dialog(ShowRoutesOnMap.this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-                View view = getLayoutInflater().inflate(R.layout.activity_location_details, null);
+                final Dialog dlg = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+                View view = getActivity().getLayoutInflater().inflate(R.layout.activity_location_details, null);
                 dlg.setContentView(view);
                 dlg.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                 //view = getLayoutInflater().inflate(R.layout.info_window_layout, null);
@@ -149,7 +140,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 detailsLable.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent startMoreDetailsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        Intent startMoreDetailsActivitty = new Intent(getContext(), ShowDestinationDetailsMain.class);
                         startMoreDetailsActivitty.putExtra("DestId", mDestId);
                         startMoreDetailsActivitty.putExtra("DestName", marker.getTitle());
                         startActivity(startMoreDetailsActivitty);
@@ -162,7 +153,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 sendPhotos.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent startPhotosActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        Intent startPhotosActivitty = new Intent(getContext(), ShowDestinationDetailsMain.class);
                         startPhotosActivitty.putExtra("DestId", mDestId);
                         startPhotosActivitty.putExtra("DestName", marker.getTitle());
                         startPhotosActivitty.putExtra("Id", 0);
@@ -173,7 +164,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 sendMessages.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent startSendMessagesActivitty = new Intent(getApplicationContext(), QuestionSlidingView.class);
+                        Intent startSendMessagesActivitty = new Intent(getContext(), QuestionSlidingView.class);
                         startSendMessagesActivitty.putExtra("DestId", mDestId);
                         startSendMessagesActivitty.putExtra("DestName", marker.getTitle());
                         startActivity(startSendMessagesActivitty);
@@ -183,7 +174,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 sendReviews.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent startReviewsActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        Intent startReviewsActivitty = new Intent(getContext(), ShowDestinationDetailsMain.class);
                         startReviewsActivitty.putExtra("DestId", mDestId);
                         startReviewsActivitty.putExtra("DestName", marker.getTitle());
                         startReviewsActivitty.putExtra("Id", 3);
@@ -194,7 +185,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 commentsrowLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent startCommentActivitty = new Intent(getApplicationContext(), ShowDestinationDetailsMain.class);
+                        Intent startCommentActivitty = new Intent(getContext(), ShowDestinationDetailsMain.class);
                         startCommentActivitty.putExtra("DestId", mDestId);
                         startCommentActivitty.putExtra("DestName", marker.getTitle());
                         startCommentActivitty.putExtra("Id", 1);
@@ -229,7 +220,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
 
                                                                            @Override
                                                                            public void onClick(View v) {
-                                                                               Intent theIntent = new Intent(ShowRoutesOnMap.this, GridViewPhotos.class);
+                                                                               Intent theIntent = new Intent(getContext(), GridViewPhotos.class);
                                                                                theIntent.putExtra("DestId", mDestId);
                                                                                startActivity(theIntent);
                                                                            }
@@ -251,10 +242,37 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
             }
 
         });
-
+        mapView.onResume();
     }
 
-    @Override
+    public void updateArticleView(String position) {
+        mDestinationLatLongs = new ArrayList<>();
+        Routes mRoute = mNewDataBase.getRoute(position);
+        JSONArray theJsonArray;
+        JSONObject jsonObject;
+        DestLatLong mDestLatLong;
+        try {
+            theJsonArray = new JSONArray(mRoute.getmRoutetripsNames());
+            Log.d("SHOWROUTELIST :- JSON", theJsonArray.toString());
+            for (int j = 0; j < theJsonArray.length(); j++) {
+                jsonObject = theJsonArray.getJSONObject(j);
+                mDestLatLong = new DestLatLong();
+                mDestLatLong.setLatitude(jsonObject.getDouble("Lat"));
+                mDestLatLong.setLongitude(jsonObject.getDouble("Long"));
+                mDestLatLong.setmDestName(jsonObject.getString("DestName"));
+                //int id = jsonObject.getInt("Id");
+                //mHashMapRoutes.put(id, mDestLatLong);
+                mDestinationLatLongs.add(mDestLatLong);
+            }
+            mapView.getMapAsync(this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (NullPointerException er) {
+            er.printStackTrace();
+        }
+    }
+
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -266,7 +284,7 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
                 TaskStackBuilder.create(this)
                         // Add all of this activity's parents to the back stack
                         .addNextIntentWithParentStack(upIntent)
-                                // Navigate up to the closest parent
+                        // Navigate up to the closest parent
                         .startActivities();
             } else {
                 // This activity is part of this app's task, so simply
@@ -277,5 +295,5 @@ public class ShowRoutesOnMap extends BaseActivity implements OnMapReadyCallback 
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 }

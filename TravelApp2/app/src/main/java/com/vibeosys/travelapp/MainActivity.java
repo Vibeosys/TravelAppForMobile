@@ -388,6 +388,7 @@ public class MainActivity extends BaseActivity
 
         String buildInfo64Based = getBuild64BasedInfo();
         UUID uuid = UUID.randomUUID();
+
         mSessionManager.setUserId(uuid.toString());
         String downloadDBURL = mSessionManager.getDownloadDbUrl(mSessionManager.getUserId()) + "&info=" + buildInfo64Based;
 
