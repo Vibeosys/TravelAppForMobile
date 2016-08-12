@@ -72,7 +72,8 @@ public class ShowRoutesOnMap extends BaseFragment implements OnMapReadyCallback 
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         MapsInitializer.initialize(getActivity());
-        String mRouteName = mIntent.getStringExtra("theRouteName");
+        Bundle bundle = this.getArguments();
+        String mRouteName = bundle.getString("theRouteName");
         //setTitle(mRouteName);
         //mHashMapRoutes = new HashMap<>();
 
