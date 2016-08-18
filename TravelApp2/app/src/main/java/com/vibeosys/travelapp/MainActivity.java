@@ -352,6 +352,7 @@ public class MainActivity extends BaseActivity
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    getPermissionsForReadWriteStorage(PERMISSION_REQUEST_MEDIA_TYPE_IMAGE);
                                     Intent theIntent = new Intent(MainActivity.this, GridViewPhotos.class);
                                     theIntent.putExtra("DestId", mDestId);
                                     startActivity(theIntent);

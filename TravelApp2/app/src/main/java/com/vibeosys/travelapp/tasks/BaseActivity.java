@@ -1,16 +1,20 @@
 package com.vibeosys.travelapp.tasks;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,9 +26,7 @@ import com.android.volley.VolleyError;
 import com.facebook.CallbackManager;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.vibeosys.travelapp.R;
@@ -65,6 +67,8 @@ public abstract class BaseActivity extends AppCompatActivity
     protected boolean mShouldResolve = false;
     protected final static String TAG = "com.vibeosys";
     private static ImageView userProfileImage;
+    protected static final int PERMISSION_REQUEST_MEDIA_TYPE_IMAGE = 21;
+    protected static final int PERMISSION_REQUEST_CAMERA = 22;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -382,4 +386,64 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
+    protected void getPermissionsForReadWriteStorage(int requestCode) {
+        if (checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                && checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Log.d("Permissions", "Permission has been granted");
+            performReadWriteStorageAction(requestCode);
+        } else {
+            requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, requestCode);
+            requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, requestCode);
+        }
+    }
+
+    protected boolean checkPermission(String strPermission) {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(), strPermission);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    protected void performReadWriteStorageAction(int requestCode) {
+    }
+
+    protected void requestPermission(String strPermission, int perCode) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, strPermission)) {
+            Toast.makeText(getApplicationContext(), "GPS permission allows us to access location data. " +
+                    "Please allow in App Settings for additional functionality.", Toast.LENGTH_LONG).show();
+        } else {
+
+            ActivityCompat.requestPermissions(this, new String[]{strPermission}, perCode);
+        }
+    }
+
+    protected void getPermissionsForCamera(int requestCode) {
+        if (checkPermission(Manifest.permission.CAMERA)
+                && checkPermission(Manifest.permission.MEDIA_CONTENT_CONTROL)) {
+            Log.d("Permissions", "Permission has been granted");
+            captureMyImage();
+            //fetchLocationData();
+        } else {
+            requestPermission(Manifest.permission.CAMERA, requestCode);
+            requestPermission(Manifest.permission.MEDIA_CONTENT_CONTROL, requestCode);
+        }
+    }
+
+    protected void captureMyImage() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+
+            case PERMISSION_REQUEST_MEDIA_TYPE_IMAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    performReadWriteStorageAction(requestCode);
+                }
+                break;
+            case PERMISSION_REQUEST_CAMERA:
+                if (grantResults.length > 0) {
+                    captureMyImage();
+                }
+                break;
+        }
+    }
 }

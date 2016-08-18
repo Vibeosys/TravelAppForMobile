@@ -209,9 +209,11 @@ public class GridViewPhotos extends BaseActivity
         if (!UserAuth.isUserLoggedIn(getApplicationContext()))
             return;
 
+        getPermissionsForCamera(PERMISSION_REQUEST_CAMERA);
         Intent takephoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         takephoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
         startActivityForResult(takephoto, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
     }
 
