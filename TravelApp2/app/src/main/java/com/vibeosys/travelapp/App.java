@@ -1,6 +1,8 @@
 package com.vibeosys.travelapp;
 
 import android.app.Application;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import java.io.File;
@@ -12,7 +14,7 @@ import java.io.OutputStream;
 /**
  * Created by mahesh on 10/9/2015.
  */
-public class App extends Application {
+public class App extends MultiDexApplication {
     private static App mInstance;
 
     protected static String DB_NAME = "TravelApp";
@@ -26,13 +28,14 @@ public class App extends Application {
 
     @Override
     public void onCreate() {
+        MultiDex.install(this);
         super.onCreate();
         mInstance = this;
         copyDataBase();
 
     }
 
-    private void copyDataBase()  {
+    private void copyDataBase() {
 
         try {
 
@@ -43,7 +46,7 @@ public class App extends Application {
 
             File outFileName = getDatabasePath(DB_NAME);
             Log.d("TTTTGA", outFileName + " " + outFileName.list());
-            if(!outFileName.exists()) {
+            if (!outFileName.exists()) {
                 outFileName.getParentFile().mkdirs();
                 outFileName.createNewFile();
                 // Open the empty db as the output stream
@@ -60,9 +63,8 @@ public class App extends Application {
                 myOutput.close();
                 myInput.close();
             }
-        }
-        catch (IOException e){
-            Log.d("TTTTGA", e+"");
+        } catch (IOException e) {
+            Log.d("TTTTGA", e + "");
         }
     }
 

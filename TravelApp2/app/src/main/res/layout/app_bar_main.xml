@@ -30,7 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:drawableLeft="@drawable/search"
+                    android:drawableLeft="@drawable/ic_search_white_24dp"
                     android:hint=" Search Destination"
                     android:inputType="textFilter"
                     android:popupBackground="#95e60000"
@@ -44,14 +44,14 @@
 
     <include layout="@layout/content_main" />
 
-    <Button
+    <ImageButton
         android:id="@+id/fab"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:background="@drawable/shape"
-        android:text="Save"
+        android:src="@drawable/ic_add_white_24dp"
         android:textColor="#ffffff" />
 
 </android.support.design.widget.CoordinatorLayout>

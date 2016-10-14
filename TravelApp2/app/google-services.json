@@ -1,56 +1,46 @@
 {
   "project_info": {
-    "project_id": "androidmapproject-1111",
-    "project_number": "260506023716",
-    "name": "AndroidMapProject"
+    "project_number": "955898085921",
+    "firebase_url": "https://travel-app-140111.firebaseio.com",
+    "project_id": "travel-app-140111",
+    "storage_bucket": "travel-app-140111.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:260506023716:android:42c7865050ea61ba",
-        "client_id": "android:com.vibeosys.travelapp",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:955898085921:android:42c7865050ea61ba",
         "android_client_info": {
-          "package_name": "com.vibeosys.travelapp",
-          "certificate_hash": []
+          "package_name": "com.vibeosys.travelapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "260506023716-j8u81i2odeds4iq837sc2r4amcjbev6o.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.vibeosys.travelapp",
-            "certificate_hash": "099308E5A6B686FEE4FE327286416ACEE5B32EE2"
-          }
+          "client_id": "955898085921-8q7n0832dg1e2qes1o6s99mu31k3ld0k.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
-          "client_id": "260506023716-rqng9simj1k0teagahpte6k4al3ttmhs.apps.googleusercontent.com",
+          "client_id": "955898085921-85qa6r232ei5bbgr8nuio7f6od6dvuu9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTgZZ--2xEPrdDtJt-4FCzUDr9RIxtqIw"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
-        },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
         },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
         },
-        "google_signin_service": {
-          "status": 2
-        },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }
