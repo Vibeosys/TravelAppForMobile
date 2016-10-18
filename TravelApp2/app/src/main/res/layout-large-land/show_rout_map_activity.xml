@@ -11,7 +11,7 @@
         android:layout_height="match_parent" />
 
     <fragment
-        android:id="@+id/article_fragment"
+        android:id="@+id/client_detail_container"
         android:name="com.vibeosys.travelapp.activities.ShowRoutesOnMap"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

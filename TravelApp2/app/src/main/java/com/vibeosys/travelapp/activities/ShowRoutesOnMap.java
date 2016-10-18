@@ -68,12 +68,14 @@ public class ShowRoutesOnMap extends BaseFragment implements OnMapReadyCallback 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.showroutes, container, false);
         Intent mIntent = getActivity().getIntent();
+
         mDestinationNames = mNewDataBase.getDestNames();
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         MapsInitializer.initialize(getActivity());
         Bundle bundle = this.getArguments();
         String mRouteName = bundle.getString("theRouteName");
+        getActivity().setTitle(mRouteName);
         //setTitle(mRouteName);
         //mHashMapRoutes = new HashMap<>();
 

@@ -43,42 +43,45 @@ import java.util.List;
 /**
  * Created by mahesh on 10/3/2015.
  */
-public class ShowRouteList extends FragmentActivity implements RouteListFragment.OnHeadlineSelectedListener
+public class ShowRouteList extends BaseActivity implements RouteListFragment.OnHeadlineSelectedListener
         /*, NavigationView.OnNavigationItemSelectedListener*/ {
 
     //int REQUESTCODE = 100;
     protected ServerSyncManager mServerSyncManager;
     protected static SessionManager mSessionManager;
     protected NewDataBase mNewDataBase;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_rout_map_activity);
-        mSessionManager = SessionManager.getInstance(getApplicationContext());
-        mServerSyncManager = new ServerSyncManager(getApplicationContext(), mSessionManager);
-        mNewDataBase = new NewDataBase(getApplicationContext(), mSessionManager);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setTitle("My Routes");
-        if (findViewById(R.id.fragment_container) != null) {
-
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        getSupportActionBar().setTitle("My Routes");
+        /*if (findViewById(R.id.fragment_container) != null) {
+            mTwoPane = true;
             if (savedInstanceState != null) {
                 return;
             }
 
-            // Create an instance of ExampleFragment
             RouteListFragment firstFragment = new RouteListFragment();
-
-            // In case this activity was started with special instructions from an Intent,
-            // pass the Intent's extras to the fragment as arguments
             firstFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, firstFragment).commit();
+        } else {
+            mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
+        }*/
+        if (findViewById(R.id.client_detail_container) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.client_detail_container, new ShowRoutesOnMap(), "Details")
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
         }
         //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
        /* ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -97,7 +100,8 @@ public class ShowRouteList extends FragmentActivity implements RouteListFragment
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);*/
-
+        RouteListFragment routeListFragment = ((RouteListFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_client));
     }
 
 
@@ -149,32 +153,40 @@ public class ShowRouteList extends FragmentActivity implements RouteListFragment
 
     @Override
     public void onArticleSelected(String position) {
-        ShowRoutesOnMap articleFrag = (ShowRoutesOnMap)
+        /*ShowRoutesOnMap articleFrag = (ShowRoutesOnMap)
                 getSupportFragmentManager().findFragmentById(R.id.article_fragment);
 
         if (articleFrag != null) {
-            // If article frag is available, we're in two-pane layout...
-
-            // Call a method in the ArticleFragment to update its content
             articleFrag.updateArticleView(position);
 
         } else {
-            // If the frag is not available, we're in the one-pane layout and must swap frags...
-
-            // Create fragment and give it an argument for the selected article
             ShowRoutesOnMap newFragment = new ShowRoutesOnMap();
             Bundle args = new Bundle();
             args.putString("theRouteName", position);
             newFragment.setArguments(args);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack so the user can navigate back
             transaction.replace(R.id.fragment_container, newFragment);
             transaction.addToBackStack(null);
-
-            // Commit the transaction
             transaction.commit();
+        }*/
+
+        if (mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle args = new Bundle();
+            args.putString("theRouteName", position);
+
+            ShowRoutesOnMap fragment = new ShowRoutesOnMap();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.client_detail_container, fragment, "Details")
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, MapRouteActivity.class);
+            intent.putExtra("theRouteName", position);
+            startActivity(intent);
         }
     }
 
